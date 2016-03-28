@@ -1,0 +1,6 @@
+export/imagens/*
+export/processados/*
+image/processar/*
+image/testes/*
+logs/*
+operation_log.txt
