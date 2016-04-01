@@ -22,6 +22,8 @@ class AnalisarRegioes {
 
     echo "\n\n";
     $regioes = [];
+
+
     foreach ($this->regioes as $id => $r) {
       $tipo = $r[0];
       if($tipo == self::TipoELipse){ # 0:ELIPSE
@@ -36,6 +38,9 @@ class AnalisarRegioes {
         throw new Exception('Tipo de região desconhecida.', 500);
       }
     }
+    // echo '<pre>';
+    // print_r($regioes->regioes);
+    // exit;
     $this->image->output['regioes'] = $regioes;
 
     if(DEBUG) {

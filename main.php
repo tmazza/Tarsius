@@ -9,6 +9,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 include_once './src/Image.php';
+// include_once './src/GeraTemplate.php';
 
 $baseDir = __DIR__ . '/image/processar/';
 $files = scandir($baseDir);
@@ -20,7 +21,8 @@ foreach ($files as $f) {
   try {
     $count++;
     # TODO: instanciar somente um objeto de imagem!
-    $image = new Image();
+    $image = new Image('FAURGS_100');
+    // $image = new GeraTemplate('FAURGS_100'); # <<<<<<<<<<<<<
     echo '<hr>' .  $f . "\n";
     $image->exec($baseDir . $f);
     $times = ($image->getTimes());

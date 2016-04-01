@@ -9,13 +9,13 @@ class BuscarAncoras {
   }
 
   public function exec(){
-    if(DEBUG){
-      $time = microtime(true);
-      $this->runDebug();
-      $this->image->saveTime('_localizaAncoras', $time);
-    } else {
+    // if(DEBUG){
+    //   $time = microtime(true);
+    //   $this->runDebug();
+    //   $this->image->saveTime('_localizaAncoras', $time);
+    // } else {
       $this->run();
-    }
+    // }
   }
 
   private function run(){
@@ -27,7 +27,7 @@ class BuscarAncoras {
     $this->image->buscador->setTolerancia($this->image->ancoras[1]->getArea()); // Atualiza tolerância de busca de ancora baseado na área encontrada para a ancora 1
     $this->image->buscador->areaBuscaInicial = ($this->image->ancoras[1]->getMaiorRaio() * 3); // Adapta tamanho da área de busca em relação ao raio da ancora
     $this->image->ancoras[2] = $this->getAncora(2, $this->posicaoEsperadaAncora2());
-    # ESCALA:Baseado no tamanho esperado do raio x tamanho real em pixel encontrado, inferir a escala da imagem.
+    # ESCALA:Baseado no tamanho esperado do raio y tamanho real em pixel encontrado, inferir a escala da imagem.
     $distanciaEntreAncoras = $this->image->ancoras[2]->getCentro()[0] - $this->image->ancoras[1]->getCentro()[0];
     $this->image->setEscala($distanciaEntreAncoras / $this->image->medidas['distAncHor']);
     # ROTACAO: Define angulo de rotação baseado em ancora 1 e 2
@@ -37,7 +37,7 @@ class BuscarAncoras {
     # ESCALA: baseada no tamanho da diagonal
     $a = ($this->image->ancoras[3]->getCentro()[1]-$this->image->ancoras[1]->getCentro()[1]);
     $b = ($this->image->ancoras[3]->getCentro()[0]-$this->image->ancoras[1]->getCentro()[0]);
-    $h = sqrt(($a**2) +($b**2));
+    $h = sqrt(pow($a,2) + pow($b,2));
     $this->image->setEscala($h / $this->image->medidas['diagonal']);
     # ANCORA 4
     $this->image->ancoras[4] = $this->getAncora(4, $this->posicaoEsperadaAncora4());

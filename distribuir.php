@@ -3,8 +3,8 @@ set_time_limit(0);
 
 do {
 
-  $fonte = __DIR__ . '/image/f3/';
-  $pipes = __DIR__ . '/image/f3/pipes/';
+  $fonte = __DIR__ . '/image/processar/';
+  $pipes = __DIR__ . '/image/do/pipes/';
 
   $qtdPipes = isset($argv[1]) ? (int) $argv[1] : 4;
 
@@ -34,7 +34,7 @@ do {
         copy($fonte.$a,$pipes.$i.'/'.$a);
         #rename($fonte.$a,$pipes.$i.'/'.$a);
       }
-      shell_exec('nohup hhvm testeInterpretadord3.php ' . $i . ' > /dev/null &');
+      shell_exec('nohup hhvm test_diff.php ' . $i . ' > /dev/null &');
       #shell_exec('nohup php testeInterpretador.php ' . $i . ' > /dev/null &');
   }
 

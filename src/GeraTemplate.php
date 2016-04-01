@@ -1,32 +1,32 @@
 <?php
-define('DEBUG',false);
+define('DEBUG',true);
 
 define('CORTE_PRETO', 150);
-define('MATCH_ANCORA', 0.90);
+define('MATCH_ANCORA', 2);
 
 define('TOLERANCIA_MATCH', 0.4); # eg: areabase  = 1000. busca triangulos de area entre 500 e 1500
-define('EXPANSAO_BUSCA', 0.4); # taxa de aumento da área de busca
-define('QTD_EXPANSOES_BUSCA', 5);
+define('EXPANSAO_BUSCA', 2); # taxa de aumento da área de busca
+define('QTD_EXPANSOES_BUSCA', 4);
 
 define('PREENCHIMENTO_MINIMO', 0.25); # >=40%
 
-include __DIR__.'/Buscador.php';
-include __DIR__.'/BuscarAncoras.php';
-include __DIR__.'/Objeto.php';
-include __DIR__.'/Helper.php';
-include __DIR__.'/ConnectedComponent.php';
-include __DIR__.'/Assinatura.php';
-include __DIR__.'/AnalisarRegioes.php';
-include __DIR__.'/OCR.php';
-include __DIR__.'/OCR_teste.php';
-include __DIR__.'/Barcode.php';
+include './src/Buscador.php';
+include './src/BuscarAncoras.php';
+include './src/Objeto.php';
+include './src/Helper.php';
+include './src/ConnectedComponent.php';
+include './src/Assinatura.php';
+include './src/AnalisarRegioes.php';
+include './src/OCR.php';
+include './src/OCR_teste.php';
+include './src/Barcode.php';
 
 /**
  * Description of ProcessaImagem
  *
  * @author tiago.mazzarollo
  */
-class Image {
+class GeraTemplate {
 
     private $timeAll;
     public $arquivo;
@@ -36,7 +36,7 @@ class Image {
     public $assAncoras = array();
     public $medidas = array();
     public $distancias = array();
-    public $escala = 11.811024; // Quantidade de pixel por mm
+    public $escala = 11.81; // Quantidade de pixel por mm
     public $ancoras = array();
     public $rot = 0; // em radianos
     private $template;
@@ -60,27 +60,64 @@ class Image {
     public function exec($arquivo) {
       $this->timeAll = microtime(true);
       $this->inicializar($arquivo);
-      $this->localizarAncoras();
-      // $aaa = microtime(true);
-      // $ocr = new OCR($this);
-      // // $ocr = new OCR($this);
-      // $template = $ocr->exec('code_template');
-      // $this->output['template'] = $template;
-      // echo 'TEMPLATE: ' . $template . "\n";
-      // $this->saveTime('ocr_template', $aaa); # tempo OCR
 
-      // $aaa = microtime(true);
-      // $ocr = new Barcode($this);
-      // $barcode = $ocr->exec();
-      // $this->output['barcode'] = $barcode;
-      // echo ' BARCODE: ' . $barcode . "\n";
-      // $this->saveTime('barcode', $aaa); # tempo OCR
-      $this->analisarRegioes();
-      $this->organizarSaida();
-
-      $this->saveTime('timeAll', $this->timeAll); # tempo total
-
+      $pontos = $this->getPontosDeQuadrado($this->image, 0, 0, imagesx($this->image), imagesy($this->image));
+      $objetos = $this->separaObjetos($pontos, 1000, 100000);
+      Helper::pintaObjetos($this->image, $objetos);
+      $copia = Helper::copia($this->image);
+      $pontos = '';
+      $ancora1 = array_shift($objetos);
+      $ancora1 = $ancora1->getCentro();
+      foreach ($objetos as $o) {
+        $c = $o->getCentro();
+        imagefilledellipse($copia,$c[0],$c[1],50,50,imagecolorallocate($copia,255,255,0));
+        $pontos .= 'array(0,'.(($c[0]-$ancora1[0])/$this->escala).','.(($c[1]-$ancora1[0])/$this->escala).',\'A\',\'W\'),' . "\n";
+      }
+      imagejpeg($copia,__DIR__.'/../image/asd.jpg');
+      // echo '--' . count($objetos);
       imagedestroy($this->image);
+
+      $handle = fopen(__DIR__.'/../image/teste.php','w');
+      fwrite($handle,$pontos);
+      fclose($handle);
+      echo '<pre>';
+      print_r($pontos);
+      exit;
+    }
+
+
+        /**
+         * Identifica objetos em $pontos. Filtra por área mínima e máxima
+         * @param type $pontos
+         * @param type $min
+         * @param type $max
+         * @return type
+         */
+        public function separaObjetos($pontos, $min, $max) {
+            $objetosConexos = new ConnectedComponent();
+            $objetosConexos->setAreaMinima($min);
+            $objetosConexos->setAreaMaxima($max);
+            return $objetosConexos->getObjetos($pontos);
+        }
+
+
+    public function getPontosDeQuadrado($img, $x0, $y0, $x1, $y1) {
+        $pontos = array();
+        $x0 = $x0 >= 0 ? $x0 : 0; // Não ultrapassa 0
+        $y0 = $y0 >= 0 ? $y0 : 0; // Não ultrapassa 0
+
+        for ($j = $y0; $j < $y1; $j++) {
+            for ($i = $x0; $i < $x1; $i++) {
+                list($r, $g, $b) = Helper::getRGB($img, $i, $j);
+                $isBlack = (($r < CORTE_PRETO && $g < CORTE_PRETO && $b < CORTE_PRETO));
+                if ($isBlack) {
+                    $pontos[$i][$j] = true;
+                }
+            }
+        }
+
+
+        return $pontos;
     }
 
     /**
@@ -96,16 +133,6 @@ class Image {
       if(DEBUG)
         $this->saveTime('_inicializar', $time);
     }
-
-    /**
-     * Localiza as ancoras da imagem (Sempre tri)
-     * @throws Exception
-     */
-    private function localizarAncoras() {
-      $buscarAncoras = new BuscarAncoras($this);
-      $buscarAncoras->exec();
-    }
-
     /**
     * Analisa cada região definida no template de acordo com o tipo especificado
     */
@@ -150,8 +177,8 @@ class Image {
      * @param type $escala
      */
     public function setEscala($escala) {
-        // $this->escala = $escala;
-        // $this->distancias = $this->defineDistancias($this->medidas); # atualiza valor do tempolate de milimetros para pixels!
+        $this->escala = $escala;
+        $this->distancias = $this->defineDistancias($this->medidas); # atualiza valor do tempolate de milimetros para pixels!
     }
 
     /**
@@ -171,10 +198,10 @@ class Image {
      */
     private function loadTemplate($template) {
         $this->template = $template;
-        $this->medidas = include __DIR__.'/../template/' . $template . '.php';
+        $this->medidas = include './template/' . $template . '.php';
         $assinaturas = array();
         for ($i = 1; $i < 5; $i++) {
-            $image = Helper::load(__DIR__.'/../image/ancoras/ancora' . $i . '.jpg');
+            $image = Helper::load('./image/ancoras/ancora' . $i . '.jpg');
             $assinaturas[$i] = $this->getAssinatura($image);
         }
         return $assinaturas;
