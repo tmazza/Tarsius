@@ -37,7 +37,7 @@ class Image {
     public $medidas = array();
     public $distancias = array();
     // public $escala = 11.811024; // Quantidade de pixel por mm
-    public $escala = 11.811024; // Quantidade de pixel por mm
+    public $escala = 300/25.4; // Quantidade de pixel por mm
     public $ancoras = array();
     public $rot = 0; // em radianos
     private $template;
@@ -64,19 +64,15 @@ class Image {
       $this->localizarAncoras();
 
       # erro de escala estimado
-      list($x1,$y1) = $this->ancoras[1]->getCentro();
-      list($x4,$y4) = Helper::rotaciona($this->ancoras[4]->getCentro(),$this->ancoras[1]->getCentro(),$this->rot);
       $esperado = $this->medidas['distAncVer']*$this->escala;
-      $avaliado = $y4 - $y1;
-      $erro = ($esperado - $avaliado) / $esperado;
+      $avaliado = Helper::dist($this->ancoras[4]->getCentro(),$this->ancoras[1]->getCentro());
       $this->escala = $avaliado / $this->medidas['distAncVer'];
+      echo 'ESC: ' . $this->escala . "\n\n";
       $this->distancias = $this->defineDistancias($this->medidas); # atualiza valor do tempolate de milimetros para pixels!
-
       // echo '--->' . (ceil($avaliado)) . "\n";
       // echo '--->' . (ceil($esperado)) . "\n";
       // echo '--->' . ($erro) . "\n";
       // exit;
-
 
       // $aaa = microtime(true);
       // $ocr = new OCR($this);
@@ -94,6 +90,9 @@ class Image {
       // $this->saveTime('barcode', $aaa); # tempo OCR
       $this->analisarRegioes();
       $this->organizarSaida();
+
+      echo "ROT: " . $this->rot . "\n";
+
 
       # testes
       // $copia = Helper::copia($this->image);
@@ -137,8 +136,6 @@ class Image {
     */
     private function analisarRegioes() {
       $interpretador = new AnalisarRegioes($this);
-      $interpretador->pontoBase = $this->ancoras[1]->getCentro();
-      $interpretador->regioes = $this->distancias['regioes'];
       $interpretador->exec();
     }
 
@@ -224,6 +221,10 @@ class Image {
             }
         }
         return $distancias;
+    }
+
+    public function getRegioes(){
+      return $this->distancias['regioes'];
     }
 
 

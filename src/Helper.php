@@ -113,14 +113,28 @@ class Helper {
 	 * @param type $m
 	 * @return type
 	 */
-	public static function rotaciona($ponto, $pontoBase, $ang) {
+	public static function rotaciona($p, $pontoBase, $ang) {
 			$x0 = $pontoBase[0];
 			$y0 = $pontoBase[1];
-			return array(
-					cos($ang) * ($ponto[0] - $x0) - sin($ang) * ($ponto[1] - $y0) + $x0,
-					sin($ang) * ($ponto[0] - $x0) + cos($ang) * ($ponto[1] - $y0) + $y0,
-			);
+			return [
+				($p[0] - $x0)*cos($ang) - ($p[1] - $y0)*sin($ang) + $x0,
+				($p[0] - $x0)*sin($ang) + ($p[1] - $y0)*cos($ang) + $y0,
+			];
+	}
+	public static function calcCoefReta($p0, $p1, $inverse = false) {
+		if ($inverse) {
+				return (($p0[0] - $p1[0]) / ($p0[1] - $p1[1])) * -1;
+		} else {
+				return ($p1[1] - $p0[1]) / ($p1[0] - $p0[0]);
+		}
 	}
 
+	public static function angulo($p0,$p1,$inverse=false){
+		return atan(self::calcCoefReta($p0, $p1, $inverse));
+	}
+
+	public static function dist($a,$b){
+		return sqrt(($a[0]+$b[0])*($a[0]+$b[0]) + ($a[1]+$b[1])*($a[1]+$b[1]));
+	}
 
 }

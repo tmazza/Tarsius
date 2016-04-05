@@ -111,11 +111,7 @@ class BuscarAncoras {
    * @param type $inverse
    */
   private function calcCoefReta($p0, $p1, $inverse = false) {
-      if ($inverse) {
-          return (($p0[0] - $p1[0]) / ($p0[1] - $p1[1])) * -1;
-      } else {
-          return ($p1[1] - $p0[1]) / ($p1[0] - $p0[0]);
-      }
+    return Helper::calcCoefReta($p0,$p1,$inverse);
   }
   /**
    * Posicao esperada de ancora 2, baseado na posicao da ancora 1 e na distância esperada.

@@ -19,23 +19,29 @@ class AnalisarRegioes {
 
   public function exec(){
     $time = microtime(true);
-    $regioes = [];
 
-    foreach ($this->regioes as $id => $r) {
+    $regioes = [];
+    foreach ($this->image->getRegioes() as $id => $r) {
+
+      $e = $this->getPontoNormalizado($r);
+      list($px,$py) = $e;
+
       $tipo = $r[0];
       if($tipo == self::TipoELipse){ # 0:ELIPSE
-        list($taxaPreenchimento,$retorno) = $this->interpretaElipse($id,$r);
+        list($taxaPreenchimento,$retorno) = $this->interpretaElipse($id,$r,$e);
         $regioes[$id] = [
           $retorno,
           $taxaPreenchimento,
-          $this->pontoBase[0]+$r[1],
-          $this->pontoBase[1]+$r[2],
+          $px,
+          $py,
         ];
       } else {
         throw new Exception('Tipo de região desconhecida.', 500);
       }
     }
-
+    // echo '<pre>';
+    // print_r($regioes->regioes);
+    // exit;
     $this->image->output['regioes'] = $regioes;
 
     if(DEBUG) {
@@ -44,28 +50,104 @@ class AnalisarRegioes {
     }
   }
 
+  private function getPontoNormalizado($r){
+    $px = $r[1];
+    $py = $r[2];
+    $a1 = $this->image->ancoras[1]->getCentro();
+    $a2 = $this->image->ancoras[2]->getCentro();
+    $a3 = $this->image->ancoras[3]->getCentro();
+    $a4 = $this->image->ancoras[4]->getCentro();
 
-  private function interpretaElipse($id,$r){
-    $ponto = array($this->pontoBase[0]+$r[1],$this->pontoBase[1]+$r[2]);
-    $e = Helper::rotaciona($ponto,$this->pontoBase,$this->image->rot);
-    $taxaPreenchimento = $this->getTaxaPreenchimento($e);
-
-    $minMatch = isset($this->image->medidas['regioes'][$id][5]) ? $this->image->medidas['regioes'][$id][5] : PREENCHIMENTO_MINIMO;
-
-    if(DEBUG){
-      if($taxaPreenchimento >= $minMatch){
-        imagefilledellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], imagecolorallocate($this->debugImage, 255, 255, 0));
-      } else {
-        imageellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], imagecolorallocate($this->debugImage, 255, 0, 0));
-      }
+    if($px > 0){
+      $px += $a1[0];
+      $base = $py > 0 ? $a1 : $a4;
+    } else {
+      $px += $a2[0];
+      $base = $py > 0 ? $a2 : $a3;
     }
 
-    return [
-      $taxaPreenchimento,
-      ($taxaPreenchimento >= $minMatch) ? $r[3] : $r[4],
-    ];
-
+    if($py > 0){
+      $py += $a1[1];
+    } else {
+      $py += $a4[1] - $a1[1];
+    }
+    $base = $a1;
+    $p = [$px,$py];
+    return Helper::rotaciona($p,$base,$this->image->rot);
   }
+
+  private function interpretaElipse($id,$r,$e){
+  $taxaPreenchimento = $this->getTaxaPreenchimento($e);
+
+  $minMatch = isset($this->image->medidas['regioes'][$id][5]) ? $this->image->medidas['regioes'][$id][5] : PREENCHIMENTO_MINIMO;
+
+  if(DEBUG){
+    if($taxaPreenchimento >= $minMatch){
+      imagefilledellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], imagecolorallocate($this->debugImage, 255, 255, 0));
+    } else {
+      imageellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], imagecolorallocate($this->debugImage, 255, 0, 0));
+    }
+  }
+
+  return [
+    $taxaPreenchimento,
+    ($taxaPreenchimento >= $minMatch) ? $r[3] : $r[4],
+  ];
+
+}
+
+
+
+
+  // public function exec(){
+  //   $time = microtime(true);
+  //   $regioes = [];
+  //
+  //   foreach ($this->regioes as $id => $r) {
+  //     $tipo = $r[0];
+  //     if($tipo == self::TipoELipse){ # 0:ELIPSE
+  //       list($taxaPreenchimento,$retorno) = $this->interpretaElipse($id,$r);
+  //       $regioes[$id] = [
+  //         $retorno,
+  //         $taxaPreenchimento,
+  //         $this->pontoBase[0]+$r[1],
+  //         $this->pontoBase[1]+$r[2],
+  //       ];
+  //     } else {
+  //       throw new Exception('Tipo de região desconhecida.', 500);
+  //     }
+  //   }
+  //
+  //   $this->image->output['regioes'] = $regioes;
+  //
+  //   if(DEBUG) {
+  //     Helper::cria($this->debugImage, 'ELIPISES_'.basename($this->image->arquivo));
+  //     $this->image->saveTime('_analisarRegioes', $time);
+  //   }
+  // }
+
+
+  // private function interpretaElipse($id,$r){
+  //   $ponto = array($this->pontoBase[0]+$r[1],$this->pontoBase[1]+$r[2]);
+  //   $e = Helper::rotaciona($ponto,$this->pontoBase,$this->image->rot);
+  //   $taxaPreenchimento = $this->getTaxaPreenchimento($e);
+  //
+  //   $minMatch = isset($this->image->medidas['regioes'][$id][5]) ? $this->image->medidas['regioes'][$id][5] : PREENCHIMENTO_MINIMO;
+  //
+  //   if(DEBUG){
+  //     if($taxaPreenchimento >= $minMatch){
+  //       imagefilledellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], imagecolorallocate($this->debugImage, 255, 255, 0));
+  //     } else {
+  //       imageellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], imagecolorallocate($this->debugImage, 255, 0, 0));
+  //     }
+  //   }
+  //
+  //   return [
+  //     $taxaPreenchimento,
+  //     ($taxaPreenchimento >= $minMatch) ? $r[3] : $r[4],
+  //   ];
+  //
+  // }
 
   private function getTaxaPreenchimento($centro){
 
