@@ -2,7 +2,7 @@
 # em milimetros
 return array(
 	'raioTriangulo' => (4.5 * sqrt(2)) / 2, # diagonal / 2
-	'ancora1' => array(10.5, 10.5),
+	'ancora1' => array(10, 10),
 	'distAncHor' => 137.25-11.25,
 	'distAncVer' => 198.75-11.25,
 	# devem ser procisas

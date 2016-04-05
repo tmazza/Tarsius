@@ -33,8 +33,14 @@ foreach ($files as $i => $f) {
   $arquivo = $dirBase.'/'.$f;
   $arquivoDest = str_replace('exec/ready/'.$dirIn,'done/img',$arquivo);
 
+  // $template = 'FAURGS_100';
+  // if(substr(pathinfo($f, PATHINFO_FILENAME),-1) == 4){
+    $template = 'FAURGS_100_4';
+  // }
+
   try {
-    $image = new Image('HCPA_50');
+    // $image = new Image('1602_50');
+    $image = new Image($template);
     $image->exec($arquivo);
 
     // altera referencia para o arquivo
@@ -45,10 +51,10 @@ foreach ($files as $i => $f) {
     fwrite($export,json_encode($image->output));
     fclose($export);
 
-    $presenca = 'A';
+    $presenca = '1'; # TODO: 1 presente - 2 ausente  (ausente = marcada)
     $str = '';
     foreach ($image->output['regioes'] as $r) { $str .= $r[0]; }
-
+    $str = $str;
     $tempos = $image->getTimes();
     $tempoExec = $tempos['timeAll'];
 
@@ -64,7 +70,7 @@ foreach ($files as $i => $f) {
   rename($arquivo,$arquivoDest);
 
   // Atualiza arquivo compartilhado de resoluções
-  $outData = [pathinfo($f,PATHINFO_FILENAME),$presenca,$str,$start,time(),$tempoExec];
+  $outData = ["'".pathinfo($f,PATHINFO_FILENAME)."'",$presenca,$str,$start,time(),number_format($tempoExec,6) * 1000000];
   $strOut = implode(';',$outData)."\n";
 
   $export = fopen(__DIR__.'/out.csv','a');

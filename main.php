@@ -21,7 +21,7 @@ foreach ($files as $f) {
   try {
     $count++;
     # TODO: instanciar somente um objeto de imagem!
-    $image = new Image('FAURGS_100');
+    $image = new Image('FAURGS_100_TESTE');
     // $image = new GeraTemplate('FAURGS_100'); # <<<<<<<<<<<<<
     echo '<hr>' .  $f . "\n";
     $image->exec($baseDir . $f);

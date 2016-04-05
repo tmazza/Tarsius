@@ -1,5 +1,5 @@
 <?php
-define('DEBUG',false);
+define('DEBUG',true);
 
 define('CORTE_PRETO', 150);
 define('MATCH_ANCORA', 0.90);
@@ -36,6 +36,7 @@ class Image {
     public $assAncoras = array();
     public $medidas = array();
     public $distancias = array();
+    // public $escala = 11.811024; // Quantidade de pixel por mm
     public $escala = 11.811024; // Quantidade de pixel por mm
     public $ancoras = array();
     public $rot = 0; // em radianos
@@ -61,6 +62,22 @@ class Image {
       $this->timeAll = microtime(true);
       $this->inicializar($arquivo);
       $this->localizarAncoras();
+
+      # erro de escala estimado
+      list($x1,$y1) = $this->ancoras[1]->getCentro();
+      list($x4,$y4) = Helper::rotaciona($this->ancoras[4]->getCentro(),$this->ancoras[1]->getCentro(),$this->rot);
+      $esperado = $this->medidas['distAncVer']*$this->escala;
+      $avaliado = $y4 - $y1;
+      $erro = ($esperado - $avaliado) / $esperado;
+      $this->escala = $avaliado / $this->medidas['distAncVer'];
+      $this->distancias = $this->defineDistancias($this->medidas); # atualiza valor do tempolate de milimetros para pixels!
+
+      // echo '--->' . (ceil($avaliado)) . "\n";
+      // echo '--->' . (ceil($esperado)) . "\n";
+      // echo '--->' . ($erro) . "\n";
+      // exit;
+
+
       // $aaa = microtime(true);
       // $ocr = new OCR($this);
       // // $ocr = new OCR($this);
@@ -77,6 +94,15 @@ class Image {
       // $this->saveTime('barcode', $aaa); # tempo OCR
       $this->analisarRegioes();
       $this->organizarSaida();
+
+      # testes
+      // $copia = Helper::copia($this->image);
+      // list($x0,$y0) = $this->ancoras[1]->getCentro();
+      // list($x1,$y1) = Helper::rotaciona($this->ancoras[3]->getCentro());
+      // list($a2x,$a2y) = Helper::rotaciona($this->ancoras[2]->getCentro());
+      // imageline($copia,$x0,$y0,$a2x,$a2y,imagecolorallocate($copia,0,255,0));
+      // Helper::rect($copia, $x0, $y0, $x1, $y1, 'asdasd');
+
 
       $this->saveTime('timeAll', $this->timeAll); # tempo total
 
@@ -110,10 +136,10 @@ class Image {
     * Analisa cada região definida no template de acordo com o tipo especificado
     */
     private function analisarRegioes() {
-        $interpretador = new AnalisarRegioes($this);
-        $interpretador->pontoBase = $this->ancoras[1]->getCentro();
-        $interpretador->regioes = $this->distancias['regioes'];
-        $interpretador->exec();
+      $interpretador = new AnalisarRegioes($this);
+      $interpretador->pontoBase = $this->ancoras[1]->getCentro();
+      $interpretador->regioes = $this->distancias['regioes'];
+      $interpretador->exec();
     }
 
     private function organizarSaida(){
@@ -193,7 +219,7 @@ class Image {
                 if(gettype ($medida) === 'string'){
                   $distancias[$nome] = $medida;
                 } else {
-                  $distancias[$nome] = $medida * $this->escala;
+                  $distancias[$nome] = $medida * ($this->escala);
                 }
             }
         }

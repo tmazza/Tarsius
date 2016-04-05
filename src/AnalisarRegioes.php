@@ -19,10 +19,7 @@ class AnalisarRegioes {
 
   public function exec(){
     $time = microtime(true);
-
-    echo "\n\n";
     $regioes = [];
-
 
     foreach ($this->regioes as $id => $r) {
       $tipo = $r[0];
@@ -38,9 +35,7 @@ class AnalisarRegioes {
         throw new Exception('Tipo de região desconhecida.', 500);
       }
     }
-    // echo '<pre>';
-    // print_r($regioes->regioes);
-    // exit;
+
     $this->image->output['regioes'] = $regioes;
 
     if(DEBUG) {
@@ -51,7 +46,8 @@ class AnalisarRegioes {
 
 
   private function interpretaElipse($id,$r){
-    $e = Helper::rotaciona(array($this->pontoBase[0]+$r[1],$this->pontoBase[1]+$r[2]),$this->pontoBase,$this->image->rot);
+    $ponto = array($this->pontoBase[0]+$r[1],$this->pontoBase[1]+$r[2]);
+    $e = Helper::rotaciona($ponto,$this->pontoBase,$this->image->rot);
     $taxaPreenchimento = $this->getTaxaPreenchimento($e);
 
     $minMatch = isset($this->image->medidas['regioes'][$id][5]) ? $this->image->medidas['regioes'][$id][5] : PREENCHIMENTO_MINIMO;

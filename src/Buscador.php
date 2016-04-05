@@ -41,10 +41,10 @@ class Buscador {
     public function analisaQuadrado($image, $objProcurado, $ponto, $areaDeBusca) {
         // Define área do quadrado com centro em $ponto e aresta de tamana $areaDeBusca
         list($x0, $y0, $x1, $y1) = $this->getPontosQuadradoDeBusca($areaDeBusca, $ponto[0], $ponto[1]);
-		    #Helper::rect($image, $x0, $y0, $x1, $y1, 'REGIAO_DE_BUSCA_' . microtime(true) . '_' . $areaDeBusca);
+		    #Helper::rect($image, $x0, $y0, $x1, $y1, 'REGIAO_DE_BUSCA_' . microtime(true) . rand(0,999) . '_' . $areaDeBusca);
         // Separa pontos do quadrado
         $pontos = $this->getPontosDeQuadrado($image, $x0, $y0, $x1, $y1);
-        #Helper::pintaPontos($image, $pontos, 'PONTOS__' . $areaDeBusca . '__' . microtime(true), [255, 255, 0]);
+        #Helper::pintaPontos($image, $pontos, 'PONTOS__' . $areaDeBusca . '__' . microtime(true). rand(0,999), [255, 255, 0]);
         // Monta objetos
         $objetos = $this->separaObjetos($pontos, $this->areaMinima, $this->areaMaxima);
         #Helper::pintaObjetos($image, $objetos);
