@@ -64,15 +64,18 @@ class Image {
       $this->localizarAncoras();
 
       # erro de escala estimado
-      $esperado = $this->medidas['distAncVer']*$this->escala;
-      $avaliado = Helper::dist($this->ancoras[4]->getCentro(),$this->ancoras[1]->getCentro());
-      $this->escala = $avaliado / $this->medidas['distAncVer'];
-      echo 'ESC: ' . $this->escala . "\n\n";
-      $this->distancias = $this->defineDistancias($this->medidas); # atualiza valor do tempolate de milimetros para pixels!
-      // echo '--->' . (ceil($avaliado)) . "\n";
-      // echo '--->' . (ceil($esperado)) . "\n";
-      // echo '--->' . ($erro) . "\n";
+      // $esperado = bcmul($this->medidas['diagonal'],$this->escala,14);
+      // $avaliado = Helper::dist($this->ancoras[1]->getCentro(),$this->ancoras[3]->getCentro());
+      // $this->escala = bcdiv($avaliado,$this->medidas['diagonal'],14);
+      // echo 'ESC: ' . $this->escala . "\n\n";
+      // echo '--->' . ($avaliado) . "\n";
+      // echo '--->' . ($esperado) . "\n";
+      // $this->distancias = $this->defineDistancias($this->medidas); # atualiza valor do tempolate de milimetros para pixels!
+      // echo $avaliado . "\n";
+      // echo Helper::distBC($this->ancoras[1]->getCentro(),$this->ancoras[3]->getCentro());
       // exit;
+
+
 
       // $aaa = microtime(true);
       // $ocr = new OCR($this);
@@ -216,7 +219,7 @@ class Image {
                 if(gettype ($medida) === 'string'){
                   $distancias[$nome] = $medida;
                 } else {
-                  $distancias[$nome] = $medida * ($this->escala);
+                  $distancias[$nome] = bcmul($medida,$this->escala,14);
                 }
             }
         }

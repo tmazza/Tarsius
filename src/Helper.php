@@ -134,7 +134,13 @@ class Helper {
 	}
 
 	public static function dist($a,$b){
-		return sqrt(($a[0]+$b[0])*($a[0]+$b[0]) + ($a[1]+$b[1])*($a[1]+$b[1]));
+		return sqrt(($a[0]-$b[0])**2 + ($a[1]-$b[1])**2);
+	}
+
+	public static function distBC($a,$b){
+		$deltaX = bcsub($a[0],$b[0],14);
+		$deltaY = bcsub($a[1],$b[1],14);
+		return bcsqrt(bcmul($deltaX,$deltaX,14) + bcmul($deltaY,$deltaY,14),14);
 	}
 
 }

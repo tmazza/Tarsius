@@ -4,10 +4,10 @@ $ajusteX = 0;
 // $ajusteY = 0;
 $ajusteY = 0;
 
-$a1x = 0;
-$a1y = 0;
+$a1x = 13.0;
+$a1y = 10.6;
 $distAncHor = 187;
-$distAncVer = 273.812;
+$distAncVer = 274;
 // 11.811023622047
 # em milimetros
 return array(
@@ -24,10 +24,23 @@ return array(
 	'elpAltura' => 2.5,
   'elpLargura' => 4.36,
 
-	'diagonal' => 332.05,
+	'diagonal' => 332,
+
+
 	'code_template' => array(103.5,0,126,3.5),
 	'regioes' => array( # distancias relativas a ancora 1
-			// array(0,40.0,127.35,'A','W'),
+			array(0,20-$a1x,20-$a1y,'A','W'),
+			array(0,20-$a1x,90-$a1y,'A','W'),
+			array(0,20-$a1x,270-$a1y,'A','W'),
+			array(0,20-$a1x,-84.5,'A','W'),
+			array(0,20-$a1x,-4.5,'A','W'),
+
+
+			array(0,80-$a1x,20-$a1y,'A','W'),
+			array(0,80-$a1x,90-$a1y,'A','W'),
+			array(0,80-$a1x,270-$a1y,'A','W'),
+
+
 
 			// array(0,40.050804403048,131.32938187976,'A','W'),
 			// array(0,40.135478408129,135.39373412362,'A','W'),

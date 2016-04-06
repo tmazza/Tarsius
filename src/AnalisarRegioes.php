@@ -21,9 +21,11 @@ class AnalisarRegioes {
     $time = microtime(true);
 
     $regioes = [];
+    $medidas = $this->image->medidas['regioes'];
+
     foreach ($this->image->getRegioes() as $id => $r) {
 
-      $e = $this->getPontoNormalizado($r);
+      $e = $this->getPontoNormalizado($r,$medidas[$id]);
       list($px,$py) = $e;
 
       $tipo = $r[0];
@@ -39,9 +41,6 @@ class AnalisarRegioes {
         throw new Exception('Tipo de regi√£o desconhecida.', 500);
       }
     }
-    // echo '<pre>';
-    // print_r($regioes->regioes);
-    // exit;
     $this->image->output['regioes'] = $regioes;
 
     if(DEBUG) {
@@ -50,9 +49,10 @@ class AnalisarRegioes {
     }
   }
 
-  private function getPontoNormalizado($r){
+  private function getPontoNormalizado($r,$d){
     $px = $r[1];
     $py = $r[2];
+
     $a1 = $this->image->ancoras[1]->getCentro();
     $a2 = $this->image->ancoras[2]->getCentro();
     $a3 = $this->image->ancoras[3]->getCentro();
@@ -69,11 +69,58 @@ class AnalisarRegioes {
     if($py > 0){
       $py += $a1[1];
     } else {
-      $py += $a4[1] - $a1[1];
+      $py += $a4[1];
     }
+
+    // CorreÁ„o de erro de escala em Y
+    $avaliado = $a4[1] - $a1[1];
+    $esperado = $this->image->medidas['distAncVer'] * $this->image->escala;
+    $erro = ($avaliado - $esperado) / $this->image->medidas['distAncVer'];
+
+    // echo 'ESC: ' . $this->image->escala . "\n";
+    // echo 'ESP: ' . $esperado. "\n";
+    // echo 'AVA: ' . $avaliado. "\n";
+    // echo 'DIF: ' . ($avaliado - $esperado) . "\n";
+    // echo 'ERR: ' . $erro . "\n";
+    // echo "X: " . $px . ' - Y: ' . $py . "\n";
+    // echo "X: " . $px . ' - Y: ' . ($py + $d[2]*$erro) . "\n";
+    // exit;
+    $px += $d[1]*$erro;
+    $py += $d[2]*$erro;
+
     $base = $a1;
     $p = [$px,$py];
-    return Helper::rotaciona($p,$base,$this->image->rot);
+
+    /// TESTES AJUSTE ESCALA
+    // $escalaAvaliada = ($a4[1] - $py) / $this->image->medidas[4][1];
+
+
+
+    // echo "ESC: " . $this->image->escala . '-' . $escalaAvaliada . "\n";
+    // print_r($this->image->medidas['regioes'][0]);
+    // echo $avaliado . '  -  ' . $esperado . ' | ' . $erro . "\n";
+
+    // $npy = $escalaAvaliada * $this->image->medidas['regioes'][0][2] + $a1[1];
+
+    // echo $py . " | " . $npy .  "\n";
+    // exit;
+    // $py = $npy;
+    // print_r($avaliado);
+    // echo "\n";
+    // print_r($esperado);
+    // echo "\n";
+    // exit;
+    // echo "ERRO POR PONTO: " . $erro . "\n";
+    // echo "ERRO NO PONTO : " . ($erro * ($p[1] - $a1[1]) );
+    // $distA1 = $p[1] - $a1[1];
+    // echo $distA1 . "\n";
+    // echO "\nPONTO DE->PARA: ";
+    // echo $p[1] . ' - ';
+    // $p[1] += ($erro *  ($p[1] - $a1[1]));
+    // echo $p[1] . "\n";
+
+    return $p;
+    // return Helper::rotaciona($p,$a4,$this->image->rot);
   }
 
   private function interpretaElipse($id,$r,$e){
