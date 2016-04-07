@@ -10,6 +10,9 @@ class AnalisarRegioes {
   public $regioes=array();
   private $debug;
 
+  private $erroX = false;
+  private $erroY = false;
+
   public function __construct($image){
     $this->image = $image;
     if(DEBUG){
@@ -72,55 +75,12 @@ class AnalisarRegioes {
       $py += $a4[1];
     }
 
-    // Correção de erro de escala em Y
-    $avaliado = $a4[1] - $a1[1];
-    $esperado = $this->image->medidas['distAncVer'] * $this->image->escala;
-    $erro = ($avaliado - $esperado) / $this->image->medidas['distAncVer'];
-
-    // echo 'ESC: ' . $this->image->escala . "\n";
-    // echo 'ESP: ' . $esperado. "\n";
-    // echo 'AVA: ' . $avaliado. "\n";
-    // echo 'DIF: ' . ($avaliado - $esperado) . "\n";
-    // echo 'ERR: ' . $erro . "\n";
-    // echo "X: " . $px . ' - Y: ' . $py . "\n";
-    // echo "X: " . $px . ' - Y: ' . ($py + $d[2]*$erro) . "\n";
-    // exit;
-    $px += $d[1]*$erro;
-    $py += $d[2]*$erro;
+    $px += bcmul($d[1],$this->getErroX(),14);
+    $py += bcmul($d[2],$this->getErroY(),14);
 
     $base = $a1;
     $p = [$px,$py];
-
-    /// TESTES AJUSTE ESCALA
-    // $escalaAvaliada = ($a4[1] - $py) / $this->image->medidas[4][1];
-
-
-
-    // echo "ESC: " . $this->image->escala . '-' . $escalaAvaliada . "\n";
-    // print_r($this->image->medidas['regioes'][0]);
-    // echo $avaliado . '  -  ' . $esperado . ' | ' . $erro . "\n";
-
-    // $npy = $escalaAvaliada * $this->image->medidas['regioes'][0][2] + $a1[1];
-
-    // echo $py . " | " . $npy .  "\n";
-    // exit;
-    // $py = $npy;
-    // print_r($avaliado);
-    // echo "\n";
-    // print_r($esperado);
-    // echo "\n";
-    // exit;
-    // echo "ERRO POR PONTO: " . $erro . "\n";
-    // echo "ERRO NO PONTO : " . ($erro * ($p[1] - $a1[1]) );
-    // $distA1 = $p[1] - $a1[1];
-    // echo $distA1 . "\n";
-    // echO "\nPONTO DE->PARA: ";
-    // echo $p[1] . ' - ';
-    // $p[1] += ($erro *  ($p[1] - $a1[1]));
-    // echo $p[1] . "\n";
-
-    return $p;
-    // return Helper::rotaciona($p,$a4,$this->image->rot);
+    return Helper::rotaciona($p,$a1,$this->image->rot);
   }
 
   private function interpretaElipse($id,$r,$e){
@@ -132,7 +92,7 @@ class AnalisarRegioes {
     if($taxaPreenchimento >= $minMatch){
       imagefilledellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], imagecolorallocate($this->debugImage, 255, 255, 0));
     } else {
-      imageellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], imagecolorallocate($this->debugImage, 255, 0, 0));
+      imageellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], imagecolorallocate($this->debugImage, 200, 0, 200));
     }
   }
 
@@ -143,58 +103,40 @@ class AnalisarRegioes {
 
 }
 
+private function getErroX(){
+  if(!$this->erroX){
+    $a1 = $this->image->ancoras[1]->getCentro();
+    $a2 = $this->image->ancoras[2]->getCentro();
+    // Correção de erro de escala em X
+    $avaliado = bcsub($a2[0],$a1[0],14);
+    $esperado = bcmul($this->image->medidas['distAncHor'],$this->image->escala,14);
+    $this->erroX = bcdiv(bcsub($avaliado,$esperado,14),$this->image->medidas['distAncHor'],14);
+  }
+  return $this->erroX;
+}
+
+private function getErroY(){
+  if(!$this->erroY){
+    $a1 = $this->image->ancoras[1]->getCentro();
+    $a4 = $this->image->ancoras[4]->getCentro();
+    // Correção de erro de escala em Y
+    $avaliado = bcsub($a4[1],$a1[1],14);
+    $esperado = bcmul($this->image->medidas['distAncVer'],$this->image->escala,14);
+    $this->erroY = bcdiv(bcsub($avaliado,$esperado,14),$this->image->medidas['distAncVer'],14);
+  }
+  return $this->erroY;
+  // $erro = abs($erro);
+  // echo 'ESC: ' . $this->image->escala . "\n";
+  // echo 'ESP: ' . $esperado. "\n";
+  // echo 'AVA: ' . $avaliado. "\n";
+  // echo 'DIF: ' . ($avaliado - $esperado) . "\n";
+  // echo 'ERR: ' . $erroX . "\n";
+  // echo "X: " . $px . ' - Y: ' . $py . "\n";
+  // echo "X: " . $px . ' - Y: ' . ($py + $d[2]*$erro) . "\n";
+  // exit;
+}
 
 
-
-  // public function exec(){
-  //   $time = microtime(true);
-  //   $regioes = [];
-  //
-  //   foreach ($this->regioes as $id => $r) {
-  //     $tipo = $r[0];
-  //     if($tipo == self::TipoELipse){ # 0:ELIPSE
-  //       list($taxaPreenchimento,$retorno) = $this->interpretaElipse($id,$r);
-  //       $regioes[$id] = [
-  //         $retorno,
-  //         $taxaPreenchimento,
-  //         $this->pontoBase[0]+$r[1],
-  //         $this->pontoBase[1]+$r[2],
-  //       ];
-  //     } else {
-  //       throw new Exception('Tipo de regiÃ£o desconhecida.', 500);
-  //     }
-  //   }
-  //
-  //   $this->image->output['regioes'] = $regioes;
-  //
-  //   if(DEBUG) {
-  //     Helper::cria($this->debugImage, 'ELIPISES_'.basename($this->image->arquivo));
-  //     $this->image->saveTime('_analisarRegioes', $time);
-  //   }
-  // }
-
-
-  // private function interpretaElipse($id,$r){
-  //   $ponto = array($this->pontoBase[0]+$r[1],$this->pontoBase[1]+$r[2]);
-  //   $e = Helper::rotaciona($ponto,$this->pontoBase,$this->image->rot);
-  //   $taxaPreenchimento = $this->getTaxaPreenchimento($e);
-  //
-  //   $minMatch = isset($this->image->medidas['regioes'][$id][5]) ? $this->image->medidas['regioes'][$id][5] : PREENCHIMENTO_MINIMO;
-  //
-  //   if(DEBUG){
-  //     if($taxaPreenchimento >= $minMatch){
-  //       imagefilledellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], imagecolorallocate($this->debugImage, 255, 255, 0));
-  //     } else {
-  //       imageellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], imagecolorallocate($this->debugImage, 255, 0, 0));
-  //     }
-  //   }
-  //
-  //   return [
-  //     $taxaPreenchimento,
-  //     ($taxaPreenchimento >= $minMatch) ? $r[3] : $r[4],
-  //   ];
-  //
-  // }
 
   private function getTaxaPreenchimento($centro){
 

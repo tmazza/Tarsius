@@ -68,10 +68,60 @@ class GeraTemplate {
       $pontos = '';
       $ancora1 = array_shift($objetos);
       $ancora1 = $ancora1->getCentro();
-      foreach ($objetos as $o) {
-        $c = $o->getCentro();
-        imagefilledellipse($copia,$c[0],$c[1],50,50,imagecolorallocate($copia,255,255,0));
-        $pontos .= 'array(0,'.(($c[0]-$ancora1[0])/$this->escala).','.(($c[1]-$ancora1[0])/$this->escala).',\'A\',\'W\'),' . "\n";
+
+      $centros = array_map(function($i){ return $i->getCentro(); },$objetos);
+
+
+      // Ordena por linha-colune
+      usort($centros,function($a,$b){
+          if($a[0] == $b[0]){
+            return $a[1] > $b[1];
+          } elseif($a[0] > $b[0]){
+            return 1;
+          } else {
+            return -1;
+          }
+      });
+
+      // Mantem somente pontos em certa área
+      $elipses = array_filter($centros,function ($i) use($ancora1){
+        $y = ($i[1]-$ancora1[1])/$this->escala;
+        echo "---" . $y . "\n";
+        return $y > 120 && $y < 230;
+      });
+
+      // agrupa em colunas de 25 linhas
+      $colunas = array_chunk($elipses,25);
+
+      $linhas = [];
+      for($i=0;$i<25;$i++){
+        $linhas[$i] = array_column($colunas,$i);
+      }
+
+      $linhas = array_map(function($i){ return array_chunk($i,5); },$linhas);
+
+      $colunas = [];
+      for($i=0;$i<4;$i++){
+        $colunas[$i] = array_column($linhas,$i);
+      }
+
+      foreach ($colunas as $col) { // 4 colunas
+        foreach ($col as $l) { // 25 linhas
+          $cor = imagecolorallocate($copia,rand(0,255),0,rand(0,255));
+          $count = 0;
+          foreach ($l as $c) {
+            $char = 'a';
+            $i = $count;
+            while($i>0){
+              $char++;
+              $i--;
+            }
+            imagefilledellipse($copia,$c[0],$c[1],50,50,$cor);
+            $pontos .= 'array(0,'.(($c[0]-$ancora1[0])/$this->escala).','.(($c[1]-$ancora1[1])/$this->escala).',\''.strtoupper($char).'\',\'W\'),' . "\n";
+            $count++;
+          }
+          $pontos .= "\n";
+        }
       }
       imagejpeg($copia,__DIR__.'/../image/asd.jpg');
       // echo '--' . count($objetos);
@@ -80,6 +130,7 @@ class GeraTemplate {
       $handle = fopen(__DIR__.'/../image/teste.php','w');
       fwrite($handle,$pontos);
       fclose($handle);
+
       echo '<pre>';
       print_r($pontos);
       exit;

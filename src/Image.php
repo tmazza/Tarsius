@@ -8,7 +8,7 @@ define('TOLERANCIA_MATCH', 0.4); # eg: areabase  = 1000. busca triangulos de are
 define('EXPANSAO_BUSCA', 0.4); # taxa de aumento da área de busca
 define('QTD_EXPANSOES_BUSCA', 5);
 
-define('PREENCHIMENTO_MINIMO', 0.25); # >=40%
+define('PREENCHIMENTO_MINIMO', 0.33); 
 
 include __DIR__.'/Buscador.php';
 include __DIR__.'/BuscarAncoras.php';
@@ -63,20 +63,6 @@ class Image {
       $this->inicializar($arquivo);
       $this->localizarAncoras();
 
-      # erro de escala estimado
-      // $esperado = bcmul($this->medidas['diagonal'],$this->escala,14);
-      // $avaliado = Helper::dist($this->ancoras[1]->getCentro(),$this->ancoras[3]->getCentro());
-      // $this->escala = bcdiv($avaliado,$this->medidas['diagonal'],14);
-      // echo 'ESC: ' . $this->escala . "\n\n";
-      // echo '--->' . ($avaliado) . "\n";
-      // echo '--->' . ($esperado) . "\n";
-      // $this->distancias = $this->defineDistancias($this->medidas); # atualiza valor do tempolate de milimetros para pixels!
-      // echo $avaliado . "\n";
-      // echo Helper::distBC($this->ancoras[1]->getCentro(),$this->ancoras[3]->getCentro());
-      // exit;
-
-
-
       // $aaa = microtime(true);
       // $ocr = new OCR($this);
       // // $ocr = new OCR($this);
@@ -94,10 +80,10 @@ class Image {
       $this->analisarRegioes();
       $this->organizarSaida();
 
-      echo "ROT: " . $this->rot . "\n";
+      // echo "ROT: " . $this->rot . "\n";
 
 
-      # testes
+      # testes - desenha retangulo
       // $copia = Helper::copia($this->image);
       // list($x0,$y0) = $this->ancoras[1]->getCentro();
       // list($x1,$y1) = Helper::rotaciona($this->ancoras[3]->getCentro());
