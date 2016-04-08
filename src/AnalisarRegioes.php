@@ -85,7 +85,6 @@ class AnalisarRegioes {
 
   private function interpretaElipse($id,$r,$e){
   $taxaPreenchimento = $this->getTaxaPreenchimento($e);
-
   $minMatch = isset($this->image->medidas['regioes'][$id][5]) ? $this->image->medidas['regioes'][$id][5] : PREENCHIMENTO_MINIMO;
 
   if(DEBUG){
@@ -153,23 +152,24 @@ private function getErroY(){
     $elipse = function ($x,$y) use($centro,$elpA,$elpB) {
       return (($x - $centro[0])**2 / ($elpA/2)**2) + (($centro[1]-$y)**2 / ($elpB/2)**2) <= 1;
     };
-    $np = $sp = [];
+    // $np = $sp = [];
     $areaAnalisada = 0;
-    // echo count($pontos) . ' | ';
     foreach ($pontos as $x => $colunas) {
       foreach ($colunas as $y => $v) {
-        if($elipse($x,$y)){
-          $sp[$x][$y] = 1;
+        if($elipse($x,$y))
           $areaAnalisada++;
-        } else {
-          $np[$x][$y] = 1;
-        }
+        //   $sp[$x][$y] = 1; // Salvas pontos dentro e fora da elipse
+        // } else {           // Usado para gerar imagem debug
+        //   $np[$x][$y] = 1;
+        // }
       }
     }
     #Helper::pintaPontos($image, $sp, 'PONTOS___' . microtime(true), [255, 0, 0]);
 
+    # TODO: pre-calcular área
     $area = pi() * ($elpA/2) * ($elpB/2);
-    #echo "\n" . number_format( ($areaAnalisada * 100) / $area ,0) . '|';
+    // echo ceil($area) . ' - ' . $areaAnalisada . ' | ' . round($areaAnalisada / $area,2) .  "\n";
+
     return ($areaAnalisada / $area);
   }
 

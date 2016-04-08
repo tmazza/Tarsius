@@ -1,15 +1,19 @@
-<pre>
 <?php
 set_time_limit(0);
 ini_set('memory_limit', '2048M');
-// Busca matriz de pixels de forma direta
-// http://stackoverflow.com/questions/13791207/better-way-to-get-map-of-all-pixels-of-an-image-with-gd
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-include_once './src/Image.php';
-// include_once './src/GeraTemplate.php';
+
+$processar = true;
+$nomeTemplate = 'HCPA_2015_345';
+
+if($processar){
+  include_once './src/Image.php';
+} else {
+  include_once './src/GeraTemplate.php';
+}
 
 $baseDir = __DIR__ . '/image/processar/';
 $files = scandir($baseDir);
@@ -21,29 +25,28 @@ foreach ($files as $f) {
   try {
     $count++;
     # TODO: instanciar somente um objeto de imagem!
-    $image = new Image('HCPA_2015_345');
-    // $image = new GeraTemplate('FAURGS_100'); # <<<<<<<<<<<<<
-    echo '<hr>' .  $f . "\n";
+    if($processar){
+      $image = new Image($nomeTemplate);
+    } else {
+      $image = new GeraTemplate($nomeTemplate);
+    }
+    echo "\n\n\n ----| " .  $f . "\n\n";
     $image->exec($baseDir . $f);
     $times = ($image->getTimes());
     $total = $times['timeAll'];
     foreach ($times as $n => $t) {
         echo str_pad($n, 30, ' ', STR_PAD_LEFT) . ': ' . number_format($t, 2) . ' - ' . str_pad(number_format((($t / $total) * 100), 1), 5, ' ', STR_PAD_LEFT) . '% - ' . ' - ' . $t . "\n";
     }
-    $export = fopen('./export/processados/'.$f.'.json','w');
-    fwrite($export,json_encode($image->output));
-    fclose($export);
-
     $regioes = array_map(function($i){ return $i[0]; },$image->output['regioes']);
     echo implode('',$regioes) . "\n";
-    echo $count ."\r";
+    echo str_repeat('_',120) . "\n";
     $image = null;
     unset($image);
   } catch (Exception $ex) {
-    echo '<h3>' . $ex->getMessage() . '</h3>';
+    echo '**' . $ex->getMessage();
   }
 }
-echo "\n----------------------------------------------------------------\n";
+echo "\n\n\n";
 echo 'TEMPO TOTAL: ' . number_format((microtime(true) - $geral),2) . "s\n";
 echo ' QUANTIDADE: ' . $count . "\n";
 echo 'TEMPO MEDIO: ' . number_format(  (microtime(true) - $geral) / $count ,2) . "s\n\n";

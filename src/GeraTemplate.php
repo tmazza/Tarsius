@@ -60,7 +60,8 @@ class GeraTemplate {
     public function exec($arquivo) {
       $this->timeAll = microtime(true);
       $this->inicializar($arquivo);
-
+      $this->localizarAncoras();
+      exit;
       $pontos = $this->getPontosDeQuadrado($this->image, 0, 0, imagesx($this->image), imagesy($this->image));
       $objetos = $this->separaObjetos($pontos, 1000, 100000);
       Helper::pintaObjetos($this->image, $objetos);
@@ -142,19 +143,19 @@ class GeraTemplate {
     }
 
 
-        /**
-         * Identifica objetos em $pontos. Filtra por área mínima e máxima
-         * @param type $pontos
-         * @param type $min
-         * @param type $max
-         * @return type
-         */
-        public function separaObjetos($pontos, $min, $max) {
-            $objetosConexos = new ConnectedComponent();
-            $objetosConexos->setAreaMinima($min);
-            $objetosConexos->setAreaMaxima($max);
-            return $objetosConexos->getObjetos($pontos);
-        }
+    /**
+     * Identifica objetos em $pontos. Filtra por área mínima e máxima
+     * @param type $pontos
+     * @param type $min
+     * @param type $max
+     * @return type
+     */
+    public function separaObjetos($pontos, $min, $max) {
+        $objetosConexos = new ConnectedComponent();
+        $objetosConexos->setAreaMinima($min);
+        $objetosConexos->setAreaMaxima($max);
+        return $objetosConexos->getObjetos($pontos);
+    }
 
 
     public function getPontosDeQuadrado($img, $x0, $y0, $x1, $y1) {
@@ -197,44 +198,6 @@ class GeraTemplate {
         $interpretador->pontoBase = $this->ancoras[1]->getCentro();
         $interpretador->regioes = $this->distancias['regioes'];
         $interpretador->exec();
-    }
-
-    private function organizarSaida(){
-      $this->output['arquivo'] = $this->arquivo;
-      $this->output['template'] = $this->template;
-      $this->output['escala'] = $this->escala;
-      $this->output['rotacao'] = $this->rot;
-      $this->output['ancoras'] = array(
-        '1' => $this->ancoras[1]->getCentro(),
-        '2' => $this->ancoras[2]->getCentro(),
-        '3' => $this->ancoras[2]->getCentro(),
-        '4' => $this->ancoras[3]->getCentro(),
-      );
-    }
-
-    /**
-     * Salva tempo decorrido para processar imagem
-     * @param type $id
-     * @param type $time
-     */
-    public function saveTime($id, $time) {
-        $this->times[$id] = microtime(true) - $time;
-    }
-
-    /**
-     * Retorna lista de tempos decorridos
-     */
-    public function getTimes() {
-        return $this->times;
-    }
-
-    /**
-     * Define a escala da imagem.
-     * @param type $escala
-     */
-    public function setEscala($escala) {
-        $this->escala = $escala;
-        $this->distancias = $this->defineDistancias($this->medidas); # atualiza valor do tempolate de milimetros para pixels!
     }
 
     /**

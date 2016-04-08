@@ -10,6 +10,11 @@
  * É gerado um array tendo o label, o representante do label set, como chabe e
  * o conjunto de pontos pertencente ao objeto conexo, em um array, como valor.
  *
+ *
+ * TODO: Busca matriz de pixels de forma mais eficiente
+ * http://stackoverflow.com/questions/13791207/better-way-to-get-map-of-all-pixels-of-an-image-with-gd
+ *
+ *
  * @author Tiago M. de paula
  */
 class ConnectedComponent {
