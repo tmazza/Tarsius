@@ -8,7 +8,7 @@ define('TOLERANCIA_MATCH', 0.4); # eg: areabase  = 1000. busca triangulos de are
 define('EXPANSAO_BUSCA', 0.4); # taxa de aumento da área de busca
 define('QTD_EXPANSOES_BUSCA', 5);
 
-define('PREENCHIMENTO_MINIMO', 0.33); 
+define('PREENCHIMENTO_MINIMO', 0.33);
 
 include __DIR__.'/Buscador.php';
 include __DIR__.'/BuscarAncoras.php';

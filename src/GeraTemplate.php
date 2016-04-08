@@ -36,7 +36,7 @@ class GeraTemplate {
     public $assAncoras = array();
     public $medidas = array();
     public $distancias = array();
-    public $escala = 11.81; // Quantidade de pixel por mm
+    public $escala = 300/25.4; // 300dpi
     public $ancoras = array();
     public $rot = 0; // em radianos
     private $template;
@@ -71,10 +71,9 @@ class GeraTemplate {
 
       $centros = array_map(function($i){ return $i->getCentro(); },$objetos);
 
-
       // Ordena por linha-colune
       usort($centros,function($a,$b){
-          if($a[0] == $b[0]){
+          if(round($a[0],0) == round($b[0],0)){
             return $a[1] > $b[1];
           } elseif($a[0] > $b[0]){
             return 1;
@@ -83,25 +82,31 @@ class GeraTemplate {
           }
       });
 
+      $minY = 90;
+      $maxY = 180;
+      $qtdLinhas = 20;
+      $qtdColunas = 3;
+
       // Mantem somente pontos em certa área
-      $elipses = array_filter($centros,function ($i) use($ancora1){
+      $elipses = array_filter($centros,function ($i) use($ancora1,$minY,$maxY){
         $y = ($i[1]-$ancora1[1])/$this->escala;
         echo "---" . $y . "\n";
-        return $y > 120 && $y < 230;
+        return $y > $minY && $y < $maxY;
       });
 
       // agrupa em colunas de 25 linhas
-      $colunas = array_chunk($elipses,25);
+      $colunas = array_chunk($elipses,$qtdLinhas);
 
       $linhas = [];
-      for($i=0;$i<25;$i++){
+      for($i=0;$i<$qtdLinhas;$i++){
         $linhas[$i] = array_column($colunas,$i);
       }
 
       $linhas = array_map(function($i){ return array_chunk($i,5); },$linhas);
 
+
       $colunas = [];
-      for($i=0;$i<4;$i++){
+      for($i=0;$i<$qtdColunas;$i++){
         $colunas[$i] = array_column($linhas,$i);
       }
 
