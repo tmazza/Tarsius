@@ -1,5 +1,7 @@
 <?php
-define('DEBUG',true);
+bcscale(14);
+
+define('DEBUG',false);
 
 define('CORTE_PRETO', 150);
 define('MATCH_ANCORA', 0.90);
@@ -8,7 +10,7 @@ define('TOLERANCIA_MATCH', 0.4); # eg: areabase  = 1000. busca triangulos de are
 define('EXPANSAO_BUSCA', 0.4); # taxa de aumento da área de busca
 define('QTD_EXPANSOES_BUSCA', 5);
 
-define('PREENCHIMENTO_MINIMO', 0.33);
+define('PREENCHIMENTO_MINIMO', 0.4);
 
 include __DIR__.'/Buscador.php';
 include __DIR__.'/BuscarAncoras.php';
@@ -28,7 +30,7 @@ include __DIR__.'/Barcode.php';
  */
 class Image {
 
-    private $timeAll;
+    protected $timeAll;
     public $arquivo;
     public $image;
     public $buscador;
@@ -37,7 +39,7 @@ class Image {
     public $medidas = array();
     public $distancias = array();
     // public $escala = 11.811024; // Quantidade de pixel por mm
-    public $escala = 300/25.4; // Quantidade de pixel por mm
+    public $escala; // Quantidade de pixel por mm
     public $ancoras = array();
     public $rot = 0; // em radianos
     private $template;
@@ -50,6 +52,7 @@ class Image {
      */
 
     public function __construct($template = 'FolhaA5_75') {
+        $this->escala = bcdiv(300,25.4);
         $this->buscador = new Buscador; #Instancia buscador de Objetos
         $this->assAncoras = $this->loadTemplate($template);
         $this->distancias = $this->defineDistancias($this->medidas); #Define distancias baseado na escala inicial
@@ -100,7 +103,7 @@ class Image {
     /**
     * Busca imagem e converte para cinza
     */
-    private function inicializar($arquivo){
+    protected function inicializar($arquivo){
       if(DEBUG)
         $time = microtime(true);
       $this->arquivo = $arquivo;
@@ -115,7 +118,7 @@ class Image {
      * Localiza as ancoras da imagem (Sempre tri)
      * @throws Exception
      */
-    private function localizarAncoras() {
+    protected function localizarAncoras() {
       $buscarAncoras = new BuscarAncoras($this);
       $buscarAncoras->exec();
     }
@@ -162,6 +165,7 @@ class Image {
      * @param type $escala
      */
     public function setEscala($escala) {
+        ///
         // $this->escala = $escala;
         // $this->distancias = $this->defineDistancias($this->medidas); # atualiza valor do tempolate de milimetros para pixels!
     }

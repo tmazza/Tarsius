@@ -20,6 +20,7 @@ class Buscador {
         $areaDeBusca = $this->areaBuscaInicial; // tamanho da aresta do quadrado de busca com centro em $ponto
         $qtdExpansoes = $this->qtdExpansoes;
         $match = false;
+
         do {
             $match = $this->analisaQuadrado($image, $objProcurado, $ponto, $areaDeBusca);
             # TODO: não refazer quadrados já análisados
@@ -48,7 +49,6 @@ class Buscador {
         // Monta objetos
         $objetos = $this->separaObjetos($pontos, $this->areaMinima, $this->areaMaxima);
         #Helper::pintaObjetos($image, $objetos);
-
         // Define assinatura de cada objeto
         // Para cada assinatura comapra com $obj procurado
         foreach ($objetos as $objeto) {

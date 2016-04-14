@@ -24,10 +24,7 @@ return array(
 	'elpAltura' => 2.5,
   'elpLargura' => 4.36,
 
-	'diagonal' => 332,
 
-
-	'code_template' => array(103.5,0,126,3.5),
 	'regioes' => array( # distancias relativas a ancora 1
 
 	#bloco 1

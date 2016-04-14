@@ -75,12 +75,18 @@ class AnalisarRegioes {
       $py += $a4[1];
     }
 
-    $px += bcmul($d[1],$this->getErroX(),14);
-    $py += bcmul($d[2],$this->getErroY(),14);
+    // TODO: de acordo com o template ou fixo para cada resolução?
+    // Tem como calcular esse valou ou depende da quantidade real de pixel utilizadas
+    $erroBaseX = -0.0035; $erroBaseX = 0;
+    $erroBaseY = -0.0081; $erroBaseY = 0;
 
-    $base = $a1;
+    $px += bcmul($d[1],$this->getErroX() - $erroBaseX);
+    $py += bcmul($d[2],$this->getErroY() - $erroBaseY);
+
+    // echo $px . ' | ' . $py . ' | ' . $this->getErroX() . ' | ' . $this->getErroY() .  "\n";
+
     $p = [$px,$py];
-    return Helper::rotaciona($p,$a1,$this->image->rot);
+    return Helper::rotaciona($p,$base,$this->image->rot);
   }
 
   private function interpretaElipse($id,$r,$e){
@@ -107,9 +113,9 @@ private function getErroX(){
     $a1 = $this->image->ancoras[1]->getCentro();
     $a2 = $this->image->ancoras[2]->getCentro();
     // Correção de erro de escala em X
-    $avaliado = bcsub($a2[0],$a1[0],14);
-    $esperado = bcmul($this->image->medidas['distAncHor'],$this->image->escala,14);
-    $this->erroX = bcdiv(bcsub($avaliado,$esperado,14),$this->image->medidas['distAncHor'],14);
+    $avaliado = bcsub($a2[0],$a1[0]);
+    $esperado = bcmul($this->image->medidas['distAncHor'],$this->image->escala);
+    $this->erroX = bcdiv(bcsub($avaliado,$esperado),$this->image->medidas['distAncHor']);
   }
   return $this->erroX;
 }
@@ -119,9 +125,9 @@ private function getErroY(){
     $a1 = $this->image->ancoras[1]->getCentro();
     $a4 = $this->image->ancoras[4]->getCentro();
     // Correção de erro de escala em Y
-    $avaliado = bcsub($a4[1],$a1[1],14);
-    $esperado = bcmul($this->image->medidas['distAncVer'],$this->image->escala,14);
-    $this->erroY = bcdiv(bcsub($avaliado,$esperado,14),$this->image->medidas['distAncVer'],14);
+    $avaliado = bcsub($a4[1],$a1[1]);
+    $esperado = bcmul($this->image->medidas['distAncVer'],$this->image->escala);
+    $this->erroY = bcdiv(bcsub($avaliado,$esperado),$this->image->medidas['distAncVer']);
   }
   return $this->erroY;
   // $erro = abs($erro);

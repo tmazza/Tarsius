@@ -8,10 +8,12 @@ error_reporting(E_ALL);
 
 $processar = true;
 $nomeTemplate = 'HCPA_2015_345';
+// $nomeTemplate = 'TESTE_FAURGS_100';
 
 if($processar){
   include_once './src/Image.php';
 } else {
+  echo 'GERAR TEMPLATE' . "\n";
   include_once './src/GeraTemplate.php';
 }
 
@@ -35,7 +37,7 @@ foreach ($files as $f) {
     $times = ($image->getTimes());
     $total = $times['timeAll'];
     foreach ($times as $n => $t) {
-        echo str_pad($n, 30, ' ', STR_PAD_LEFT) . ': ' . number_format($t, 2) . ' - ' . str_pad(number_format((($t / $total) * 100), 1), 5, ' ', STR_PAD_LEFT) . '% - ' . ' - ' . $t . "\n";
+      echo str_pad($n, 30, ' ', STR_PAD_LEFT) . ': ' . number_format($t, 2) . ' - ' . str_pad(number_format((($t / $total) * 100), 1), 5, ' ', STR_PAD_LEFT) . '% - ' . ' - ' . $t . "\n";
     }
     $regioes = array_map(function($i){ return $i[0]; },$image->output['regioes']);
     echo implode('',$regioes) . "\n";

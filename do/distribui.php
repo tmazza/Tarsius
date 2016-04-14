@@ -4,7 +4,7 @@ set_time_limit(0);
 ini_set('memory_limit', '2048M');
 date_default_timezone_set('America/Sao_Paulo');
 
-$qtdProcessos = 4;
+$qtdProcessos = 16;
 $espera = 30; # em segndos
 
 isset($argv[1]) ? null : die("\tQual a pasta do concurso?\n");

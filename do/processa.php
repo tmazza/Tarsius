@@ -33,10 +33,7 @@ foreach ($files as $i => $f) {
   $arquivo = $dirBase.'/'.$f;
   $arquivoDest = str_replace('exec/ready/'.$dirIn,'done/img',$arquivo);
 
-  // $template = 'FAURGS_100';
-  // if(substr(pathinfo($f, PATHINFO_FILENAME),-1) == 4){
-    $template = 'FAURGS_100_4';
-  // }
+  $template = 'HCPA_2015_345';
 
   try {
     // $image = new Image('1602_50');

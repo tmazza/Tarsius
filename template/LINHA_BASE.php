@@ -26,10 +26,6 @@ return array(
 	'elpAltura' => 2.5,
   'elpLargura' => 4.36,
 
-	'diagonal' => 332,
-
-
-	'code_template' => array(103.5,0,126,3.5),
 	'regioes' => array( # distancias relativas a ancora 1
 			// array(0,20-$a1x,20-$a1y,'A','W'),
 			// array(0,20-$a1x,90-$a1y,'A','W'),
