@@ -3,4 +3,5 @@ export/processados/*
 image/processar/*
 image/testes/*
 logs/*
+do/finalizados/1*
 operation_log.txt

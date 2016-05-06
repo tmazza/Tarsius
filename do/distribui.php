@@ -23,9 +23,9 @@ while(1){
 
   if(count($files) > 0){
     echo "\n----------------------------------------------------------------\n";
-    // $files = array_slice($files,0,10);
+    // $files = array_slice($files,0,100);
 
-    $tamBloco = ceil(count($files) / $qtdProcessos);
+    $tamBloco = ceil(count($files) / $qtdProcessos); # quebra em n pedacos de acordo com o tamnho da entrada
     $blocos = array_chunk($files,$tamBloco);
 
     $dirExec = __DIR__.'/exec';
@@ -45,7 +45,8 @@ while(1){
       // Diretorio temporario
       mkdir($dirDest);
       foreach ($bloco as $file) {
-        if(copy($dirOrigem.$file,$dirDest.$file)){
+        if(rename($dirOrigem.$file,$dirDest.$file)){
+        // if(copy($dirOrigem.$file,$dirDest.$file)){
           $jaProcessados[] = $file;
           setJaProcessados(json_encode($jaProcessados));
         } else {

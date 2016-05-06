@@ -7,7 +7,9 @@ error_reporting(E_ALL);
 
 
 $processar = true;
-$nomeTemplate = 'HCPA_2015_345';
+$nomeTemplate = 'FAURGS_80';
+// $nomeTemplate = 'LINHA_BASE';
+// $nomeTemplate = 'HCPA_2015_345';
 // $nomeTemplate = 'TESTE_FAURGS_100';
 
 if($processar){

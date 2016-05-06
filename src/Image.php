@@ -4,13 +4,13 @@ bcscale(14);
 define('DEBUG',false);
 
 define('CORTE_PRETO', 150);
-define('MATCH_ANCORA', 0.90);
-
 define('TOLERANCIA_MATCH', 0.4); # eg: areabase  = 1000. busca triangulos de area entre 500 e 1500
 define('EXPANSAO_BUSCA', 0.4); # taxa de aumento da área de busca
 define('QTD_EXPANSOES_BUSCA', 5);
 
-define('PREENCHIMENTO_MINIMO', 0.4);
+define('MATCH_ANCORA', 0.85);
+define('PREENCHIMENTO_MINIMO', 0.33);
+// define('RESOLUCAO_IMAGEM', 300); # EM DPI
 
 include __DIR__.'/Buscador.php';
 include __DIR__.'/BuscarAncoras.php';
@@ -44,7 +44,13 @@ class Image {
     public $rot = 0; // em radianos
     private $template;
 
+    //
+    public $resolucao = 300; # Em dpi
+
     public $output = array();
+
+    public $coefA;
+    public $coefB;
 
     /**
      * Nova imagem
@@ -52,10 +58,14 @@ class Image {
      */
 
     public function __construct($template = 'FolhaA5_75') {
-        $this->escala = bcdiv(300,25.4);
-        $this->buscador = new Buscador; #Instancia buscador de Objetos
-        $this->assAncoras = $this->loadTemplate($template);
-        $this->distancias = $this->defineDistancias($this->medidas); #Define distancias baseado na escala inicial
+      $this->template = $template;
+    }
+
+    private function depoisDeDefinirResolucao(){
+      $this->escala = bcdiv($this->resolucao,25.4);
+      $this->buscador = new Buscador; #Instancia buscador de Objetos
+      $this->assAncoras = $this->loadTemplate(  $this->template);
+      $this->distancias = $this->defineDistancias($this->medidas); #Define distancias baseado na escala inicial
     }
 
     /**
@@ -64,7 +74,64 @@ class Image {
     public function exec($arquivo) {
       $this->timeAll = microtime(true);
       $this->inicializar($arquivo);
+
+      // PARTE TESTE PERSPECTIVA
+      # valores antes da escala ser alterada
+      // $a1 = $this->distancias['ancora1'];
+      // $hor = $this->distancias['distAncHor'];
+      // $ver = $this->distancias['distAncVer'];
+      // $a2 = [$a1[0]+$hor,$a1[1]];
+      // $a3 = [$a1[0],$a1[1]+$ver];
+      // $base  = [$a1,$a2,$a3];
+      // END PARTE TESTE PERSPECTIVA
+
       $this->localizarAncoras();
+
+      // TESTE PERSPECTIVA
+      // $avaliado  = [$this->ancoras[1]->getCentro(),$this->ancoras[2]->getCentro(),$this->ancoras[3]->getCentro()];
+      //
+      // $mA = [
+      //   # yi,Xi,1
+      //   [$base[0][1],$avaliado[0][0],1],
+      //   [$base[1][1],$avaliado[1][0],1],
+      //   [$base[2][1],$avaliado[2][0],1],
+      // ];
+      //
+      // $mB = [
+      //   # xi,Xi,1
+      //   [$base[0][0],$avaliado[0][0],1],
+      //   [$base[1][0],$avaliado[1][0],1],
+      //   [$base[2][0],$avaliado[2][0],1],
+      // ];
+      //
+      // $mC = [
+      //   # xi,yi,1
+      //   [$base[0][0],$base[0][1],1],
+      //   [$base[1][0],$base[1][1],1],
+      //   [$base[2][0],$base[2][1],1],
+      // ];
+      //
+      // $mD = [
+      //   # xi,yi,Xi
+      //   [$base[0][0],$base[0][1],$avaliado[0][0]],
+      //   [$base[1][0],$base[1][1],$avaliado[1][0]],
+      //   [$base[2][0],$base[2][1],$avaliado[2][0]],
+      // ];
+      // $A =    $this->det($mA);
+      // $B = -1*$this->det($mB);
+      // $C =    $this->det($mC);
+      // $D = -1*$this->det($mD);
+      //
+      // $X = function($x,$y) use($A,$B,$C,$D){
+      //   return (-1*($A*$x+$B*$y+$D)) / $C;
+      // };
+      // echo $X(235,589);
+      // exit;
+      //
+      // $this->coefA = $this->solve3x3($A,$bx);
+      // $this->coefB = $this->solve3x3($A,$by);
+      // END TESTE PERSPECTIVA
+
 
       // $aaa = microtime(true);
       // $ocr = new OCR($this);
@@ -85,7 +152,6 @@ class Image {
 
       // echo "ROT: " . $this->rot . "\n";
 
-
       # testes - desenha retangulo
       // $copia = Helper::copia($this->image);
       // list($x0,$y0) = $this->ancoras[1]->getCentro();
@@ -94,16 +160,43 @@ class Image {
       // imageline($copia,$x0,$y0,$a2x,$a2y,imagecolorallocate($copia,0,255,0));
       // Helper::rect($copia, $x0, $y0, $x1, $y1, 'asdasd');
 
-
       $this->saveTime('timeAll', $this->timeAll); # tempo total
 
       imagedestroy($this->image);
     }
 
+    # TESTE PERESPECTIVA
+    private function solve3x3($A,$b){
+      $D  = $this->det($A);
+      $Dx = $this->det([$b   ,$A[1],$A[2]]);
+      $Dy = $this->det([$A[0],$b   ,$A[2]]);
+      $Dz = $this->det([$A[0],$A[1],$b   ]);
+
+      return [$Dx/$D,$Dy/$D,$Dz/$D];
+    }
+    private function det($m){
+      list($a1,$a2,$a3) = array_column($m,0);
+      list($b1,$b2,$b3) = array_column($m,1);
+      list($c1,$c2,$c3) = array_column($m,2);
+      return $a1*($b2*$c3-$c2*$b3) - $a2*($b1*$c3-$c1*$b3) + $a3*($b1*$c2-$c1*$b2);
+    }
+    # FIM TESTE PERSPECTIVA
+
+
     /**
     * Busca imagem e converte para cinza
     */
     protected function inicializar($arquivo){
+
+      # TODO: REMOVER ! USAR OS DADOS DA IMAGESM!!!!
+      $bitTeste = (int) substr($arquivo,-5,1);
+      if($bitTeste == 1 || $bitTeste == 2)
+        $this->resolucao = 200;
+
+      $this->depoisDeDefinirResolucao();
+
+      echo 'Resolucao:  ' . $this->resolucao . "<<<--";
+
       if(DEBUG)
         $time = microtime(true);
       $this->arquivo = $arquivo;
@@ -142,6 +235,12 @@ class Image {
         '3' => $this->ancoras[2]->getCentro(),
         '4' => $this->ancoras[3]->getCentro(),
       );
+
+      $this->output['CORTE_PRETO'] = CORTE_PRETO;
+      $this->output['MATCH_ANCORA'] = MATCH_ANCORA;
+      $this->output['PREENCHIMENTO_MINIMO'] = PREENCHIMENTO_MINIMO;
+      $this->output['RESOLUCAO_IMAGEM'] = $this->resolucao;
+
     }
 
     /**

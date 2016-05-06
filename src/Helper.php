@@ -116,6 +116,7 @@ class Helper {
 	public static function rotaciona($p, $pontoBase, $ang) {
 			$x0 = $pontoBase[0];
 			$y0 = $pontoBase[1];
+
 			return [
 				($p[0] - $x0)*cos($ang) - ($p[1] - $y0)*sin($ang) + $x0,
 				($p[0] - $x0)*sin($ang) + ($p[1] - $y0)*cos($ang) + $y0,

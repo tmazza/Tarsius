@@ -33,7 +33,9 @@ foreach ($files as $i => $f) {
   $arquivo = $dirBase.'/'.$f;
   $arquivoDest = str_replace('exec/ready/'.$dirIn,'done/img',$arquivo);
 
-  $template = 'HCPA_2015_345';
+  $template = 'FAURGS_80';
+  // $template = 'HCPA_2015_345';
+  // $template = 'FAURGS_100';
 
   try {
     // $image = new Image('1602_50');
@@ -42,11 +44,7 @@ foreach ($files as $i => $f) {
 
     // altera referencia para o arquivo
     $image->output['arquivo'] = $arquivoDest;
-
-    // salva debug do arquivo
-    $export = fopen($dirDoneFile.'/'.$f.'.json','w');
-    fwrite($export,json_encode($image->output));
-    fclose($export);
+    $imageOutPut = $image->output;
 
     $presenca = '1'; # TODO: 1 presente - 2 ausente  (ausente = marcada)
     $str = '';
@@ -60,8 +58,14 @@ foreach ($files as $i => $f) {
     $presenca = '?';
     $str = $e->getMessage();
     $tempoExec = '??';
+    $imageOutPut = ['erro'=>$e->getMessage()];
 
   }
+
+  // salva debug do arquivo
+  $export = fopen($dirDoneFile.'/'.$f.'.json','w');
+  fwrite($export,json_encode($imageOutPut));
+  fclose($export);
 
   // move imagem para pasta de finalizadas
   rename($arquivo,$arquivoDest);

@@ -56,48 +56,54 @@ class AnalisarRegioes {
     $px = $r[1];
     $py = $r[2];
 
-    $a1 = $this->image->ancoras[1]->getCentro();
-    $a2 = $this->image->ancoras[2]->getCentro();
-    $a3 = $this->image->ancoras[3]->getCentro();
-    $a4 = $this->image->ancoras[4]->getCentro();
-
-    if($px > 0){
-      $px += $a1[0];
-      $base = $py > 0 ? $a1 : $a4;
-    } else {
-      $px += $a2[0];
-      $base = $py > 0 ? $a2 : $a3;
+    $ancBase = isset($d[5]) ? $d[5] : 1;
+    $base = $this->image->ancoras[$ancBase]->getCentro();
+    if($px > 0 && $py > 0){
+      $base = $this->image->ancoras[1]->getCentro();
+    } elseif($px < 0 && $py > 0){
+      $base = $this->image->ancoras[2]->getCentro();
+    } elseif($px < 0 && $py < 0){
+      $base = $this->image->ancoras[3]->getCentro();
+    } elseif($px > 0 && $py < 0){
+      $base = $this->image->ancoras[4]->getCentro();
     }
-
-    if($py > 0){
-      $py += $a1[1];
-    } else {
-      $py += $a4[1];
-    }
+    $px += $base[0];
+    $py += $base[1];
 
     // TODO: de acordo com o template ou fixo para cada resolução?
     // Tem como calcular esse valou ou depende da quantidade real de pixel utilizadas
-    $erroBaseX = -0.0035; $erroBaseX = 0;
-    $erroBaseY = -0.0081; $erroBaseY = 0;
+    $erroBaseX = -0.0035; $erroBaseX = 0; # <-- Note que o erro base não está sendo utilizado
+    $erroBaseY = -0.0081; $erroBaseY = 0; # <-- Note que o erro base não está sendo utilizado
 
     $px += bcmul($d[1],$this->getErroX() - $erroBaseX);
     $py += bcmul($d[2],$this->getErroY() - $erroBaseY);
 
-    // echo $px . ' | ' . $py . ' | ' . $this->getErroX() . ' | ' . $this->getErroY() .  "\n";
-
     $p = [$px,$py];
+
     return Helper::rotaciona($p,$base,$this->image->rot);
+
   }
 
   private function interpretaElipse($id,$r,$e){
   $taxaPreenchimento = $this->getTaxaPreenchimento($e);
-  $minMatch = isset($this->image->medidas['regioes'][$id][5]) ? $this->image->medidas['regioes'][$id][5] : PREENCHIMENTO_MINIMO;
+  $minMatch = PREENCHIMENTO_MINIMO;
 
   if(DEBUG){
+
+    $closest = $this->getAncoraMaisProx($e);
+
+    $cor = imagecolorallocate($this->debugImage, 255, 0, 0);
+    // switch ($closest) {
+    //   case 1: $cor = imagecolorallocate($this->debugImage, 255, 0, 0); break;
+    //   case 2: $cor = imagecolorallocate($this->debugImage, 0, 255, 0); break;
+    //   case 3: $cor = imagecolorallocate($this->debugImage, 0, 255, 255); break;
+    //   case 4: $cor = imagecolorallocate($this->debugImage, 255, 255, 0); break;
+    // }
+
     if($taxaPreenchimento >= $minMatch){
-      imagefilledellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], imagecolorallocate($this->debugImage, 255, 255, 0));
+      imagefilledellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], $cor);
     } else {
-      imageellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], imagecolorallocate($this->debugImage, 200, 0, 200));
+      imageellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], $cor);
     }
   }
 
@@ -107,6 +113,27 @@ class AnalisarRegioes {
   ];
 
 }
+
+
+
+// TODO: só para teste!!! ?
+private function getAncoraMaisProx($ponto){
+  $a1 = $this->image->ancoras[1]->getCentro();
+  $a2 = $this->image->ancoras[2]->getCentro();
+  $a3 = $this->image->ancoras[3]->getCentro();
+  $a4 = $this->image->ancoras[4]->getCentro();
+  $ancoras = [$a1,$a2,$a3,$a4];
+  $dists = array_map(function($i) use($ponto){
+    return Helper::dist($ponto,$i);
+  },$ancoras);
+
+  $indice = array_keys($dists, min($dists));
+
+  return $indice[0]+1;
+}
+// FIM TESTE
+
+
 
 private function getErroX(){
   if(!$this->erroX){
