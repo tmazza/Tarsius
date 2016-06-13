@@ -7,7 +7,11 @@ ini_set('memory_limit', '2048M');
 if(!isset($argv[1]))
   die("Informe um diretorio de trabalho.\n");
 
+if(!isset($argv[2]))
+    die("Informe um diretorio de origem.\n");
+
 $dirIn = $argv[1];
+$dirOut = $argv[2];
 $dirBase = __DIR__. '/exec/ready/'.$dirIn;
 
 if(!is_dir($dirBase))
@@ -21,17 +25,14 @@ $dirDoneFile = __DIR__.'/done/file';
 if(!is_dir($dirDoneFile))
   mkdir($dirDoneFile);
 
-$dirDoneImg = __DIR__.'/done/img';
-if(!is_dir($dirDoneImg))
-  mkdir($dirDoneImg);
-
 $files = array_filter(scandir($dirBase),function($i) { return pathinfo($i, PATHINFO_EXTENSION) == 'jpg'; });
 
 foreach ($files as $i => $f) {
   $start = time();
 
   $arquivo = $dirBase.'/'.$f;
-  $arquivoDest = str_replace('exec/ready/'.$dirIn,'done/img',$arquivo);
+  // $arquivoDest = str_replace('exec/ready/'.$dirIn,'done/img',$arquivo);
+  $arquivoDest = $dirOut.'/'.$f;
 
   $template = 'FAURGS_80';
   // $template = 'HCPA_2015_345';
