@@ -27,7 +27,6 @@ class AnalisarRegioes {
     $medidas = $this->image->medidas['regioes'];
 
     foreach ($this->image->getRegioes() as $id => $r) {
-
       $e = $this->getPontoNormalizado($r,$medidas[$id]);
       list($px,$py) = $e;
 

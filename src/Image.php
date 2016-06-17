@@ -1,7 +1,7 @@
 <?php
 bcscale(14);
 
-define('DEBUG',false);
+define('DEBUG',true);
 
 define('CORTE_PRETO', 150);
 define('TOLERANCIA_MATCH', 0.4); # eg: areabase  = 1000. busca triangulos de area entre 500 e 1500
@@ -10,7 +10,7 @@ define('QTD_EXPANSOES_BUSCA', 5);
 
 define('MATCH_ANCORA', 0.85);
 define('PREENCHIMENTO_MINIMO', 0.33);
-// define('RESOLUCAO_IMAGEM', 300); # EM DPI
+define('RESOLUCAO_IMAGEM', 300); # EM DPI
 
 include __DIR__.'/Buscador.php';
 include __DIR__.'/BuscarAncoras.php';
@@ -24,7 +24,7 @@ include __DIR__.'/OCR_teste.php';
 include __DIR__.'/Barcode.php';
 
 /**
- * Description of ProcessaImagem
+ * Description of Image
  *
  * @author tiago.mazzarollo
  */
@@ -38,26 +38,18 @@ class Image {
     public $assAncoras = array();
     public $medidas = array();
     public $distancias = array();
-    // public $escala = 11.811024; // Quantidade de pixel por mm
     public $escala; // Quantidade de pixel por mm
     public $ancoras = array();
     public $rot = 0; // em radianos
     private $template;
-
-    //
-    public $resolucao = 300; # Em dpi
+    public $resolucao = RESOLUCAO_IMAGEM; # Em dpi
 
     public $output = array();
 
     public $coefA;
     public $coefB;
 
-    /**
-     * Nova imagem
-     * @param type $file
-     */
-
-    public function __construct($template = 'FolhaA5_75') {
+    public function __construct($template) {
       $this->template = $template;
     }
 
@@ -74,65 +66,7 @@ class Image {
     public function exec($arquivo) {
       $this->timeAll = microtime(true);
       $this->inicializar($arquivo);
-
-      // PARTE TESTE PERSPECTIVA
-      # valores antes da escala ser alterada
-      // $a1 = $this->distancias['ancora1'];
-      // $hor = $this->distancias['distAncHor'];
-      // $ver = $this->distancias['distAncVer'];
-      // $a2 = [$a1[0]+$hor,$a1[1]];
-      // $a3 = [$a1[0],$a1[1]+$ver];
-      // $base  = [$a1,$a2,$a3];
-      // END PARTE TESTE PERSPECTIVA
-
       $this->localizarAncoras();
-
-      // TESTE PERSPECTIVA
-      // $avaliado  = [$this->ancoras[1]->getCentro(),$this->ancoras[2]->getCentro(),$this->ancoras[3]->getCentro()];
-      //
-      // $mA = [
-      //   # yi,Xi,1
-      //   [$base[0][1],$avaliado[0][0],1],
-      //   [$base[1][1],$avaliado[1][0],1],
-      //   [$base[2][1],$avaliado[2][0],1],
-      // ];
-      //
-      // $mB = [
-      //   # xi,Xi,1
-      //   [$base[0][0],$avaliado[0][0],1],
-      //   [$base[1][0],$avaliado[1][0],1],
-      //   [$base[2][0],$avaliado[2][0],1],
-      // ];
-      //
-      // $mC = [
-      //   # xi,yi,1
-      //   [$base[0][0],$base[0][1],1],
-      //   [$base[1][0],$base[1][1],1],
-      //   [$base[2][0],$base[2][1],1],
-      // ];
-      //
-      // $mD = [
-      //   # xi,yi,Xi
-      //   [$base[0][0],$base[0][1],$avaliado[0][0]],
-      //   [$base[1][0],$base[1][1],$avaliado[1][0]],
-      //   [$base[2][0],$base[2][1],$avaliado[2][0]],
-      // ];
-      // $A =    $this->det($mA);
-      // $B = -1*$this->det($mB);
-      // $C =    $this->det($mC);
-      // $D = -1*$this->det($mD);
-      //
-      // $X = function($x,$y) use($A,$B,$C,$D){
-      //   return (-1*($A*$x+$B*$y+$D)) / $C;
-      // };
-      // echo $X(235,589);
-      // exit;
-      //
-      // $this->coefA = $this->solve3x3($A,$bx);
-      // $this->coefB = $this->solve3x3($A,$by);
-      // END TESTE PERSPECTIVA
-
-
       // $aaa = microtime(true);
       // $ocr = new OCR($this);
       // // $ocr = new OCR($this);
@@ -149,17 +83,6 @@ class Image {
       // $this->saveTime('barcode', $aaa); # tempo OCR
       $this->analisarRegioes();
       $this->organizarSaida();
-
-      // echo "ROT: " . $this->rot . "\n";
-
-      # testes - desenha retangulo
-      // $copia = Helper::copia($this->image);
-      // list($x0,$y0) = $this->ancoras[1]->getCentro();
-      // list($x1,$y1) = Helper::rotaciona($this->ancoras[3]->getCentro());
-      // list($a2x,$a2y) = Helper::rotaciona($this->ancoras[2]->getCentro());
-      // imageline($copia,$x0,$y0,$a2x,$a2y,imagecolorallocate($copia,0,255,0));
-      // Helper::rect($copia, $x0, $y0, $x1, $y1, 'asdasd');
-
       $this->saveTime('timeAll', $this->timeAll); # tempo total
 
       imagedestroy($this->image);
@@ -180,23 +103,12 @@ class Image {
       list($c1,$c2,$c3) = array_column($m,2);
       return $a1*($b2*$c3-$c2*$b3) - $a2*($b1*$c3-$c1*$b3) + $a3*($b1*$c2-$c1*$b2);
     }
-    # FIM TESTE PERSPECTIVA
-
 
     /**
     * Busca imagem e converte para cinza
     */
     protected function inicializar($arquivo){
-
-      # TODO: REMOVER ! USAR OS DADOS DA IMAGESM!!!!
-      $bitTeste = (int) substr($arquivo,-5,1);
-      if($bitTeste == 1 || $bitTeste == 2)
-        $this->resolucao = 200;
-
       $this->depoisDeDefinirResolucao();
-
-      echo 'Resolucao:  ' . $this->resolucao . "<<<--";
-
       if(DEBUG)
         $time = microtime(true);
       $this->arquivo = $arquivo;

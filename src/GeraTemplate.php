@@ -19,9 +19,9 @@ class GeraTemplate extends Image {
     $maxArea = 100000;
 
     // Tornar atributos
-    $minY = 70;
-    $maxY = 180;
-    $qtdLinhas = 27;
+    $minY = 15;
+    $maxY = 170;
+    $qtdLinhas = 25;
     $qtdColunas = 3;
 
     # busca todos os componentes conexos com área limitado por $minArea e $maxArea
@@ -73,7 +73,7 @@ class GeraTemplate extends Image {
     }
     foreach ($colunas as $col) {
       foreach ($col as $l) {
-        $cor = imagecolorallocate($copia,rand(0,255),0,rand(0,255));
+        $cor = imagecolorallocate($copia,rand(0,255),150,rand(0,255));
         $count = 0;
         foreach ($l as $c) {
           $char = 'a';

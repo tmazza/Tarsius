@@ -6,7 +6,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 $processar = true;
-$nomeTemplate = 'FAURGS_80';
+$nomeTemplate = 'COPERSE_75';
 // $nomeTemplate = 'LINHA_BASE';
 // $nomeTemplate = 'HCPA_2015_345';
 // $nomeTemplate = 'TESTE_FAURGS_100';
@@ -27,7 +27,6 @@ $count = 0;
 foreach ($files as $f) {
   try {
     $count++;
-    # TODO: instanciar somente um objeto de imagem!
     if($processar){
       $image = new Image($nomeTemplate);
     } else {
