@@ -19,9 +19,9 @@ include __DIR__.'/Helper.php';
 include __DIR__.'/ConnectedComponent.php';
 include __DIR__.'/Assinatura.php';
 include __DIR__.'/AnalisarRegioes.php';
-include __DIR__.'/OCR.php';
-include __DIR__.'/OCR_teste.php';
-include __DIR__.'/Barcode.php';
+// include __DIR__.'/OCR.php';
+// include __DIR__.'/OCR_teste.php';
+// include __DIR__.'/Barcode.php';
 
 /**
  * Description of Image

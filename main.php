@@ -6,10 +6,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 $processar = true;
-$nomeTemplate = 'COPERSE_75';
-// $nomeTemplate = 'LINHA_BASE';
-// $nomeTemplate = 'HCPA_2015_345';
-// $nomeTemplate = 'TESTE_FAURGS_100';
+$nomeTemplate = 'FAURGS_100';
 
 if($processar){
   include_once './src/Image.php';
@@ -18,7 +15,7 @@ if($processar){
   include_once './src/GeraTemplate.php';
 }
 
-$baseDir = __DIR__ . '/image/processar/';
+$baseDir = __DIR__ . '/image/processar/'; // Source
 $files = scandir($baseDir);
 unset($files[0]);
 unset($files[1]);

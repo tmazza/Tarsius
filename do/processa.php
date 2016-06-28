@@ -1,6 +1,6 @@
 <?php
 include_once __DIR__ . '/../src/Image.php';
-// Busca imagens do diretório origem e move para exec cria um diretorio temporario
+// Busca imagens do diretï¿½rio origem e move para exec cria um diretorio temporario
 set_time_limit(0);
 ini_set('memory_limit', '2048M');
 
@@ -34,7 +34,7 @@ foreach ($files as $i => $f) {
   // $arquivoDest = str_replace('exec/ready/'.$dirIn,'done/img',$arquivo);
   $arquivoDest = $dirOut.'/'.$f;
 
-  $template = 'FAURGS_80';
+  $template = 'LINHA_BASE';
   // $template = 'HCPA_2015_345';
   // $template = 'FAURGS_100';
 
@@ -70,9 +70,9 @@ foreach ($files as $i => $f) {
 
   // move imagem para pasta de finalizadas
   rename($arquivo,$arquivoDest);
-
-  // Atualiza arquivo compartilhado de resoluções
-  $outData = ["'".pathinfo($f,PATHINFO_FILENAME)."'",$presenca,$str,$start,time(),number_format($tempoExec,6) * 1000000];
+  echo 'Movendo de ' . $arquivo . ' - ' . $arquivoDest . "\n";
+  // Atualiza arquivo compartilhado de resoluï¿½ï¿½es
+  $outData = ["'".pathinfo($f,PATHINFO_FILENAME)."'",$presenca,$str,$start,time(),number_format((float)$tempoExec,6) * 1000000];
   $strOut = implode(';',$outData)."\n";
 
   $export = fopen(__DIR__.'/out.csv','a');
