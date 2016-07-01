@@ -5,3 +5,4 @@ image/testes/*
 logs/*
 do/finalizados/1*
 operation_log.txt
+*.db

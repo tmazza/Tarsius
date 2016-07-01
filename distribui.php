@@ -1,12 +1,20 @@
+#!/usr/bin/php
 <?php
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 set_time_limit(0);
 ini_set('memory_limit', '2048M');
 date_default_timezone_set('America/Sao_Paulo');
 
 $db = new PDO('sqlite:tarsius.db');
+$trabId = 1;
+
 $getTrabalho = $db->prepare('SELECT * FROM trabalho WHERE id = :trabId');
 $addDistribuido = $db->prepare('INSERT INTO distribuido (trabalho_id,nome,status) VALUES (:trabId,:nome,:status)');
 $getJaDistribuido = $db->prepare('SELECT nome FROM distribuido WHERE trabalho_id = :trabId');
+$criarProcesso = $db->prepare('INSERT INTO processo (pid,status,trabalho_id,workDir) VALUES (:pid,:status,:trabId,:workDir)');
 
 // Busca imagens do diret�rio origem e move para exec cria um diretorio temporario
 
@@ -18,10 +26,9 @@ $qtdProcessos           = $processadores + ceil(0.25*$processadores);
 $tamMaxBlocoPorProcesso = 250;
 $espera                 = 1; # em segndos
 
-
-$trabId = 29;
 $getTrabalho->execute([':trabId'=>$trabId]);
 $data = $getTrabalho->fetch(PDO::FETCH_ASSOC);
+$getTrabalho->closeCursor();
 
 if(is_null($data['sourceDir']))
   die("\tQual a pasta do concurso?\n");
@@ -69,7 +76,6 @@ while (1) {
             mkdir($dirDest);
             foreach ($bloco as $file) {
                 if (rename($dirOrigem . '/' . $file, $dirDest . $file)) {
-                    //if(copy($dirOrigem.$file,$dirDest.$file)){
                     setJaProcessados($trabId,$file,$addDistribuido);
                 } else {
                     echo 'Arquivo n�o copiado ' . $file . "\n";
@@ -80,16 +86,18 @@ while (1) {
             echo ($i + 1) . ' ';
 
             //shell_exec('hhvm processa.php ' . $dirHash . ' ' . $dirOrigem);
-            shell_exec('php do/processa.php ' . $dirHash . ' ' . $dirOrigem . ' > /dev/null &');
+            $cmd = 'php processa.php ' . $dirHash . ' ' . $dirOrigem . ' ' . $trabId;
+            $pid = exec($cmd . ' > /dev/null 2>&1 & echo $!; ');
+            $criarProcesso->execute([
+              ':pid'=>$pid,
+              ':trabId'=>$trabId,
+              ':status'=>1,
+              ':workDir'=>$dirHash,
+            ]);
+            $criarProcesso->closeCursor();
         }
 
         echo "\n";
-    } else {
-        //if($processosParaCriar == 0){
-        //  echo " - Limite de {$qtdProcessos} processos atingido. Aguardando...";
-        //} else {
-        //  echo " - Nenhum arquivo.";
-        //}
     }
     echo "\r" . 'Aguardando...';
     sleep($espera);
@@ -97,22 +105,23 @@ while (1) {
 
 function getQtdProcessosNaoFinalizados()
 {
-    $qtd = 0;
-    $dir = __DIR__ . '/exec/ready';
-    if (file_exists($dir)) {
-        $files = array_filter(scandir($dir), function($i)
-        {
-            return $i != '.' && $i != '..';
-        });
-        $qtd   = count($files);
-    }
-    return $qtd;
+  $qtd = 0;
+  $dir = __DIR__ . '/exec/ready';
+  if (file_exists($dir)) {
+      $files = array_filter(scandir($dir), function($i){
+          return $i != '.' && $i != '..';
+      });
+      $qtd   = count($files);
+  }
+  return $qtd;
 }
 
 function getJaProcessados($trabId,$getJaDistribuido)
 {
   $getJaDistribuido->execute([':trabId'=>$trabId]);
-  return array_column($getJaDistribuido->fetchAll(),'nome');
+  $data = array_column($getJaDistribuido->fetchAll(),'nome');
+  $getJaDistribuido->closeCursor();
+  return $data;
 }
 
 function setJaProcessados($trabId,$str,$addDistribuido)
@@ -122,4 +131,5 @@ function setJaProcessados($trabId,$str,$addDistribuido)
     ':nome'=>$str,
     ':status'=>1,
   ]);
+  $addDistribuido->closeCursor();
 }
