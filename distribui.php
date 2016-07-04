@@ -1,6 +1,5 @@
 #!/usr/bin/php
 <?php
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -8,9 +7,10 @@ set_time_limit(0);
 ini_set('memory_limit', '2048M');
 date_default_timezone_set('America/Sao_Paulo');
 
-$db = new PDO('sqlite:tarsius.db');
-$trabId = 1;
+if(!isset($argv[1])) die("Qual o trabalho?\n");
+$trabId = $argv[1];
 
+$db = new PDO('sqlite:'.__DIR__.'/tarsius.db');
 $getTrabalho = $db->prepare('SELECT * FROM trabalho WHERE id = :trabId');
 $addDistribuido = $db->prepare('INSERT INTO distribuido (trabalho_id,nome,status) VALUES (:trabId,:nome,:status)');
 $getJaDistribuido = $db->prepare('SELECT nome FROM distribuido WHERE trabalho_id = :trabId');
@@ -43,8 +43,8 @@ if (!is_dir($dirExec))
 $dirReady = $dirExec . '/ready';
 if (!is_dir($dirReady))
     mkdir($dirReady);
-
-while (1) {
+$keepRunning = true;
+while ($keepRunning) {
 
     $processosNaoFinalizados = getQtdProcessosNaoFinalizados();
 
@@ -99,9 +99,23 @@ while (1) {
 
         echo "\n";
     }
+
+    $getTrabalho->execute([':trabId'=>$trabId]);
+    $data = $getTrabalho->fetch(PDO::FETCH_ASSOC);
+    $getTrabalho->closeCursor();
+    if($data['status'] != 1){
+      $keepRunning = false;
+    }
     echo "\r" . 'Aguardando...';
     sleep($espera);
 }
+
+$setStatusTrabalho = $db->prepare('UPDATE trabalho SET status = :status WHERE id = :trabId');
+$setStatusTrabalho->execute([
+   ':trabId'=>$trabId,
+   ':status'=>0,
+]);
+$setStatusTrabalho->closeCursor();
 
 function getQtdProcessosNaoFinalizados()
 {
