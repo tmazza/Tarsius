@@ -12,9 +12,9 @@ $trabId = $argv[1];
 
 $db = new PDO('sqlite:'.__DIR__.'/tarsius.db');
 $getTrabalho = $db->prepare('SELECT * FROM trabalho WHERE id = :trabId');
-$addDistribuido = $db->prepare('INSERT INTO distribuido (trabalho_id,nome,status) VALUES (:trabId,:nome,:status)');
+$addDistribuido = $db->prepare('INSERT INTO distribuido (trabalho_id,nome,status,tempDir) VALUES (:trabId,:nome,:status,:tempDir)');
 $getJaDistribuido = $db->prepare('SELECT nome FROM distribuido WHERE trabalho_id = :trabId');
-$criarProcesso = $db->prepare('INSERT INTO processo (pid,status,trabalho_id,workDir) VALUES (:pid,:status,:trabId,:workDir)');
+$criarProcesso = $db->prepare('INSERT INTO processo (pid,status,trabalho_id,workDir,qtd) VALUES (:pid,:status,:trabId,:workDir,:qtd)');
 
 // Busca imagens do diret�rio origem e move para exec cria um diretorio temporario
 
@@ -24,11 +24,11 @@ if ($processadores <= 0)
 echo $processadores . ' processador(es) encontrados' . "\n";
 $qtdProcessos           = $processadores + ceil(0.25*$processadores);
 $tamMaxBlocoPorProcesso = 250;
-$espera                 = 1; # em segndos
 
 $getTrabalho->execute([':trabId'=>$trabId]);
 $data = $getTrabalho->fetch(PDO::FETCH_ASSOC);
 $getTrabalho->closeCursor();
+$espera = $data['tempoDistribuicao'];
 
 if(is_null($data['sourceDir']))
   die("\tQual a pasta do concurso?\n");
@@ -76,7 +76,7 @@ while ($keepRunning) {
             mkdir($dirDest);
             foreach ($bloco as $file) {
                 if (rename($dirOrigem . '/' . $file, $dirDest . $file)) {
-                    setJaProcessados($trabId,$file,$addDistribuido);
+                    setJaProcessados($trabId,$file,$addDistribuido,$dirHash);
                 } else {
                     echo 'Arquivo n�o copiado ' . $file . "\n";
                 }
@@ -93,6 +93,7 @@ while ($keepRunning) {
               ':trabId'=>$trabId,
               ':status'=>1,
               ':workDir'=>$dirHash,
+              ':qtd'=>count($bloco),
             ]);
             $criarProcesso->closeCursor();
         }
@@ -105,6 +106,7 @@ while ($keepRunning) {
     $getTrabalho->closeCursor();
     if($data['status'] != 1){
       $keepRunning = false;
+      $espera = $data['tempoDistribuicao'];
     }
     echo "\r" . 'Aguardando...';
     sleep($espera);
@@ -138,12 +140,13 @@ function getJaProcessados($trabId,$getJaDistribuido)
   return $data;
 }
 
-function setJaProcessados($trabId,$str,$addDistribuido)
+function setJaProcessados($trabId,$str,$addDistribuido,$dirHash)
 {
   $addDistribuido->execute([
     ':trabId'=>$trabId,
     ':nome'=>$str,
     ':status'=>1,
+    ':tempDir'=>$dirHash,
   ]);
   $addDistribuido->closeCursor();
 }

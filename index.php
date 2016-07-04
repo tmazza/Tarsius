@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 $db = new PDO('sqlite:tarsius.db');
 $getTrabalho = $db->prepare('SELECT * FROM trabalho WHERE id = :trabId');
 $getProcessos = $db->prepare('SELECT * FROM processo WHERE trabalho_id = :trabId');
+$getQtdProcessada = $db->prepare('SELECT p.id,d.status,count(*) as qtd FROM processo p JOIN distribuido d ON d.tempDir = workDir AND d.status != 2 WHERE p.trabalho_id = :trabId GROUP BY p.id');
 
 $trabId = 29;
 $getTrabalho->execute([':trabId'=>$trabId]);
@@ -13,6 +14,17 @@ $getTrabalho->closeCursor();
 $getProcessos->execute([':trabId'=>$trabId]);
 $processos = $getProcessos->fetchAll(PDO::FETCH_ASSOC);
 $getProcessos->closeCursor();
+
+$getQtdProcessada->execute([':trabId'=>$trabId]);
+$qtdProcessada = $getQtdProcessada->fetchAll(PDO::FETCH_ASSOC);
+$getQtdProcessada->closeCursor();
+
+$faltaProcessar = [];
+foreach ($qtdProcessada as $q) {
+  $faltaProcessar[$q['id']] = $q['qtd'];
+}
+
+
 
 echo $data['id'] . ' | ';
 echo $data['nome'] . ' | ';
@@ -27,11 +39,15 @@ if($data['status'] == 0){
 } else {
   echo '???';
 }
+?>
 
-echo '<hr>';
+<hr>
+<table style='width:100%;font-family:monospace;'>
+  <?php foreach ($processos as $p): ?>
+    <?php $cor = $p['status'] == 1 ? '#7a7' : 'transparent'; ?>
+    <tr style="background:<?=$cor?>"><td><?=implode('</td><td>',$p)?></td>
+      <?php if(isset($faltaProcessar[$p['id']])) echo '<td>' . $faltaProcessar[$p['id']] . '</td>'; ?>
 
-foreach ($processos as $p) {
-  echo '<div' . ( $p['status'] == 1 ? ' style="background:#7a7" ' : '' ). '>';
-  echo $p['id'] . ' - ' . $p['pid'] . ' - ' . $p['trabalho_id'] . ' - ' . $p['workDir'] . '| ' . $p['status'] .  '<br>';
-  echo '</div>';
-}
+    </tr>
+  <?php endforeach; ?>
+</table>
