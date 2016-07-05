@@ -7,7 +7,7 @@ $setAsProcessada = $db->prepare('UPDATE distribuido SET status = :status WHERE t
 $setStatusProcesso = $db->prepare('UPDATE processo SET status = :status WHERE trabalho_id = :trabId AND pid = :pid');
 $getStatusProc = $db->prepare("SELECT status FROM processo WHERE trabalho_id = :trab AND pid = :pid");
 
-include_once __DIR__ . '/../tarsius/src/Image.php';
+include_once __DIR__ . '/../src/Image.php';
 
 if(!isset($argv[1])) die("Informe um diretorio de trabalho.\n");
 if(!isset($argv[2])) die("Informe um diretorio de origem.\n");
@@ -52,7 +52,6 @@ foreach ($files as $i => $f) {
     $template = 'LINHA_BASE';
 
     try {
-      // $image = new Image('1602_50');
       $image = new Image($template);
       $image->exec($arquivo);
 
