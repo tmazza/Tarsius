@@ -10,7 +10,7 @@ date_default_timezone_set('America/Sao_Paulo');
 if(!isset($argv[1])) die("Qual o trabalho?\n");
 $trabId = $argv[1];
 
-$db = new PDO('sqlite:'.__DIR__.'/tarsius.db');
+$db = new PDO('sqlite:tarsius.db');
 $getTrabalho = $db->prepare('SELECT * FROM trabalho WHERE id = :trabId');
 $addDistribuido = $db->prepare('INSERT INTO distribuido (trabalho_id,nome,status,tempDir) VALUES (:trabId,:nome,:status,:tempDir)');
 $getJaDistribuido = $db->prepare('SELECT nome FROM distribuido WHERE trabalho_id = :trabId');

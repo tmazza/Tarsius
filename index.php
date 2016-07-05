@@ -1,3 +1,4 @@
+<meta http-equiv="refresh" content="2">
 <?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -31,23 +32,22 @@ echo $data['nome'] . ' | ';
 echo '<code>' . $data['sourceDir'] . '</code>';
 
 if($data['status'] == 0){
-  echo '<a href="iniciarTrabalho.php?id='.$trabId.'">Iniciar</a>';
+  echo '<a href="iniciarTrabalho.php?id='.$trabId.'">Iniciar distribuição</a>';
+  echo " | <a href='cancelarTrabalho.php?id=".$trabId."' onclick='return confirm(\'Certeza ?\')'>Cancelar trabalho</a>";
 } else if($data['status'] == 1) {
-  echo '<a href="pararTrabalho.php?id='.$trabId.'">Parar</a>';
+  echo '<a href="pararTrabalho.php?id='.$trabId.'">Parar distribuição</a>';
 } else if($data['status'] == 2) {
   echo "Parando...";
 } else {
   echo '???';
 }
 ?>
-
 <hr>
 <table style='width:100%;font-family:monospace;'>
   <?php foreach ($processos as $p): ?>
     <?php $cor = $p['status'] == 1 ? '#7a7' : 'transparent'; ?>
     <tr style="background:<?=$cor?>"><td><?=implode('</td><td>',$p)?></td>
       <?php if(isset($faltaProcessar[$p['id']])) echo '<td>' . $faltaProcessar[$p['id']] . '</td>'; ?>
-
-    </tr>
+      </tr>
   <?php endforeach; ?>
 </table>
