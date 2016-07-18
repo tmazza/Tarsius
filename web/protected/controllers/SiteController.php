@@ -1,12 +1,14 @@
 <?php
-class SiteController extends CController {
+class SiteController extends BaseController {
 
 
   public function actionIndex(){
-    $trabalhos = Trabalho::model()->findAll();
-    $this->render('index',[
-      'trabalhos'=>$trabalhos,
-    ]);
+    $this->render('index');
   }
+
+  public function actionError(){
+    echo 'erro';
+  }
+
 
 }

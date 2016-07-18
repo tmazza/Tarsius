@@ -30,13 +30,11 @@ class Trabalho extends CActiveRecord
 	 */
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
 		return array(
+			array('nome, sourceDir, tempoDistribuicao', 'required'),
 			array('status, pid, tempoDistribuicao', 'numerical', 'integerOnly'=>true),
+			array('status','default','setOnEmpty'=>true,'value'=>0),
 			array('nome, sourceDir', 'safe'),
-			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
 			array('id, nome, sourceDir, status, pid, tempoDistribuicao', 'safe', 'on'=>'search'),
 		);
 	}
@@ -44,10 +42,7 @@ class Trabalho extends CActiveRecord
 	/**
 	 * @return array relational rules.
 	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
+	public function relations() {
 		return array(
 			'processos' => array(self::HAS_MANY, 'Processo', 'trabalho_id'),
 			'distribuidos' => array(self::HAS_MANY, 'Distribuido', 'trabalho_id'),
@@ -67,36 +62,6 @@ class Trabalho extends CActiveRecord
 			'pid' => 'Pid',
 			'tempoDistribuicao' => 'Tempo Distribuicao',
 		);
-	}
-
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 *
-	 * Typical usecase:
-	 * - Initialize the model fields with values from filter form.
-	 * - Execute this method to get CActiveDataProvider instance which will filter
-	 * models according to data in model fields.
-	 * - Pass data provider to CGridView, CListView or any similar widget.
-	 *
-	 * @return CActiveDataProvider the data provider that can return the models
-	 * based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('id',$this->id);
-		$criteria->compare('nome',$this->nome,true);
-		$criteria->compare('sourceDir',$this->sourceDir,true);
-		$criteria->compare('status',$this->status);
-		$criteria->compare('pid',$this->pid);
-		$criteria->compare('tempoDistribuicao',$this->tempoDistribuicao);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
 	}
 
 	/**
