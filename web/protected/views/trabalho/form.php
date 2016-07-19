@@ -1,3 +1,8 @@
+<?php
+$this->menu = [
+	['Cancelar',$this->createUrl('/trabalho/index')],
+];
+?>
 <h2>Trabalho</h2>
 <div class="uk-form">
 	<?php

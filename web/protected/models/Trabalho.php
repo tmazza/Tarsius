@@ -17,6 +17,12 @@
  */
 class Trabalho extends CActiveRecord
 {
+
+	const statusExecutando = 1;
+	const statusFinalizado = 2;
+	const statusDeveParar = 3;
+
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -44,7 +50,7 @@ class Trabalho extends CActiveRecord
 	 */
 	public function relations() {
 		return array(
-			'processos' => array(self::HAS_MANY, 'Processo', 'trabalho_id'),
+			'processos' => array(self::HAS_MANY, 'Processo', 'trabalho_id', 'order'=>'id DESC'),
 			'distribuidos' => array(self::HAS_MANY, 'Distribuido', 'trabalho_id'),
 		);
 	}
@@ -74,4 +80,31 @@ class Trabalho extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+	public function solicitaPausaProcessos()
+	{
+		return Processo::model()->updateAll([
+			'status'=>self::statusDeveParar,
+		],"trabalho_id = {$this->id} and status = " . self::statusExecutando) > 0;
+	}
+
+	public function qtdProcessosAtivos()
+	{
+		return Processo::model()->count("trabalho_id = {$this->id} and status != " . self::statusFinalizado);
+	}
+
+	public function getLabelStatus(){
+		switch ($this->status) {
+			case 0: return 'Parado';
+			case 1: return 'Distribuindo';
+			case 2: return 'Parando...';
+		}
+	}
+
+	public function getJaDistribuidos(){
+		return array_map(function($i){
+			return $i->nome;
+		},$this->distribuidos);
+	}
+
 }

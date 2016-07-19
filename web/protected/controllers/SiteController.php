@@ -7,7 +7,9 @@ class SiteController extends BaseController {
   }
 
   public function actionError(){
-    echo 'erro';
+    echo '<pre>';
+    print_r(Yii::app()->errorHandler);
+    echo '</pre>';
   }
 
 

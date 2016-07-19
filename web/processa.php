@@ -41,6 +41,10 @@ foreach ($files as $i => $f) {
     $proc = $getStatusProc->fetch(PDO::FETCH_ASSOC);
     $getStatusProc->closeCursor();
     $first = false;
+
+    echo 'STATUS:' . $proc['status'];
+
+
   }
   if($proc['status'] == 1){
     $start = time();
@@ -87,8 +91,6 @@ foreach ($files as $i => $f) {
     ':nome'=>basename($f,PATHINFO_FILENAME),
   ]);
   $setAsProcessada->closeCursor();
-
-  fwrite($hhh,"R{$aaa}: {$result} "  . json_encode($setAsProcessada->errorInfo()) . "\n");
 }
 
 $setStatusProcesso->execute([

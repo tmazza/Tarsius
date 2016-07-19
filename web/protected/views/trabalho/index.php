@@ -1,3 +1,8 @@
+<?php
+$this->menu = [
+	['Novo trabalho',$this->createUrl('/trabalho/novo')],
+];
+?>
 <h2>Trabalhos</h2>
 <?php foreach($trabalhos as $t): ?>
 	<h3>

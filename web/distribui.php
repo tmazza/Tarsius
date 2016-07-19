@@ -1,11 +1,5 @@
 #!/usr/bin/php
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-set_time_limit(0);
-ini_set('memory_limit', '2048M');
-date_default_timezone_set('America/Sao_Paulo');
 
 if(!isset($argv[1])) die("Qual o trabalho?\n");
 $trabId = $argv[1];

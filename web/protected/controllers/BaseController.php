@@ -1,6 +1,8 @@
 <?php
 class BaseController extends CController {
+
 	public $wb;
+	public $menu = [];
 
 	protected function beforeAction($action){
 		Yii::app()->clientScript->registerCoreScript('jquery');

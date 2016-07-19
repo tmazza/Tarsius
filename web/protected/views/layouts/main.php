@@ -40,7 +40,10 @@
                     <div class="uk-panel">
                         <h3 class="uk-panel-title">Ações</h3>
                         <ul class="uk-list uk-list-line">
-                            <li><?=CHtml::link('Novo trabalho',$this->createUrl('/trabalho/novo'));?></li>
+                        	<?php 
+                        	foreach ($this->menu as $i)
+                        		echo '<li>' . CHtml::link($i[0],$i[1],isset($i[2])?$i[2]:[]) . '</li>';
+                        	?>
                         </ul>
                     </div>
                 </div>
