@@ -38,7 +38,7 @@ if($trabalho->status == 1)
 		function notify(){
 			var notification = new Notification("Distribuindo...");
 		}
-		let count = 0;
+		var count = 0;
 		setInterval(function(){ 
 			$.ajax({
 				url: '<?=$this->createUrl('/trabalho/updateVer',['id'=>$trabalho->id]);?>',

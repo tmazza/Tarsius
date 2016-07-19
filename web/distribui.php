@@ -72,10 +72,10 @@ while ($keepRunning) {
                 if (rename($dirOrigem . '/' . $file, $dirDest . $file)) {
                     setJaProcessados($trabId,$file,$addDistribuido,$dirHash);
                 } else {
-                    echo 'Arquivo n�o copiado ' . $file . "\n";
+                    echo 'Arquivo não copiado ' . $file . "\n";
                 }
             }
-            // Diretorio onde outro programa estar� consultando
+            // Diretorio onde outro programa estara consultando
             rename($dirDest, $dirReady . '/' . $dirHash);
             echo ($i + 1) . ' ';
 

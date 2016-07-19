@@ -2691,3 +2691,32 @@ Stack trace:
 REQUEST_URI=/processamentoFolhas/tarsius/web/index.php/trabalho/ver/id/29
 HTTP_REFERER=http://localhost/processamentoFolhas/tarsius/web/index.php/trabalho/ver/id/29
 ---
+2016/07/19 13:45:27 [error] [php] Undefined variable: pid (/home/left/www/processamentoFolhas/tarsius/web/protected/controllers/TrabalhoController.php:59)
+Stack trace:
+#0 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(4164): CInlineAction->runWithParamsInternal()
+#1 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(3678): CInlineAction->runWithParams()
+#2 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(3663): TrabalhoController->runAction()
+#3 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(3653): TrabalhoController->runActionWithFilters()
+#4 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(1768): TrabalhoController->run()
+#5 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(1688): CWebApplication->runController()
+#6 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(1205): CWebApplication->processRequest()
+#7 /home/left/www/processamentoFolhas/tarsius/web/index.php(15): CWebApplication->run()
+REQUEST_URI=/processamentoFolhas/tarsius/web/index.php/trabalho/iniciar/id/29
+2016/07/19 13:47:14 [error] [php] mkdir(): Permission denied (/home/left/www/processamentoFolhas/tarsius/web/protected/commands/DistribuiCommand.php:77)
+Stack trace:
+#0 unknown(0): DistribuiCommand->actionIndex()
+#1 /home/left/www/processamentoFolhas/tarsius/web/yii/console/CConsoleCommand.php(172): ReflectionMethod->invokeArgs()
+#2 /home/left/www/processamentoFolhas/tarsius/web/yii/console/CConsoleCommandRunner.php(71): DistribuiCommand->run()
+#3 /home/left/www/processamentoFolhas/tarsius/web/protected/controllers/TrabalhoController.php(97): CConsoleCommandRunner->run()
+#4 /home/left/www/processamentoFolhas/tarsius/web/protected/controllers/TrabalhoController.php(57): TrabalhoController->runDistribui()
+#5 unknown(0): TrabalhoController->actionIniciar()
+#6 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(4147): ReflectionMethod->invokeArgs()
+#7 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(4164): CInlineAction->runWithParamsInternal()
+#8 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(3678): CInlineAction->runWithParams()
+#9 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(3663): TrabalhoController->runAction()
+#10 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(3653): TrabalhoController->runActionWithFilters()
+#11 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(1768): TrabalhoController->run()
+#12 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(1688): CWebApplication->runController()
+#13 /home/left/www/processamentoFolhas/tarsius/web/yii/yiilite.php(1205): CWebApplication->processRequest()
+#14 /home/left/www/processamentoFolhas/tarsius/web/index.php(15): CWebApplication->run()
+REQUEST_URI=/processamentoFolhas/tarsius/web/index.php/trabalho/iniciar/id/29

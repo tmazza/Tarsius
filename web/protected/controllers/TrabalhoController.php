@@ -18,7 +18,6 @@ class TrabalhoController extends BaseController {
 				$this->redirect($this->createUrl('/trabalho/index'));
 			}
 		}
-
 		$this->render('form',[
 			'model'=>$model,
 		]);
@@ -51,13 +50,10 @@ class TrabalhoController extends BaseController {
 	public function actionIniciar($id){
 		$trabalho = Trabalho::model()->findByPk((int)$id);
 
-		$file = Yii::getPathOfAlias('webroot') . '/distribui.php';
-
-		$cmd = 'php ' . $file . ' ' . $trabalho->id;
+		$cmd = Yii::getPathOfAlias('webroot') . '/protected/yiic distribui --trabId=' . $trabalho->id;
 		$pid = exec($cmd . ' > /dev/null 2>&1 & echo $!; ');
 
 		$trabalho->status = 1;
-		$trabalho->pid = $pid;
 		$trabalho->update(['status']);
 
 		$this->redirect($this->createUrl('/trabalho/ver',['id'=>$trabalho->id]));
@@ -89,6 +85,14 @@ class TrabalhoController extends BaseController {
 		$this->renderPartial('_ver',$this->getInfoTrabalho($id));
 	}
 
-
+	private function runDistribui($trabalho) {
+	    $commandPath = Yii::app()->getBasePath() . DIRECTORY_SEPARATOR . 'commands';
+	    $runner = new CConsoleCommandRunner();
+	    $runner->addCommands($commandPath);
+	    $commandPath = Yii::getFrameworkPath() . DIRECTORY_SEPARATOR . 'cli' . DIRECTORY_SEPARATOR . 'commands';
+	    $runner->addCommands($commandPath);
+	    $args = array('yiic', 'distribui', '--trabId='.$trabalho->id);
+	    $runner->run($args);
+	}
 
 }

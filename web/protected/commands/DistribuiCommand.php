@@ -77,21 +77,15 @@ class DistribuiCommand extends CConsoleCommand
             mkdir($dirDest); # temporario enquanto busca imagens de sourceDir
             foreach ($bloco as $file) {
               if (copy($this->trabalho->sourceDir . '/' . $file, $dirDest . $file)) 
-                true;
-                // $this->setJaDistribuido($file,$dirHash);
+                $this->setJaDistribuido($file,$dirHash);
               else
                 echo "Falha ao mover arquivo: {$file} \n";
             }
 
             rename($dirDest, $this->dirReady . '/' . $dirHash); # Diretorio final após buscar todas imagens do processo
             $cmd = "php " . __DIR__.'/../../processa.php' . " {$dirHash} {$this->trabalho->sourceDir} {$this->trabalho->id}";
-            $pid = exec($cmd);
-
-
-            echo $pid;
-            exit;
-            // $pid = exec($cmd . ' > /dev/null 2>&1 & echo $!; ');
-            // $this->criarProcesso($pid,$dirHash,count($bloco));
+            $pid = $pid = exec($cmd . ' > /dev/null 2>&1 & echo $!; ');
+            $this->criarProcesso($pid,$dirHash,count($bloco));
 
             echo ($i + 1) . ' ';
           }

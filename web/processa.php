@@ -2,7 +2,7 @@
 set_time_limit(0);
 ini_set('memory_limit', '2048M');
 
-$db = new PDO('sqlite:tarsius.db');
+$db = new PDO('sqlite:/home/left/www/processamentoFolhas/tarsius/web/tarsius.db');
 $setAsProcessada = $db->prepare('UPDATE distribuido SET status = :status WHERE trabalho_id = :trabId AND nome = :nome');
 $setStatusProcesso = $db->prepare('UPDATE processo SET status = :status WHERE trabalho_id = :trabId AND pid = :pid');
 $getStatusProc = $db->prepare("SELECT status FROM processo WHERE trabalho_id = :trab AND pid = :pid");
@@ -41,10 +41,7 @@ foreach ($files as $i => $f) {
     $proc = $getStatusProc->fetch(PDO::FETCH_ASSOC);
     $getStatusProc->closeCursor();
     $first = false;
-
     echo 'STATUS:' . $proc['status'];
-
-
   }
   if($proc['status'] == 1){
     $start = time();
