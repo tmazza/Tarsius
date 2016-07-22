@@ -39,7 +39,8 @@ class Helper {
 	}
 
 	public static function cria($image, $nome) {
-		imagepng($image, __DIR__ . '/../image/' . $nome . '.png');
+		$baseDir = __DIR__ . '/../data';
+		imagepng($image, $baseDir . '/runtime/' . $nome . '.png');
 	}
 
 	public static function rect($image, $x0, $y0, $x1, $y1, $nome) {

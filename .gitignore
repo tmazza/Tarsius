@@ -3,6 +3,9 @@ export/processados/*
 image/processar/*
 image/testes/*
 logs/*
+web/done
+web/exec
+web/assets
 do/finalizados/1*
 operation_log.txt
 *.db

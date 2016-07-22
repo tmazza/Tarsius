@@ -198,10 +198,10 @@ class Image {
      */
     private function loadTemplate($template) {
         $this->template = $template;
-        $this->medidas = include __DIR__.'/../template/' . $template . '.php';
+        $this->medidas = include __DIR__.'/../data/template/' . $template . '.php';
         $assinaturas = array();
         for ($i = 1; $i < 5; $i++) {
-            $image = Helper::load(__DIR__.'/../image/ancoras/ancora' . $i . '.jpg');
+            $image = Helper::load(__DIR__.'/ancoras/ancora' . $i . '.jpg');
             $assinaturas[$i] = $this->getAssinatura($image);
         }
         return $assinaturas;

@@ -46,8 +46,6 @@ class ProcessaCommand extends CConsoleCommand {
 		  }
 
 
-
-
 	      $arquivo = $this->dirIn.'/'.$f;
 	   	 $arquivoDest = $this->dirOut.'/'.$f;
 
@@ -56,7 +54,7 @@ class ProcessaCommand extends CConsoleCommand {
 		    $start = time();
 
  
-		    $template = 'LINHA_BASE'; // TODO: pegar do trabalho!
+		    $template = 'FAURGS_100'; // TODO: pegar do trabalho!
 
 		    try {
 		      $image = new Image($template);
