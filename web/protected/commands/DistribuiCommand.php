@@ -83,7 +83,12 @@ class DistribuiCommand extends CConsoleCommand
             }
 
             rename($dirDest, $this->dirReady . '/' . $dirHash); # Diretorio final após buscar todas imagens do processo
-            $cmd = "php " . __DIR__.'/../../processa.php' . " {$dirHash} {$this->trabalho->sourceDir} {$this->trabalho->id}";
+            $cmd = Yii::getPathOfAlias('application') .'/yiic processa';
+            $cmd .= " --dirIn={$dirHash}";
+            $cmd .= " --dirOut={$this->trabalho->sourceDir}";
+            $cmd .= " --trabId={$this->trabalho->id}";
+
+            echo $cmd . "\n";
             $pid = $pid = exec($cmd . ' > /dev/null 2>&1 & echo $!; ');
             $this->criarProcesso($pid,$dirHash,count($bloco));
 
