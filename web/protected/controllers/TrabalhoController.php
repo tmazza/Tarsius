@@ -27,6 +27,22 @@ class TrabalhoController extends BaseController {
 		$this->render('ver',$this->getInfoTrabalho($id));
 	}
 
+	public function actionEditar($id){
+		$model = Trabalho::model()->findByPk((int)$id);
+
+		if(isset($_POST['Trabalho'])){
+			$model->attributes = $_POST['Trabalho'];
+			if($model->validate()){
+				$model->save();
+				$this->redirect($this->createUrl('/trabalho/index'));
+			}
+		}
+
+		$this->render('form',[
+			'model'=>$model,
+		]);
+	}
+
 	private function getInfoTrabalho($id){		
 		$trabalho = Trabalho::model()->findByPk((int)$id);
 

@@ -10,6 +10,9 @@ $this->menu = [
 			'id'=>$t->id,
 		]));?>		
 	</h3>
+	<?=CHtml::link('Configurar',$this->createUrl('/trabalho/editar',['id'=>$t->id,]));?>
+	<br>
+
 	<?=$t->sourceDir?><br>
 	<?=$t->tempoDistribuicao?> seg
 	<hr>

@@ -3,6 +3,7 @@ $this->menu = [];
 
 if($trabalho->status == 0){
 	$this->menu[] = ['Iniciar distribuição',$this->createUrl('/trabalho/iniciar',['id'=>$trabalho->id,])];
+	$this->menu[] = ['Configurar',$this->createUrl('/trabalho/editar',['id'=>$trabalho->id,])];
 	$this->menu[] = ['Excluir trabalho',$this->createUrl('/trabalho/excluir',['id'=>$trabalho->id,]),[
 		'confirm'=>'Certeza?',]];
 }
