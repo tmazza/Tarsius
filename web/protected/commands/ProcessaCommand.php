@@ -9,7 +9,7 @@ class ProcessaCommand extends CConsoleCommand {
 	public $trabalho;
 
 	public function __construct(){
-		$this->dirBase = __DIR__ . '/../..';
+		$this->dirBase = __DIR__ . '/../../../data/runtime';
 	}
 
 	public function actionIndex($dirIn=false,$dirOut=false,$trabId=false){
@@ -17,16 +17,14 @@ class ProcessaCommand extends CConsoleCommand {
 		if(!$dirIn) die("Informe um diretorio de trabalho.\n");
 		if(!$dirOut) die("Informe um diretorio de origem.\n");
 		if(!$trabId) die("Qual o trabID ?.\n");
-		$this->dirIn .= $this->dirBase . '/exec/ready/' . $dirIn;
+
+		$this->dirIn .= $this->dirBase . '/trab-'.$trabId.'/exec/ready/' . $dirIn;
 		$this->dirOut = $dirOut;
 		if(!is_dir($this->dirBase))	die("Diretorio de trabalho nao encontrado.\n");
 
 		$this->pid = getmypid();
 
-		$dirDone = $this->dirBase.'/done';
-		if(!is_dir($dirDone)) mkdir($dirDone,0777);
-
-		$dirDoneFile = $this->dirBase.'/done/file';
+		$dirDoneFile = $this->dirBase.'/trab-'.$trabId.'/file';
 		if(!is_dir($dirDoneFile)) mkdir($dirDoneFile,0777);
 
 		$files = array_filter(scandir($this->dirIn),function($i) { 

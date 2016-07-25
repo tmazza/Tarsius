@@ -22,19 +22,22 @@ class DistribuiCommand extends CConsoleCommand
     # Quantidade máxima de processos
     $this->qtdProcessos = $this->qtdProcessadores + ceil(0.25*$processadores);
 
-    $this->dirBase = __DIR__ . '/../..';
+    $this->dirBase = __DIR__ . '/../../../data/runtime';
 
   }
 
   public function actionIndex($trabId=false){
     if($trabId){
-      $this->setTrabalho($trabId);
+      $this->setTrabalho($trabId);  
 
-      $this->dirExec = $this->dirBase . '/exec';
-      if (!is_dir($this->dirExec)) mkdir($this->dirExec);
+      # Diretório de trabalho
+      if (!is_dir($this->dirBase . '/trab-'.$trabId)) mkdir($this->dirBase . '/trab-'.$trabId,0777);
+
+      $this->dirExec = $this->dirBase . '/trab-'.$trabId.'/exec';
+      if (!is_dir($this->dirExec)) mkdir($this->dirExec,0777);
 
       $this->dirReady = $this->dirExec . '/ready';
-      if (!is_dir($this->dirReady)) mkdir($this->dirReady);
+      if (!is_dir($this->dirReady)) mkdir($this->dirReady,0777);
 
       $this->loop();
       $this->trabalho->status = 0;
