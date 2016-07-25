@@ -10,6 +10,8 @@ if($trabalho->status == 0){
 if($trabalho->status == 1)
 	$this->menu[] = ['Pausar distribuição',$this->createUrl('/trabalho/pausar',['id'=>$trabalho->id,])];
 
+$this->menu[] = ['Debug finalizadas',$this->createUrl('/trabalho/finalizadas',['id'=>$trabalho->id,])];
+
 ?>
 <h3>
 	<?=CHtml::link('Trabalhos',$this->createUrl('/trabalho/index'));?> 

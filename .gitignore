@@ -6,6 +6,7 @@ logs/*
 web/done
 web/exec
 web/assets
+web/protected/runtime
 do/finalizados/1*
 operation_log.txt
 *.db

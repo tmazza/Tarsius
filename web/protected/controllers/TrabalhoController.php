@@ -104,6 +104,13 @@ class TrabalhoController extends BaseController {
 		$this->renderPartial('_ver',$this->getInfoTrabalho($id));
 	}
 
+	public function actionFinalizadas($id){
+		$trabalho = Trabalho::model()->findByPk((int)$id);
+		$this->render('finalizadas',[
+			'trabalho'=>$trabalho,
+		]);		
+	}
+
 	private function runDistribui($trabalho) {
 	    $commandPath = Yii::app()->getBasePath() . DIRECTORY_SEPARATOR . 'commands';
 	    $runner = new CConsoleCommandRunner();
