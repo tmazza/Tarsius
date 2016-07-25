@@ -9,7 +9,6 @@ define('EXPANSAO_BUSCA', 0.4); # taxa de aumento da área de busca
 define('QTD_EXPANSOES_BUSCA', 5);
 
 define('MATCH_ANCORA', 0.85);
-define('PREENCHIMENTO_MINIMO', 0.33);
 define('RESOLUCAO_IMAGEM', 300); # EM DPI
 
 include __DIR__.'/Buscador.php';
@@ -49,8 +48,9 @@ class Image {
     public $coefA;
     public $coefB;
 
-    public function __construct($template) {
+    public function __construct($template,$preenchimentoMinimo=0.3) {
       $this->template = $template;
+      $this->preenchimentoMinimo = $preenchimentoMinimo; 
     }
 
     private function depoisDeDefinirResolucao(){
@@ -150,7 +150,7 @@ class Image {
 
       $this->output['CORTE_PRETO'] = CORTE_PRETO;
       $this->output['MATCH_ANCORA'] = MATCH_ANCORA;
-      $this->output['PREENCHIMENTO_MINIMO'] = PREENCHIMENTO_MINIMO;
+      $this->output['PREENCHIMENTO_MINIMO'] = $this->preenchimentoMinimo;
       $this->output['RESOLUCAO_IMAGEM'] = $this->resolucao;
 
     }

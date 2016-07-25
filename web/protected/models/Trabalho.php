@@ -40,7 +40,7 @@ class Trabalho extends CActiveRecord
 			array('nome, sourceDir, tempoDistribuicao', 'required'),
 			array('status, pid, tempoDistribuicao', 'numerical', 'integerOnly'=>true),
 			array('status','default','setOnEmpty'=>true,'value'=>0),
-			array('nome, sourceDir, template', 'safe'),
+			array('nome, sourceDir, template, taxaPreenchimento', 'safe'),
 			array('id, nome, sourceDir, status, pid, tempoDistribuicao', 'safe', 'on'=>'search'),
 		);
 	}
@@ -67,6 +67,7 @@ class Trabalho extends CActiveRecord
 			'status' => 'Status',
 			'pid' => 'Pid',
 			'tempoDistribuicao' => 'Tempo Distribuicao',
+			'taxaPreenchimento' => 'Taxa preenchimento mínimo',
 		);
 	}
 

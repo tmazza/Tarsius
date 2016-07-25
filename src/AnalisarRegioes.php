@@ -85,7 +85,7 @@ class AnalisarRegioes {
 
   private function interpretaElipse($id,$r,$e){
   $taxaPreenchimento = $this->getTaxaPreenchimento($e);
-  $minMatch = PREENCHIMENTO_MINIMO;
+  $minMatch = $this->image->preenchimentoMinimo;
 
   if(DEBUG){
 

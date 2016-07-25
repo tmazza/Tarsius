@@ -14,10 +14,6 @@ class ProcessaCommand extends CConsoleCommand {
 
 	public function actionIndex($dirIn=false,$dirOut=false,$trabId=false){
 
-		// echo '***' . Yii::getPathOfAlias('webroot') . '/../../src/*' . "\n";
-		// exit;
-
-
 		if(!$dirIn) die("Informe um diretorio de trabalho.\n");
 		if(!$dirOut) die("Informe um diretorio de origem.\n");
 		if(!$trabId) die("Qual o trabID ?.\n");
@@ -28,16 +24,14 @@ class ProcessaCommand extends CConsoleCommand {
 		$this->pid = getmypid();
 
 		$dirDone = $this->dirBase.'/done';
-		if(!is_dir($dirDone)) mkdir($dirDone);
+		if(!is_dir($dirDone)) mkdir($dirDone,0777);
 
 		$dirDoneFile = $this->dirBase.'/done/file';
-		if(!is_dir($dirDoneFile)) mkdir($dirDoneFile);
+		if(!is_dir($dirDoneFile)) mkdir($dirDoneFile,0777);
 
 		$files = array_filter(scandir($this->dirIn),function($i) { 
 		  return pathinfo($i, PATHINFO_EXTENSION) == 'jpg'; 
 		});
-
-	    // $template = 'FAURGS_100';
 
 		$count = 0;
 		$first = true;
@@ -57,7 +51,7 @@ class ProcessaCommand extends CConsoleCommand {
 		    $start = time();
 
 		    try {
-		      $image = new Image($template);
+		      $image = new Image($template,$this->trabalho->taxaPreenchimento);
 		      $image->exec($arquivo);
 		      // altera referencia para o arquivo
 		      $image->output['arquivo'] = $arquivoDest;
@@ -75,7 +69,6 @@ class ProcessaCommand extends CConsoleCommand {
 		      $tempoExec = '??';
 		      $imageOutPut = ['erro'=>$e->getMessage()];
 		    }
-
 		    
 		    // salva debug do arquivo
 		    $export = fopen($dirDoneFile.'/'.$f.'.json','w');
