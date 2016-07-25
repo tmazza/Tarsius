@@ -121,6 +121,7 @@ class DistribuiCommand extends CConsoleCommand
     $model->status = 1;
     $model->trabalho_id = $this->trabalho->id;
     $model->tempDir = $dirHash;
+    $model->dataDistribuicao = time();
     $model->save();
   }
 

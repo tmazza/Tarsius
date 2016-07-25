@@ -28,13 +28,9 @@ class Distribuido extends CActiveRecord
 	 */
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
 		return array(
 			array('status, trabalho_id', 'numerical', 'integerOnly'=>true),
-			array('nome, tempDir', 'safe'),
-			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
+			array('nome, tempDir,dataDistribuicao,dataFechamento', 'safe'),
 			array('id, nome, status, trabalho_id, tempDir', 'safe', 'on'=>'search'),
 		);
 	}

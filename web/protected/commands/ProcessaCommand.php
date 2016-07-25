@@ -81,7 +81,8 @@ class ProcessaCommand extends CConsoleCommand {
 
 	
 		  $qtd = Distribuido::model()->updateAll([
-		  	'status'=>$this->trabalho->status == 1 ? 2 : 3,		  	
+		  	'status'=>$this->trabalho->status == 1 ? 2 : 3,	
+		  	'dataFechamento'=>time(),	  	
 		  ],[
 		  	'condition'=>"trabalho_id={$this->trabalho->id} AND nome='{$f}'",
 		  ]);
