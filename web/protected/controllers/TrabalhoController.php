@@ -20,6 +20,8 @@ class TrabalhoController extends BaseController {
 		}
 		$this->render('form',[
 			'model'=>$model,
+			'templates' => $this->getTemplate(),
+
 		]);
 	}
 
@@ -40,6 +42,7 @@ class TrabalhoController extends BaseController {
 
 		$this->render('form',[
 			'model'=>$model,
+			'templates' => $this->getTemplate(),
 		]);
 	}
 
@@ -109,6 +112,16 @@ class TrabalhoController extends BaseController {
 	    $runner->addCommands($commandPath);
 	    $args = array('yiic', 'distribui', '--trabId='.$trabalho->id);
 	    $runner->run($args);
+	}
+
+
+	private function getTemplate(){
+		$templatesDir = Yii::app()->params['templatesDir'];
+		$files = CFileHelper::findFiles($templatesDir);
+		$valores = array_map(function($i){ 
+			return pathinfo(basename($i),PATHINFO_FILENAME); 
+		},$files);
+		return array_combine($files,$valores);
 	}
 
 }

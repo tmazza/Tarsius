@@ -43,5 +43,7 @@ return array(
             ),
         ),
     ),
-    'params' => array(),
+    'params' => [
+        'templatesDir'=>__DIR__.'/../../../data/template'
+    ],
 );

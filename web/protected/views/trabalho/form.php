@@ -32,9 +32,16 @@ $this->menu = [
 	    <?php echo $form->error($model,'tempoDistribuicao'); ?>
 	</div>
 
+	<div class="uk-row">
+	    <?php echo $form->labelEx($model,'template'); ?>
+	    <?php echo $form->dropDownList($model,'template',$templates,[
+	    	'prompt'=>'Selecione ...',
+	    ]); ?>
+	    <?php echo $form->error($model,'template'); ?>
+	</div>
 
 	<div class="row buttons">
-	    <?php echo CHtml::submitButton('Submit'); ?>
+	    <?php echo CHtml::submitButton('Gravar'); ?>
 	</div>
 
 </div>
