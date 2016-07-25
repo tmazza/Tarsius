@@ -37,24 +37,24 @@ class ProcessaCommand extends CConsoleCommand {
 		  return pathinfo($i, PATHINFO_EXTENSION) == 'jpg'; 
 		});
 
+	    // $template = 'FAURGS_100';
+
 		$count = 0;
 		$first = true;
 		foreach ($files as $i => $f) {
-		  $count++;
-		  if($first || $count % 50 == 0){
-		  	$this->trabalho = Trabalho::model()->findByPk($trabId);
-		  }
+		  	$count++;
+		  	if($first || $count % 50 == 0){
+		  		$this->trabalho = Trabalho::model()->findByPk($trabId);
+			}
 
+		 	$template = $this->trabalho->template;
 
-	      $arquivo = $this->dirIn.'/'.$f;
-	   	 $arquivoDest = $this->dirOut.'/'.$f;
+	     	$arquivo = $this->dirIn.'/'.$f;
+	   	 	$arquivoDest = $this->dirOut.'/'.$f;
 
 
 		  if($this->trabalho->status == 1){
 		    $start = time();
-
- 
-		    $template = 'FAURGS_100'; // TODO: pegar do trabalho!
 
 		    try {
 		      $image = new Image($template);

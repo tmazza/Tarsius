@@ -117,11 +117,10 @@ class TrabalhoController extends BaseController {
 
 	private function getTemplate(){
 		$templatesDir = Yii::app()->params['templatesDir'];
-		$files = CFileHelper::findFiles($templatesDir);
 		$valores = array_map(function($i){ 
 			return pathinfo(basename($i),PATHINFO_FILENAME); 
-		},$files);
-		return array_combine($files,$valores);
+		},CFileHelper::findFiles($templatesDir));
+		return array_combine($valores,$valores);
 	}
 
 }
