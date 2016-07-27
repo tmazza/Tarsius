@@ -86,7 +86,7 @@ class DistribuiCommand extends CConsoleCommand
             }
 
             rename($dirDest, $this->dirReady . '/' . $dirHash); # Diretorio final após buscar todas imagens do processo
-            $cmd = Yii::getPathOfAlias('application') .'/yiic processa';
+            $cmd = 'hhvm ' . Yii::getPathOfAlias('application') .'/yiic processa';
             $cmd .= " --dirIn={$dirHash}";
             $cmd .= " --dirOut={$this->trabalho->sourceDir}";
             $cmd .= " --trabId={$this->trabalho->id}";
