@@ -16,6 +16,9 @@
  */
 class Processo extends CActiveRecord
 {
+
+	// const StatusExecutando = 1;
+
 	/**
 	 * @return string the associated database table name
 	 */
