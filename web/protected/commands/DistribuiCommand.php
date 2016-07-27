@@ -79,7 +79,7 @@ class DistribuiCommand extends CConsoleCommand
             $dirDest = $this->dirExec . '/' . $dirHash . '/';
             mkdir($dirDest); # temporario enquanto busca imagens de sourceDir
             foreach ($bloco as $file) {
-              if (copy($this->trabalho->sourceDir . '/' . $file, $dirDest . $file)) 
+              if (rename($this->trabalho->sourceDir . '/' . $file, $dirDest . $file)) 
                 $this->setJaDistribuido($file,$dirHash);
               else
                 echo "Falha ao mover arquivo: {$file} \n";
@@ -115,6 +115,7 @@ class DistribuiCommand extends CConsoleCommand
     $model->trabalho_id = $this->trabalho->id;
     $model->workDir = $dirHash;
     $model->qtd = $qtdArquivos;
+    $model->dataInicio = time();
     $model->save();
   }
 

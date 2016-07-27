@@ -90,6 +90,7 @@ class ProcessaCommand extends CConsoleCommand {
   		// UPDATE processo SET status = :status WHERE trabalho_id = :trabId AND pid = :pid');
 		$qtd = Processo::model()->updateAll([
 			'status'=>2,
+			'dataFim'=>time(),
 		],"trabalho_id={$trabId} AND pid={$this->pid}");
 
 		rmdir ($this->dirIn);
