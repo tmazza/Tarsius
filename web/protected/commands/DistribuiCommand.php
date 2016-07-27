@@ -20,7 +20,7 @@ class DistribuiCommand extends CConsoleCommand
     else
       $this->qtdProcessadores = $processadores;      
     # Quantidade máxima de processos
-    $this->qtdProcessos = $this->qtdProcessadores + ceil(0.25*$processadores);
+    $this->qtdProcessos = $this->qtdProcessadores + ceil(0.10*$processadores);
 
     $this->dirBase = __DIR__ . '/../../../data/runtime';
 

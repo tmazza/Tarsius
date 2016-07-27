@@ -14,7 +14,13 @@
  * @property Trabalho $trabalho
  */
 class Distribuido extends CActiveRecord
-{
+{	
+
+	const StatusFechado = 2;
+	const StatusParado = 3;
+	const StatusAguardando = 1;
+
+
 	/**
 	 * @return string the associated database table name
 	 */

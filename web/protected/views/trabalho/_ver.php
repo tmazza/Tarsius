@@ -1,5 +1,5 @@
 Status: <?=$trabalho->getLabelStatus();?>
-<table class="uk-table uk-table-condensed uk-table-stripped">
+<table class="uk-table uk-table-condensed uk-table-striped">
   <?php foreach ($trabalho->processos as $p): ?>
   	<tr>	
       <td><?=$p->pid;?></td>    
@@ -18,12 +18,12 @@ Status: <?=$trabalho->getLabelStatus();?>
         <?php if(isset($faltaProcessar[$p->id])): ?>
           <?php $processadas = $p->qtd-$faltaProcessar[$p->id];?>
           <td>
-            <?=number_format($tempoTotal/$processadas,2,',','.');?>seg
+            <?=number_format($tempoTotal/($processadas>0?$processadas:1),2,',','.');?>seg
           </td>
           <td>
               <div class="uk-grid">
-                <div class='uk-width-9-10'>
-                  <progress value='<?=(100 - (100 * ($faltaProcessar[$p->id]/$p->qtd)))?>' max='100' style='width:90%'></progress>
+                <div class='uk-width-8-10'>
+                  <progress value='<?=(100 - (100 * ($faltaProcessar[$p->id]/$p->qtd)))?>' max='100' style='width:100%'></progress>
                 </div>
                 <div class='uk-width-1-10'>
                   <?=$processadas .'/'.$p->qtd;?>
@@ -33,7 +33,7 @@ Status: <?=$trabalho->getLabelStatus();?>
         <?php endif; ?>
       <?php else: ?>
         <td>
-          <?=number_format($tempoTotal/($p->qtd>0?$p->qtd:1),2,',','.');?>
+          <?//=number_format($tempoTotal/($p->qtd>0?$p->qtd:1),2,',','.');?>
         </td>
         <td><small>Finalizado</small></td>
       <?php endif; ?>

@@ -32,13 +32,9 @@ class Processo extends CActiveRecord
 	 */
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
 		return array(
 			array('pid, status, trabalho_id, qtd', 'numerical', 'integerOnly'=>true),
 			array('workDir', 'safe'),
-			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
 			array('id, pid, status, trabalho_id, workDir, qtd', 'safe', 'on'=>'search'),
 		);
 	}
@@ -48,8 +44,6 @@ class Processo extends CActiveRecord
 	 */
 	public function relations()
 	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
 		return array(
 			'trabalho' => array(self::BELONGS_TO, 'Trabalho', 'trabalho_id'),
 		);

@@ -2,19 +2,19 @@
 $this->menu = [];
 
 if($trabalho->status == 0){
-	$this->menu[] = ['Iniciar distribuição',$this->createUrl('/trabalho/iniciar',[
+	$this->menu[] = ['<i class="uk-icon uk-icon-play"></i> Distribuir',$this->createUrl('/trabalho/iniciar',[
 		'id'=>$trabalho->id,])];
-	$this->menu[] = ['Configurar',$this->createUrl('/trabalho/editar',[
+	$this->menu[] = ['<i class="uk-icon uk-icon-cog"></i> Configurar',$this->createUrl('/trabalho/editar',[
 		'id'=>$trabalho->id,])];
-	$this->menu[] = ['Excluir trabalho',$this->createUrl('/trabalho/excluir',[
+	$this->menu[] = ['Apagar/reset',$this->createUrl('/trabalho/excluir',[
 		'id'=>$trabalho->id,]),[
 		'confirm'=>'Certeza?',]];
 }
 if($trabalho->status == 1)
-	$this->menu[] = ['Pausar distribuição',$this->createUrl('/trabalho/pausar',[
+	$this->menu[] = ['<i class="uk-icon uk-icon-pause"></i> Pausar trabalho',$this->createUrl('/trabalho/pausar',[
 		'id'=>$trabalho->id,])];
 
-$this->menu[] = ['Debug finalizadas',$this->createUrl('/trabalho/finalizadas',[
+$this->menu[] = ['Ver processadas',$this->createUrl('/trabalho/finalizadas',[
 	'id'=>$trabalho->id,])];
 
 ?>

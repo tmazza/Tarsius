@@ -76,14 +76,23 @@ class ProcessaCommand extends CConsoleCommand {
 
 		  // move imagem para pasta de finalizadas
 		  rename($arquivo,$arquivoDest);
-
-	
+		
+		if($this->trabalho->status == 1){ // Trabalho executando | folha interpretada
 		  $qtd = Distribuido::model()->updateAll([
-		  	'status'=>$this->trabalho->status == 1 ? 2 : 3,	
+		  	'status'=>2,	
 		  	'dataFechamento'=>time(),	  	
 		  ],[
 		  	'condition'=>"trabalho_id={$this->trabalho->id} AND nome='{$f}'",
 		  ]);
+		} else {  # | folha somente renomeada
+		  $qtd = Distribuido::model()->updateAll([
+		  	'status'=>3,	
+		  	'nome'=>$f . ' (canelada em ' . date('d/m/Y H:i:s') . ')',	
+		  	'dataFechamento'=>time(),	  	
+		  ],[
+		  	'condition'=>"trabalho_id={$this->trabalho->id} AND nome='{$f}'",
+		  ]);
+		}
 
 		}
 
