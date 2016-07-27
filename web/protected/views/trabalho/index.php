@@ -5,15 +5,24 @@ $this->menu = [
 ?>
 <h2>Trabalhos</h2>
 <?php foreach($trabalhos as $t): ?>
-	<h3>
-		<?=CHtml::link($t->nome,$this->createUrl('/trabalho/ver',[
-			'id'=>$t->id,
-		]));?>		
-	</h3>
-	<?=CHtml::link('Configurar',$this->createUrl('/trabalho/editar',['id'=>$t->id,]));?>
-	<br>
-
-	<?=$t->sourceDir?><br>
-	<?=$t->tempoDistribuicao?> seg
-	<hr>
+	<div class="uk-panel uk-panel-box">
+		<h3><?=$t->nome?>
+			<div class="uk-button-group uk-float-right">
+				<?=CHtml::link('Configurar',$this->createUrl('/trabalho/editar',['id'=>$t->id,]),[
+					'class'=>'uk-button uk-button-small'
+				]);?>
+				<?=CHtml::link('Ver',$this->createUrl('/trabalho/ver',[
+					'id'=>$t->id,
+				]),[
+					'class'=>'uk-button uk-button-small uk-button-primary'
+				]);?>		
+			</div>
+		</h3>
+		<?php
+		$this->widget('zii.widgets.CDetailView', array(
+		    'data'=>$t,
+		    'attributes'=>Trabalho::detailView($t),
+		));
+		?>
+	</div>
 <?php endforeach; ?>

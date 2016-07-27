@@ -28,22 +28,22 @@
                     </li>
                 </ul>
                 <a href="#offcanvas" class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas></a>
-                <div class="uk-navbar-brand uk-navbar-center uk-visible-small">Brand</div>
+                <div class="uk-navbar-brand uk-navbar-center uk-visible-small">Tarsius</div>
             </nav>
 
             <div class="uk-grid" data-uk-grid-margin>
                 <div class="uk-width-medium-3-4">
-                	<?=$content;?>
+                    <?=$content;?>
                 </div>
 
                 <div class="uk-width-medium-1-4">
                     <div class="uk-panel">
                         <h3 class="uk-panel-title">Ações</h3>
-                        <ul class="uk-list uk-list-line">
-                        	<?php 
-                        	foreach ($this->menu as $i)
-                        		echo '<li>' . CHtml::link($i[0],$i[1],isset($i[2])?$i[2]:[]) . '</li>';
-                        	?>
+                        <ul class="uk-nav uk-nav-side">
+                            <?php 
+                            foreach ($this->menu as $i)
+                                echo '<li>' . CHtml::link($i[0],$i[1],isset($i[2])?$i[2]:[]) . '</li>';
+                            ?>
                         </ul>
                     </div>
                 </div>
@@ -54,24 +54,10 @@
         <div id="offcanvas" class="uk-offcanvas">
             <div class="uk-offcanvas-bar">
                 <ul class="uk-nav uk-nav-offcanvas">
-                    <li>
-                        <a href="layouts_frontpage.html">Frontpage</a>
-                    </li>
-                    <li>
-                        <a href="layouts_portfolio.html">Portfolio</a>
-                    </li>
-                    <li class="uk-active">
-                        <a href="layouts_blog.html">Blog</a>
-                    </li>
-                    <li>
-                        <a href="layouts_documentation.html">Documentation</a>
-                    </li>
-                    <li>
-                        <a href="layouts_contact.html">Contact</a>
-                    </li>
-                    <li>
-                        <a href="layouts_login.html">Login</a>
-                    </li>
+                    <?php 
+                    foreach ($this->menu as $i)
+                        echo '<li>' . CHtml::link($i[0],$i[1],isset($i[2])?$i[2]:[]) . '</li>';
+                    ?>
                 </ul>
             </div>
         </div>

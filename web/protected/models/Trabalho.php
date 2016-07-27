@@ -63,10 +63,10 @@ class Trabalho extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'nome' => 'Nome',
-			'sourceDir' => 'Source Dir',
+			'sourceDir' => 'Diretório de trabalho',
 			'status' => 'Status',
 			'pid' => 'Pid',
-			'tempoDistribuicao' => 'Tempo Distribuicao',
+			'tempoDistribuicao' => 'Tempo de distribuição',
 			'taxaPreenchimento' => 'Taxa preenchimento mínimo',
 		);
 	}
@@ -106,6 +106,32 @@ class Trabalho extends CActiveRecord
 		return array_map(function($i){
 			return $i->nome;
 		},$this->distribuidos);
+	}
+
+	public static function detailView($model){
+		return [
+	    	'sourceDir',
+    	 	array(
+	            'label'=>'Status',
+	            'type'=>'raw',
+	            'value'=>$model->getLabelStatus(),
+	        ),
+	        array(
+	            'label'=>'Processo',
+	            'type'=>'raw',
+	            'value'=>is_null($model->pid) ? '<small>processo parado</small>' : $model->pid,
+	        ),
+	        array(
+	            'label'=>'Tempo de distribuição',
+	            'type'=>'raw',
+	            'value'=>$model->tempoDistribuicao . ' segundo(s)',
+	        ),
+	        array(
+	            'label'=>'Preenchimento mínimo',
+	            'type'=>'raw',
+	            'value'=> number_format($model->taxaPreenchimento*100,0,',','.').'%',
+	        ),
+	    ];
 	}
 
 }
