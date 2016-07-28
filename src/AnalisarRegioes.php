@@ -69,8 +69,8 @@ class AnalisarRegioes {
     $px += $base[0];
     $py += $base[1];
 
-    // TODO: de acordo com o template ou fixo para cada resolução?
-    // Tem como calcular esse valou ou depende da quantidade real de pixel utilizadas
+    // TODO: de acordo com o template ou fixo para cada resolução? (perspectiva da image, gera o erro!)
+    // Tem como calcular esse valou ou depende da quantidade real de pixel utilizadas?
     $erroBaseX = -0.0035; $erroBaseX = 0; # <-- Note que o erro base não está sendo utilizado
     $erroBaseY = -0.0081; $erroBaseY = 0; # <-- Note que o erro base não está sendo utilizado
 
@@ -132,8 +132,6 @@ private function getAncoraMaisProx($ponto){
 }
 // FIM TESTE
 
-
-
 private function getErroX(){
   if(!$this->erroX){
     $a1 = $this->image->ancoras[1]->getCentro();
@@ -156,15 +154,6 @@ private function getErroY(){
     $this->erroY = bcdiv(bcsub($avaliado,$esperado),$this->image->medidas['distAncVer']);
   }
   return $this->erroY;
-  // $erro = abs($erro);
-  // echo 'ESC: ' . $this->image->escala . "\n";
-  // echo 'ESP: ' . $esperado. "\n";
-  // echo 'AVA: ' . $avaliado. "\n";
-  // echo 'DIF: ' . ($avaliado - $esperado) . "\n";
-  // echo 'ERR: ' . $erroX . "\n";
-  // echo "X: " . $px . ' - Y: ' . $py . "\n";
-  // echo "X: " . $px . ' - Y: ' . ($py + $d[2]*$erro) . "\n";
-  // exit;
 }
 
 

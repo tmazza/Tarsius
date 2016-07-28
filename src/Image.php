@@ -9,7 +9,6 @@ define('EXPANSAO_BUSCA', 0.4); # taxa de aumento da área de busca
 define('QTD_EXPANSOES_BUSCA', 5);
 
 define('MATCH_ANCORA', 0.85);
-define('RESOLUCAO_IMAGEM', 300); # EM DPI
 
 include __DIR__.'/Buscador.php';
 include __DIR__.'/BuscarAncoras.php';
@@ -41,7 +40,7 @@ class Image {
     public $ancoras = array();
     public $rot = 0; // em radianos
     private $template;
-    public $resolucao = RESOLUCAO_IMAGEM; # Em dpi
+    public $resolucao = false; # Em dpi
 
     public $output = array();
 
@@ -56,16 +55,16 @@ class Image {
     private function depoisDeDefinirResolucao(){
       $this->escala = bcdiv($this->resolucao,25.4);
       $this->buscador = new Buscador; #Instancia buscador de Objetos
-      $this->assAncoras = $this->loadTemplate(  $this->template);
+      $this->assAncoras = $this->loadTemplate($this->template);
       $this->distancias = $this->defineDistancias($this->medidas); #Define distancias baseado na escala inicial
     }
 
     /**
      * Processa imagem
      */
-    public function exec($arquivo) {
+    public function exec($arquivo,$resolucao=300) {
       $this->timeAll = microtime(true);
-      $this->inicializar($arquivo);
+      $this->inicializar($arquivo,$resolucao);
       $this->localizarAncoras();
       // $aaa = microtime(true);
       // $ocr = new OCR($this);
@@ -107,7 +106,8 @@ class Image {
     /**
     * Busca imagem e converte para cinza
     */
-    protected function inicializar($arquivo){
+    protected function inicializar($arquivo,$resolucao){
+      $this->resolucao = $resolucao;
       $this->depoisDeDefinirResolucao();
       if(DEBUG)
         $time = microtime(true);

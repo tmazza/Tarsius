@@ -21,7 +21,7 @@
                         <?=CHtml::link('Trabalhos',$this->createUrl('/trabalho/index'));?>
                     </li>
                     <li>
-                        <a href="#!">Templates</a>
+                       <?=CHtml::link('Templates',$this->createUrl('/template/index'));?>
                     </li>
                     <li>
                         <a href="#!">...</a>
