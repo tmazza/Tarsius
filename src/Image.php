@@ -156,6 +156,75 @@ class Image {
     }
 
     /**
+     * Organiza saída da interpretaçaõ das regiões de acordo com o formato de saida.
+     * @param formatoSaida deve ser um dicionário tendo como chave o nome
+     * esperado pra saída (qualquer nome) e como valor ou uma string ou 
+     * um array. Caso seja string, deve ser igual ao ID de alguma região
+     * do template. Caso seja function, deve obrigatoriamente conter um
+     * índice de chave 'match' o qual possui a expressão regular que será
+     * usada como filtro para os ID's das regiões. Somente ID's que passarem
+     * na comparação com 'match' serão incluídos na saída. O resultada das
+     * diversas regiões que tiverem match serão concatenados, opcionalmente
+     * é possível passar um função de ordenação com índice 'sort'. Abaixo um
+     * exemplo de formato de arquivo válido:
+     * [
+     *   'ausente' => 'eAusente',
+     *   'respostas' => [
+     *    'match' => '/^e-/', 
+     *     'sort' => function($a,$b){
+     *       return $a > $b;          
+     *     },
+     *   ],
+     * ];
+     * O formato acima terá como saída duas linhas (ausente e respostas). A primeira
+     * linha tem o valor interpretado pela região de ID 'eAusente' a segunda linha 
+     * terá o resultado concatenado de todas as regiões que tenham ID que comece com 'e-'.
+     *
+     * @param data dicionário com chave sendo o ID de uma região e chave o valor 
+     * interpretado nessa região. Exemplo:
+     * [
+     *    'e-02' => 'B',
+     *    'e-01' => 'A',
+     *    'e-03' => 'C',
+     *    'eAusente' => 'SIM',
+     * ]
+     *  
+     * @return dicionario com as chaves sendo iguais as definidas em {@param formatoSaida}
+     * e valor o resultado do processamento, conforme explicado acima. Por exemplo, usando
+     * os valores exemplificados acime de {@param formatoSaida} e {@param data} a saída seria:
+     * [
+     *  'ausente' => 'SIM',
+     *  'respostas' => 'ABC',
+     * ]
+     *
+     * Note que a string 'respostas' está em ordem devido a regra de ordenamento definida.
+     * Caso não houvesse, a saída seria 'BAC'.
+     *
+     */
+    protected function formatarSaida($formatoSaida,$data){
+      $output = [];
+      foreach ($formatoSaida as $key => $value) {
+        if(is_string($value)){
+          $output[$key] = $data[$value];
+        } else {
+
+          $matchs = array_filter(array_keys($data),function($i) use($value){
+            return preg_match($value['match'],$i) == 1;
+          });
+
+          if(isset($value['sort']) && $value['sort']) 
+            usort($matchs,$value['sort']);
+
+          $output[$key] = '';
+          foreach ($matchs as $m) 
+            $output[$key] .= $data[$m];
+
+        }
+      }
+      return $output;
+    }
+
+    /**
      * Salva tempo decorrido para processar imagem
      * @param type $id
      * @param type $time
