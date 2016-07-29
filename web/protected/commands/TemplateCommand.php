@@ -11,7 +11,8 @@ class TemplateCommand extends CConsoleCommand {
 
 	private function getConfig(){
 		 return [
-	      'regioes'=>[
+		  'nome' => 'template teste tj 100',
+	      'regioes' => [
 	        [ # bloco de questões
 	          'p1' => [0,1450],    # Em pixel
 	          'p2' => [2300,2700],  # Em pixel

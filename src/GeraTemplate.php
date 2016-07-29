@@ -1,6 +1,22 @@
 <?php
 
-include __DIR__ . '/Image.php';
+define('DEBUG',true);
+
+define('CORTE_PRETO', 150);
+define('TOLERANCIA_MATCH', 0.4); # eg: areabase  = 1000. busca triangulos de area entre 500 e 1500
+define('EXPANSAO_BUSCA', 0.4); # taxa de aumento da área de busca
+define('QTD_EXPANSOES_BUSCA', 10);
+
+define('MATCH_ANCORA', 0.85);
+include __DIR__.'/Buscador.php';
+include __DIR__.'/BuscarAncoras.php';
+include __DIR__.'/Objeto.php';
+include __DIR__.'/Helper.php';
+include __DIR__.'/ConnectedComponent.php';
+include __DIR__.'/ConnectedComponent.php';
+include __DIR__.'/Assinatura.php';
+include __DIR__.'/AnalisarRegioes.php';
+
 
 /**
  * Description of ProcessaImagem
@@ -15,7 +31,7 @@ class GeraTemplate {
   #
   public $template;
   public $buscador;
-
+  public $ancoraBase;
 
   /**
    * Cria lista de objetos em {@param arquivo} baseado nas definições de {@param $config}
@@ -52,7 +68,33 @@ class GeraTemplate {
    * da folha. 
    */
   private function criaArquivoTemplate($config,$regioes){
-    # TODO:
+    $ax = $this->ancoraBase[0]/$this->escala;
+    $ay = $this->ancoraBase[1]/$this->escala;
+
+    $renderRegioes = function() use($regioes,$ax,$ay) {
+      $content = '';
+
+      foreach ($regioes as $k => $r) {
+        $content .= "\t\t'{$k}' => [";
+        $content .= $r[0] . ',';
+        $content .= ($r[1]-$ax) . ',';
+        $content .= ($r[2]-$ay) . ',';
+        $content .= "'" . $r[3] . "',";
+        $content .= "'" . $r[4] . "'";
+        $content .= "],\n"; 
+      }
+      return $content;
+    };
+
+    $baseTemplate = include __DIR__.'/_cascaTemplate.php';
+
+    $nome = strtolower(str_replace(' ','_', $config['nome']));
+    $file = __DIR__.'/../data/template/'.$nome.'.php';
+    $h = fopen($file,'w+');
+    fwrite($h, $baseTemplate);
+    fclose($h);
+    // print_r($baseTemplate);
+    // exit;
   }
 
   /**
@@ -86,8 +128,8 @@ class GeraTemplate {
       foreach ($lista as $cLinha => $l) {
         $count = 0;
         foreach ($l as $cObjeto => $c) {
-          $x = (($c[0])/$this->escala); # Converte para milimetros
-          $y = (($c[1])/$this->escala); # Converte para milimetros
+          $x = $c[0]/$this->escala; # Converte para milimetros
+          $y = $c[1]/$this->escala; # Converte para milimetros
 
           $genId = $cb['id'];
           $idRegiao = is_string($genId) ? $genId : $genId($cBloco,$cLinha,$cObjeto);
@@ -188,7 +230,7 @@ class GeraTemplate {
       $this->buscador = new Buscador; #Instancia buscador de Objetos
       $this->qtdExpansoes = 10;
       $this->assAncoras = [
-        1 => $this->getAssinatura(Helper::load(__DIR__.'/ancoras/ancora1.jpg')),
+        1 => $this->getAssinatura(Helper::load(__DIR__.'/ancoras/ancora1.jpg'),1,1000000), # TODO: definir valores de busca de acordo com resolução da imagem
       ];
       $this->arquivo = $arquivo;
       $this->image = Helper::load($arquivo);
@@ -196,7 +238,9 @@ class GeraTemplate {
         throw new Exception('Imagem não pode ser convertida para tons de cinza.', 500);
 
       $buscarAncoras = new BuscarAncoras($this);
-      $buscarAncoras->getAncora(1,[0,0]); # busca pela 1º ancora a partir da origem
+      $ancora1 = $buscarAncoras->getAncora(1,[0,0]); # busca pela 1º ancora a partir da origem
+
+      $this->ancoraBase =$ancora1->getCentro();
 
       $this->fnSortLinhaColuna = function($a,$b){ 
         return $a[1] == $b[1] ? $a[0] >= $b[0] : $a[1] >= $b[1];
