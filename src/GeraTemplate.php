@@ -7,11 +7,14 @@ include __DIR__ . '/Image.php';
  *
  * @author tiago.mazzarollo
  */
-class GeraTemplate extends Image {
+class GeraTemplate {
 
   private $coordNeg = false;
   private $fnSortLinhaColuna;
   private $fnSortLinha;
+  #
+  public $template;
+  public $buscador;
 
 
   /**
@@ -83,9 +86,6 @@ class GeraTemplate extends Image {
       foreach ($lista as $cLinha => $l) {
         $count = 0;
         foreach ($l as $cObjeto => $c) {
-          $ancBase = $this->getAncoraMaisProx($c);
-          $base = $this->ancoras[$ancBase]->getCentro();
-          
           $x = (($c[0])/$this->escala); # Converte para milimetros
           $y = (($c[1])/$this->escala); # Converte para milimetros
 
@@ -173,8 +173,6 @@ class GeraTemplate extends Image {
         if(!isset($blocos[$k2]))
           $blocos[$k2]=[];
         $blocos[$k2][] = $b;
-        foreach ($b as $k3 => $a) {
-        }
       }
     }
     return $blocos;
@@ -185,8 +183,21 @@ class GeraTemplate extends Image {
    */
   private function init($arquivo,$resolucao){
       ini_set('memory_limit', '2048M');
-      $this->inicializar($arquivo,$resolucao);
-      $this->localizarAncoras();
+      $this->resolucao = $resolucao;
+      $this->escala = bcdiv($this->resolucao,25.4);
+      $this->buscador = new Buscador; #Instancia buscador de Objetos
+      $this->qtdExpansoes = 10;
+      $this->assAncoras = [
+        1 => $this->getAssinatura(Helper::load(__DIR__.'/ancoras/ancora1.jpg')),
+      ];
+      $this->arquivo = $arquivo;
+      $this->image = Helper::load($arquivo);
+      if (!imagefilter($this->image, IMG_FILTER_GRAYSCALE))
+        throw new Exception('Imagem não pode ser convertida para tons de cinza.', 500);
+
+      $buscarAncoras = new BuscarAncoras($this);
+      $buscarAncoras->getAncora(1,[0,0]); # busca pela 1º ancora a partir da origem
+
       $this->fnSortLinhaColuna = function($a,$b){ 
         return $a[1] == $b[1] ? $a[0] >= $b[0] : $a[1] >= $b[1];
       };
@@ -195,29 +206,15 @@ class GeraTemplate extends Image {
       };
   }
 
-  private function getAncoraMaisProx($ponto){
-    if($this->coordNeg){ 
-      # TODO: 
-      # Depende também do script de processamento reconhecer coordenadas negativas
-      # O objetivo do uso de coordenadas negativas é reduzir a distância entre o
-      # ponto avaliado e o ponto de referência (âncora) visando diminutir o erro 
-      # gerado a partir da conversão entre dpi -> pixel/mm
-
-      // $a1 = $this->ancoras[1]->getCentro(); 
-      // $a2 = $this->ancoras[2]->getCentro();
-      // $a3 = $this->ancoras[3]->getCentro();
-      // $a4 = $this->ancoras[4]->getCentro();
-      // $ancoras = [$a1,$a2,$a3,$a4];
-      // $dists = array_map(function($i) use($ponto){
-      //   return Helper::dist($ponto,$i);
-      // },$ancoras);
-      // $indice = array_keys($dists, min($dists));
-      // return $indice[0]+1;
-    } else {
-      return 1;
-    }
-
+  /**
+   * Busca a assinatura de toda uma imagem
+   * @param type $image
+   * @return type
+   */
+  public function getAssinatura($image,$min=200,$max=3000) {
+      $pontos = $this->buscador->getPontosDeQuadrado($image, 0, 0, imagesx($image), imagesy($image));
+      $objetos = $this->buscador->separaObjetos($pontos, $min, $max);
+      return Assinatura::get($objetos[0]);
   }
-
 
 }

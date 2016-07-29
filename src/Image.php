@@ -39,7 +39,7 @@ class Image {
     public $escala; // Quantidade de pixel por mm
     public $ancoras = array();
     public $rot = 0; // em radianos
-    private $template;
+    public $template;
     public $resolucao = false; # Em dpi
 
     public $output = array();

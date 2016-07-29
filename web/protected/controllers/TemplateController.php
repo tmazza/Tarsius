@@ -12,7 +12,7 @@ class TemplateController extends BaseController {
 	public function actionCriar(){
 		include_once(Yii::getPathOfAlias('webroot') . '/../src/GeraTemplate.php');
 		$img = Yii::getPathOfAlias('webroot') . '/../data/gerarTemplate/a.jpg';
-		$g = new GeraTemplate('TEMPLATE_1');
+		$g = new GeraTemplate();
 		$config = $this->getConfig();
 		$g->gerarTemplate($img,$config);
 	}
