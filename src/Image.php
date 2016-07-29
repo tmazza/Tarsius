@@ -153,6 +153,11 @@ class Image {
       $this->output['PREENCHIMENTO_MINIMO'] = $this->preenchimentoMinimo;
       $this->output['RESOLUCAO_IMAGEM'] = $this->resolucao;
 
+      # TODO: aplicar no resultado da interpretação das regiões.
+      // if($config['formatoSaida']){
+      //   $out = $this->formatarSaida($config['formatoSaida'],$out);
+      // }
+
     }
 
     /**

@@ -13,7 +13,9 @@ class TemplateController extends BaseController {
 		include_once(Yii::getPathOfAlias('webroot') . '/../src/GeraTemplate.php');
 		$img = Yii::getPathOfAlias('webroot') . '/../data/gerarTemplate/a.jpg';
 		$g = new GeraTemplate('TEMPLATE_1');
-		$g->exec($img);
+		$config = $this->getConfig();
+		$g->gerarTemplate($img,$config);
 	}
+
 
 }
