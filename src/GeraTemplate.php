@@ -92,7 +92,7 @@ class GeraTemplate {
 
     $file = $baseDir.'/template.json';
     $h = fopen($file,'w+');
-    fwrite($h, json_encode($content));
+    fwrite($h, json_encode($content,JSON_PRETTY_PRINT));
     fclose($h);
   }
 
@@ -105,8 +105,8 @@ class GeraTemplate {
     $corTex = imagecolorallocate($copia,0,150,255);
     $corObj = imagecolorallocatealpha ($copia,150,255,0,50);
     foreach ($regioes as $id => $r) {
-      $x = ($r[1])*$this->escala+$this->ancoraBase[0];
-      $y = ($r[2])*$this->escala+$this->ancoraBase[1];
+      $x = $r[1]*$this->escala+$this->ancoraBase[0];
+      $y = $r[2]*$this->escala+$this->ancoraBase[1];
 
       imagefilledellipse($copia,$x,$y,30,30,$corObj);
       imagettftext ($copia,17.0,0.0,$x-5,$y+5,$corTex,__DIR__.'/SIXTY.TTF',$id);
