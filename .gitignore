@@ -10,3 +10,8 @@ web/protected/runtime
 do/finalizados/1*
 operation_log.txt
 *.db
+data/*.jpg
+data/template/*
+data/runtime/*
+web/protected/config/dbExport.php
+

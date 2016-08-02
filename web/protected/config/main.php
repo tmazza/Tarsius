@@ -11,14 +11,15 @@ return array(
     'modules' => array(
       'gii' => array(
           'class' => 'system.gii.GiiModule',
-          'password' => 'bdg',
+          'password' => 'gii',
           'ipFilters' => array('*'),
       ),
     ),
     'language' => 'pt_br',
     'components' => array(
-        'urlManager'  => require(dirname(__FILE__) . '/rotas.php'),
-        'db'          => require(dirname(__FILE__) . '/database.php'),
+        'urlManager'  => require __DIR__ . '/rotas.php',
+        'db'          => require __DIR__ . '/database.php',
+        'dbExport'    => require __DIR__ . '/dbExport.php',
         'errorHandler' => array(
             'errorAction' => '/site/error',
         ),

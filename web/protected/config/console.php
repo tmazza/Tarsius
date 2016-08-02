@@ -9,7 +9,8 @@ return array(
     ),
     'language' => 'pt_br',
     'components' => array(
-        'db'          => require(dirname(__FILE__) . '/database.php'),
+        'db'          => require __DIR__ . '/database.php',
+        'dbExport'    => require __DIR__ . '/dbExport.php',
         'errorHandler' => array(
             'errorAction' => '/site/error',
         ),

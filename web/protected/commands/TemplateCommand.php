@@ -41,8 +41,8 @@ class TemplateCommand extends CConsoleCommand {
 	          'casoFalse' => 'W',
 	        ],
 	        [ # elipse ausente
-	          'p1' => [1450,2300],    # Em pixel
-	          'p2' => [1550,2450],  # Em pixel
+	          'p1' => [1300,2200],    # Em pixel
+	          'p2' => [1600,2700],  # Em pixel
 	          'colunasPorLinha' => false,
 	          'agrupaObjetos' => false,
 	          'minArea' => 400,
@@ -50,8 +50,8 @@ class TemplateCommand extends CConsoleCommand {
 
 	          'id' => 'eAusente',
 	          'tipo' => 0,
-	          'casoTrue' => 'A',
-	          'casoFalse' => 'W',
+	          'casoTrue' => 'S',
+	          'casoFalse' => 'N',
 	        ],
 	      ],
 
@@ -101,9 +101,10 @@ class TemplateCommand extends CConsoleCommand {
 	        'ausente' => 'eAusente',
 	        'respostas' => [
 	          'match' => '/^e-.*-\d$/', # começa com 'e-' tem qualquer coisa ou nada no meio e termina com '-<inteitor>'
-	          'order' => function($a,$b){
-	            return $a > $b;          
-	          }
+	          'order' => false
+	          // 'order' => function($a,$b){
+	          //   return $a > $b;          
+	          // }
 	        ],
 	      ],
 	    ];

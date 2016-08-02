@@ -111,6 +111,7 @@ class Trabalho extends CActiveRecord
 	public static function detailView($model){
 		return [
 	    	'sourceDir',
+	    	'template',
     	 	array(
 	            'label'=>'Status',
 	            'type'=>'raw',
