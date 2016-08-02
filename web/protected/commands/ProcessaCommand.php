@@ -60,13 +60,6 @@ class ProcessaCommand extends CConsoleCommand {
 		      $str = $str;
 		      $tempos = $image->getTimes();
 		      $tempoExec = $tempos['timeAll'];
-
-		      if(isset($imageOutPut['saidaFormatada']))
-			      $this->export($imageOutPut['saidaFormatada']);
-
-
-
-
 		    } catch(Exception $e){
 		      $presenca = '?';
 		      $str = $e->getMessage();
@@ -74,22 +67,25 @@ class ProcessaCommand extends CConsoleCommand {
 		      $imageOutPut = ['erro'=>$e->getMessage()];
 		      // echo $e->getMessage();
 		    }
-		    
+		    	
+		    $output = json_encode($imageOutPut);
+
 		    // salva debug do arquivo
 		    $export = fopen($dirDoneFile.'/'.$f.'.json','w');
-		    fwrite($export,json_encode($imageOutPut));
+		    fwrite($export,$output);
 		    fclose($export);
 		  }
 
 
 
-		  // move imagem para pasta de finalizadas
-	 	 rename($arquivo,$arquivoDest);
+		  	// move imagem para pasta de finalizadas
+	 	 	rename($arquivo,$arquivoDest);
 		
 			if($this->trabalho->status == 1){ // Trabalho executando | folha interpretada
 			  $qtd = Distribuido::model()->updateAll([
 			  	'status'=>2,	
 			  	'dataFechamento'=>time(),	  	
+			  	'output'=>$output,	
 			  ],[
 			  	'condition'=>"trabalho_id={$this->trabalho->id} AND nome='{$f}'",
 			  ]);
@@ -97,7 +93,7 @@ class ProcessaCommand extends CConsoleCommand {
 			  $qtd = Distribuido::model()->updateAll([
 			  	'status'=>3,	
 			  	'nome'=>$f . ' (canelada em ' . date('d/m/Y H:i:s') . ')',	
-			  	'dataFechamento'=>time(),	  	
+			  	'dataFechamento'=>time(),	  
 			  ],[
 			  	'condition'=>"trabalho_id={$this->trabalho->id} AND nome='{$f}'",
 			  ]);
@@ -115,31 +111,6 @@ class ProcessaCommand extends CConsoleCommand {
 
 		echo "ok\n";
 	}
-
-	private function export($valor){
-		if(false){
-	      $export = [
-	        'Ausente' => 'ausente',
-	        'RespostasOriginais' => 'respostas',
-	      ];
-	      $export = array_map(function($i) use($valor) {
-	        return $valor[$i];
-	      },$export);
-
-	      try {
-	        $model = new Leitura;
-	        $model->NomeArquivo = 'teste-' . time();
-	        $model->attributes = $export;
-
-	        if($model->validate()){
-	          $model->save();
-	        } else {
-	          print_r($model->getErrors());
-	        }
-	      } catch(Exception $e){
-	        echo $e->getMessage();
-	      }
-		}
-	}
+	
 }
 

@@ -135,4 +135,8 @@ class Trabalho extends CActiveRecord
 	    ];
 	}
 
+	public function getNaoExportados(){
+		return Distribuido::model()->count("trabalho_id={$this->id} AND exportado=0 AND output IS NOT NULL");
+	}
+
 }

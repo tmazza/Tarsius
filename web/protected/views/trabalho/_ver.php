@@ -1,3 +1,10 @@
+<?php 
+$qtdNaoExportados = $trabalho->getNaoExportados(); 
+if($qtdNaoExportados > 0){
+  echo "<b>{$qtdNaoExportados} arquivo(s) não exportado(s)</b>";
+}
+?>
+<br>
 Status: <?=$trabalho->getLabelStatus();?>
 <table class="uk-table uk-table-condensed uk-table-striped">
   <?php foreach ($trabalho->processos as $p): ?>

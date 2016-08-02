@@ -44,7 +44,7 @@ $this->menu[] = ['Ver processadas',$this->createUrl('/trabalho/finalizadas',[
 		  } 
 		}
 		function notify(){
-			var notification = new Notification("Distribuindo...");
+			// var notification = new Notification("Distribuindo...");
 		}
 		var count = 0;
 		setInterval(function(){ 
