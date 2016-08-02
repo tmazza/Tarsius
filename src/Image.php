@@ -41,6 +41,7 @@ class Image {
     public $rot = 0; // em radianos
     public $template;
     public $resolucao = false; # Em dpi
+    public $formatoSaida = false;
 
     public $output = array();
 
@@ -153,12 +154,41 @@ class Image {
       $this->output['PREENCHIMENTO_MINIMO'] = $this->preenchimentoMinimo;
       $this->output['RESOLUCAO_IMAGEM'] = $this->resolucao;
 
-      # TODO: aplicar no resultado da interpretação das regiões.
-      // if($config['formatoSaida']){
-      //   $out = $this->formatarSaida($config['formatoSaida'],$out);
-      // }
+      if($this->formatoSaida){
+        $valor = $this->formatarSaida($this->formatoSaida,$this->output['regioes']);
+        $this->exportarResultados($valor);
+      }
 
     }
+
+    /**
+     * TODO: remover! deve estar na aplicação, na forma atual força que a classe esteja dentro de uma
+     * aplicação Yii
+     */
+    private function exportarResultados($valor){
+      $export = [
+        'Ausente' => 'ausente',
+        'RespostasOriginais' => 'respostas',
+      ];
+      $export = array_map(function($i) use($valor) {
+        return $valor[$i];
+      },$export);
+
+      try {
+        $model = new Leitura;
+        $model->NomeArquivo = 'teste-' . time();
+        $model->attributes = $export;
+
+        if($model->validate()){
+          echo 'TODO: salvar!';
+        } else {
+          print_r($model->getErrors());
+        }
+      } catch(Exception $e){
+        echo $e->getMessage();
+      }
+    }
+
 
     /**
      * Organiza saída da interpretaçaõ das regiões de acordo com o formato de saida.
@@ -210,7 +240,7 @@ class Image {
       $output = [];
       foreach ($formatoSaida as $key => $value) {
         if(is_string($value)){
-          $output[$key] = $data[$value];
+          $output[$key] = $data[$value][0];
         } else {
 
           $matchs = array_filter(array_keys($data),function($i) use($value){
@@ -222,7 +252,7 @@ class Image {
 
           $output[$key] = '';
           foreach ($matchs as $m) 
-            $output[$key] .= $data[$m];
+            $output[$key] .= $data[$m][0];
 
         }
       }
@@ -276,6 +306,12 @@ class Image {
         $templateFile = __DIR__.'/../data/template/' . $template . '.json';
         $str = file_get_contents($templateFile);
         $data = json_decode($str,true);
+
+        if(isset($data['formatoSaida'])){
+          $this->formatoSaida = json_decode($data['formatoSaida'],true);
+          unset($data['formatoSaida']);
+        }
+
         $this->medidas = $data;
 
         $assinaturas = array();

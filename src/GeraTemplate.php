@@ -87,7 +87,7 @@ class GeraTemplate {
       'elpAltura' => 2.5,
       'elpLargura' => 4.36,
       'regioes' => $regioes,
-      // 'formatoSaida' => isset($config['formatoSaida']) ? CJSON::encode($config['formatoSaida']) : false,
+      'formatoSaida' => isset($config['formatoSaida']) ? CJSON::encode($config['formatoSaida']) : false,
     ];
 
     $file = $baseDir.'/template.json';
