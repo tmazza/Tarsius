@@ -1,7 +1,7 @@
 <?php
 bcscale(14);
 
-define('DEBUG',true);
+define('DEBUG',false);
 
 define('CORTE_PRETO', 150);
 define('TOLERANCIA_MATCH', 0.4); # eg: areabase  = 1000. busca triangulos de area entre 500 e 1500
@@ -88,22 +88,6 @@ class Image {
       imagedestroy($this->image);
     }
 
-    # TESTE PERESPECTIVA
-    // private function solve3x3($A,$b){
-    //   $D  = $this->det($A);
-    //   $Dx = $this->det([$b   ,$A[1],$A[2]]);
-    //   $Dy = $this->det([$A[0],$b   ,$A[2]]);
-    //   $Dz = $this->det([$A[0],$A[1],$b   ]);
-
-    //   return [$Dx/$D,$Dy/$D,$Dz/$D];
-    // }
-    // private function det($m){
-    //   list($a1,$a2,$a3) = array_column($m,0);
-    //   list($b1,$b2,$b3) = array_column($m,1);
-    //   list($c1,$c2,$c3) = array_column($m,2);
-    //   return $a1*($b2*$c3-$c2*$b3) - $a2*($b1*$c3-$c1*$b3) + $a3*($b1*$c2-$c1*$b2);
-    // }
-
     /**
     * Busca imagem e converte para cinza
     */
@@ -155,40 +139,10 @@ class Image {
       $this->output['RESOLUCAO_IMAGEM'] = $this->resolucao;
 
       if($this->formatoSaida){
-        $valor = $this->formatarSaida($this->formatoSaida,$this->output['regioes']);
-        $this->exportarResultados($valor);
+        $this->output['saidaFormatada'] = $this->formatarSaida($this->formatoSaida,$this->output['regioes']);
       }
 
     }
-
-    /**
-     * TODO: remover! deve estar na aplicação, na forma atual força que a classe esteja dentro de uma
-     * aplicação Yii
-     */
-    private function exportarResultados($valor){
-      $export = [
-        'Ausente' => 'ausente',
-        'RespostasOriginais' => 'respostas',
-      ];
-      $export = array_map(function($i) use($valor) {
-        return $valor[$i];
-      },$export);
-
-      try {
-        $model = new Leitura;
-        $model->NomeArquivo = 'teste-' . time();
-        $model->attributes = $export;
-
-        if($model->validate()){
-          echo 'TODO: salvar!';
-        } else {
-          print_r($model->getErrors());
-        }
-      } catch(Exception $e){
-        echo $e->getMessage();
-      }
-    }
-
 
     /**
      * Organiza saída da interpretaçaõ das regiões de acordo com o formato de saida.

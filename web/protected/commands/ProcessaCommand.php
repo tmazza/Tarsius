@@ -60,6 +60,13 @@ class ProcessaCommand extends CConsoleCommand {
 		      $str = $str;
 		      $tempos = $image->getTimes();
 		      $tempoExec = $tempos['timeAll'];
+
+		      if(isset($imageOutPut['saidaFormatada']))
+			      $this->export($imageOutPut['saidaFormatada']);
+
+
+
+
 		    } catch(Exception $e){
 		      $presenca = '?';
 		      $str = $e->getMessage();
@@ -73,6 +80,8 @@ class ProcessaCommand extends CConsoleCommand {
 		    fwrite($export,json_encode($imageOutPut));
 		    fclose($export);
 		  }
+
+
 
 		  // move imagem para pasta de finalizadas
 	 	 rename($arquivo,$arquivoDest);
@@ -107,5 +116,30 @@ class ProcessaCommand extends CConsoleCommand {
 		echo "ok\n";
 	}
 
+	private function export($valor){
+		if(false){
+	      $export = [
+	        'Ausente' => 'ausente',
+	        'RespostasOriginais' => 'respostas',
+	      ];
+	      $export = array_map(function($i) use($valor) {
+	        return $valor[$i];
+	      },$export);
+
+	      try {
+	        $model = new Leitura;
+	        $model->NomeArquivo = 'teste-' . time();
+	        $model->attributes = $export;
+
+	        if($model->validate()){
+	          $model->save();
+	        } else {
+	          print_r($model->getErrors());
+	        }
+	      } catch(Exception $e){
+	        echo $e->getMessage();
+	      }
+		}
+	}
 }
 
