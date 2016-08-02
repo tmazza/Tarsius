@@ -7,18 +7,15 @@ return array(
 
 	'ancora1' => array('{$ax}','{$ay}'),
 
-	'distAncHor' => 187,
-	'distAncVer' => 274,
-
-	'disElipHor' => 4.75,
-	'disElipVer' => 71.55,
-
+	'distAncHor' => {$distAncHor},
+	'distAncVer' => {$distAncVer},
 	'elpAltura' => 2.5,
   	'elpLargura' => 4.36,
 
 	'regioes' => array(
 {$renderRegioes()}
 	),
+	'formatoSaida' => {$formatoSaida},
 );
 TEMPLATE;
 

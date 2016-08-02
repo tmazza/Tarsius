@@ -13,7 +13,6 @@ class ProcessaCommand extends CConsoleCommand {
 	}
 
 	public function actionIndex($dirIn=false,$dirOut=false,$trabId=false){
-
 		if(!$dirIn) die("Informe um diretorio de trabalho.\n");
 		if(!$dirOut) die("Informe um diretorio de origem.\n");
 		if(!$trabId) die("Qual o trabID ?.\n");
@@ -66,6 +65,7 @@ class ProcessaCommand extends CConsoleCommand {
 		      $str = $e->getMessage();
 		      $tempoExec = '??';
 		      $imageOutPut = ['erro'=>$e->getMessage()];
+		      // echo $e->getMessage();
 		    }
 		    
 		    // salva debug do arquivo
@@ -75,24 +75,24 @@ class ProcessaCommand extends CConsoleCommand {
 		  }
 
 		  // move imagem para pasta de finalizadas
-		  rename($arquivo,$arquivoDest);
+	 	 rename($arquivo,$arquivoDest);
 		
-		if($this->trabalho->status == 1){ // Trabalho executando | folha interpretada
-		  $qtd = Distribuido::model()->updateAll([
-		  	'status'=>2,	
-		  	'dataFechamento'=>time(),	  	
-		  ],[
-		  	'condition'=>"trabalho_id={$this->trabalho->id} AND nome='{$f}'",
-		  ]);
-		} else {  # | folha somente renomeada
-		  $qtd = Distribuido::model()->updateAll([
-		  	'status'=>3,	
-		  	'nome'=>$f . ' (canelada em ' . date('d/m/Y H:i:s') . ')',	
-		  	'dataFechamento'=>time(),	  	
-		  ],[
-		  	'condition'=>"trabalho_id={$this->trabalho->id} AND nome='{$f}'",
-		  ]);
-		}
+			if($this->trabalho->status == 1){ // Trabalho executando | folha interpretada
+			  $qtd = Distribuido::model()->updateAll([
+			  	'status'=>2,	
+			  	'dataFechamento'=>time(),	  	
+			  ],[
+			  	'condition'=>"trabalho_id={$this->trabalho->id} AND nome='{$f}'",
+			  ]);
+			} else {  # | folha somente renomeada
+			  $qtd = Distribuido::model()->updateAll([
+			  	'status'=>3,	
+			  	'nome'=>$f . ' (canelada em ' . date('d/m/Y H:i:s') . ')',	
+			  	'dataFechamento'=>time(),	  	
+			  ],[
+			  	'condition'=>"trabalho_id={$this->trabalho->id} AND nome='{$f}'",
+			  ]);
+			}
 
 		}
 

@@ -18,6 +18,8 @@ include __DIR__.'/Assinatura.php';
 include __DIR__.'/AnalisarRegioes.php';
 
 
+bcscale(14); # precisão nos operações float
+
 /**
  * Description of ProcessaImagem
  *
@@ -32,6 +34,12 @@ class GeraTemplate {
   public $template;
   public $buscador;
   public $ancoraBase;
+
+  public $escala;
+  public $resolucao;
+
+  public $qtdExpansoes;
+  public $assAncoras;
 
   /**
    * Cria lista de objetos em {@param arquivo} baseado nas definições de {@param $config}
@@ -49,16 +57,19 @@ class GeraTemplate {
    */
   public function gerarTemplate($arquivo,$config,$resolucao=300){
     $this->init($arquivo,$resolucao);
-
     $regioes = [];
     foreach ($config['regioes'] as $cb) { # Configuracao Bloco
       $blocos = $this->gerarBlocos($cb);
       $regioes = array_merge($regioes,$this->formataRegioes($cb,$blocos));
     }
 
-    $this->criaArquivoTemplate($config,$regioes);
+    # arquivos de saida (template, debug)
+    $baseDir = __DIR__.'/../data/template/';# . strtolower(str_replace(' ','_', $config['nome']));
+    if(!is_dir($baseDir))
+      mkdir($baseDir);
 
-    $this->criaImagensDebug($regioes);
+    $this->criaArquivoTemplate($config,$regioes,$baseDir);
+    $this->criaImagensDebug($regioes,$baseDir);
   }  
 
   /**
@@ -67,49 +78,40 @@ class GeraTemplate {
    * junto com a fomatação da saída e os valores necessários para interpretação
    * da folha. 
    */
-  private function criaArquivoTemplate($config,$regioes){
-    $ax = $this->ancoraBase[0]/$this->escala;
-    $ay = $this->ancoraBase[1]/$this->escala;
+  private function criaArquivoTemplate($config,$regioes,$baseDir){
+    $content = [
+      'raioTriangulo' => (14 * sqrt(2)) / 2, # diagonal / 2
+      'ancora1' => [$this->ancoraBase[0]/$this->escala,$this->ancoraBase[1]/$this->escala],
+      'distAncHor' => 126,
+      'distAncVer' => 189,
+      'elpAltura' => 2.5,
+      'elpLargura' => 4.36,
+      'regioes' => $regioes,
+      // 'formatoSaida' => isset($config['formatoSaida']) ? CJSON::encode($config['formatoSaida']) : false,
+    ];
 
-    $renderRegioes = function() use($regioes,$ax,$ay) {
-      $content = '';
-
-      foreach ($regioes as $k => $r) {
-        $content .= "\t\t'{$k}' => [";
-        $content .= $r[0] . ',';
-        $content .= ($r[1]-$ax) . ',';
-        $content .= ($r[2]-$ay) . ',';
-        $content .= "'" . $r[3] . "',";
-        $content .= "'" . $r[4] . "'";
-        $content .= "],\n"; 
-      }
-      return $content;
-    };
-
-    $baseTemplate = include __DIR__.'/_cascaTemplate.php';
-
-    $nome = strtolower(str_replace(' ','_', $config['nome']));
-    $file = __DIR__.'/../data/template/'.$nome.'.php';
+    $file = $baseDir.'/template.json';
     $h = fopen($file,'w+');
-    fwrite($h, $baseTemplate);
+    fwrite($h, json_encode($content));
     fclose($h);
-    // print_r($baseTemplate);
-    // exit;
   }
 
   /**
    * Imagens para visualização do resultado da interpretação
    */
-  private function criaImagensDebug($regioes){
+  private function criaImagensDebug($regioes,$baseDir){
     # Posições dos objetos e seus labels
     $copia = Helper::copia($this->image);
     $corTex = imagecolorallocate($copia,0,150,255);
     $corObj = imagecolorallocatealpha ($copia,150,255,0,50);
     foreach ($regioes as $id => $r) {
-      imagefilledellipse($copia,$r[1]*$this->escala,$r[2]*$this->escala,30,30,$corObj);
-      imagettftext ($copia,17.0,0.0,($r[1]*$this->escala)-5,($r[2]*$this->escala)+5,$corTex,__DIR__.'/SIXTY.TTF',$id);
+      $x = ($r[1])*$this->escala+$this->ancoraBase[0];
+      $y = ($r[2])*$this->escala+$this->ancoraBase[1];
+
+      imagefilledellipse($copia,$x,$y,30,30,$corObj);
+      imagettftext ($copia,17.0,0.0,$x-5,$y+5,$corTex,__DIR__.'/SIXTY.TTF',$id);
     }
-    imagejpeg($copia,__DIR__.'/../data/runtime/idsRegioes.jpg');
+    imagejpeg($copia,$baseDir.'/preview.jpg');
     imagedestroy($this->image);
   }
 
@@ -128,8 +130,8 @@ class GeraTemplate {
       foreach ($lista as $cLinha => $l) {
         $count = 0;
         foreach ($l as $cObjeto => $c) {
-          $x = $c[0]/$this->escala; # Converte para milimetros
-          $y = $c[1]/$this->escala; # Converte para milimetros
+          $x = ($c[0] - $this->ancoraBase[0])/$this->escala; # Converte para milimetros
+          $y = ($c[1] - $this->ancoraBase[1])/$this->escala; # Converte para milimetros
 
           $genId = $cb['id'];
           $idRegiao = is_string($genId) ? $genId : $genId($cBloco,$cLinha,$cObjeto);
@@ -184,7 +186,7 @@ class GeraTemplate {
     $objetos = array_map(function($i){ 
       return $i->getCentro(); 
     },$this->buscador->separaObjetos($pontos, $cb['minArea'], $cb['maxArea']));
-    #Helper::pintaObjetos($this->image, $objetos);
+    #Helper::pintaObjetos($this->image, $this->buscador->separaObjetos($pontos, $cb['minArea'], $cb['maxArea']));
     usort($objetos,$this->fnSortLinhaColuna); # Ordena por linha-coluna
     
     if($cb['colunasPorLinha']){
@@ -230,9 +232,8 @@ class GeraTemplate {
       $this->buscador = new Buscador; #Instancia buscador de Objetos
       $this->qtdExpansoes = 10;
       $this->assAncoras = [
-        1 => $this->getAssinatura(Helper::load(__DIR__.'/ancoras/ancora1.jpg'),1,1000000), # TODO: definir valores de busca de acordo com resolução da imagem
+        1 => $this->getAssinatura(Helper::load(__DIR__.'/ancoras/ancora1.jpg')), # TODO: definir valores de busca de acordo com resolução da imagem
       ];
-      $this->arquivo = $arquivo;
       $this->image = Helper::load($arquivo);
       if (!imagefilter($this->image, IMG_FILTER_GRAYSCALE))
         throw new Exception('Imagem não pode ser convertida para tons de cinza.', 500);
@@ -240,7 +241,7 @@ class GeraTemplate {
       $buscarAncoras = new BuscarAncoras($this);
       $ancora1 = $buscarAncoras->getAncora(1,[0,0]); # busca pela 1º ancora a partir da origem
 
-      $this->ancoraBase =$ancora1->getCentro();
+      $this->ancoraBase = $ancora1->getCentro();
 
       $this->fnSortLinhaColuna = function($a,$b){ 
         return $a[1] == $b[1] ? $a[0] >= $b[0] : $a[1] >= $b[1];

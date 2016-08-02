@@ -88,20 +88,20 @@ class Image {
     }
 
     # TESTE PERESPECTIVA
-    private function solve3x3($A,$b){
-      $D  = $this->det($A);
-      $Dx = $this->det([$b   ,$A[1],$A[2]]);
-      $Dy = $this->det([$A[0],$b   ,$A[2]]);
-      $Dz = $this->det([$A[0],$A[1],$b   ]);
+    // private function solve3x3($A,$b){
+    //   $D  = $this->det($A);
+    //   $Dx = $this->det([$b   ,$A[1],$A[2]]);
+    //   $Dy = $this->det([$A[0],$b   ,$A[2]]);
+    //   $Dz = $this->det([$A[0],$A[1],$b   ]);
 
-      return [$Dx/$D,$Dy/$D,$Dz/$D];
-    }
-    private function det($m){
-      list($a1,$a2,$a3) = array_column($m,0);
-      list($b1,$b2,$b3) = array_column($m,1);
-      list($c1,$c2,$c3) = array_column($m,2);
-      return $a1*($b2*$c3-$c2*$b3) - $a2*($b1*$c3-$c1*$b3) + $a3*($b1*$c2-$c1*$b2);
-    }
+    //   return [$Dx/$D,$Dy/$D,$Dz/$D];
+    // }
+    // private function det($m){
+    //   list($a1,$a2,$a3) = array_column($m,0);
+    //   list($b1,$b2,$b3) = array_column($m,1);
+    //   list($c1,$c2,$c3) = array_column($m,2);
+    //   return $a1*($b2*$c3-$c2*$b3) - $a2*($b1*$c3-$c1*$b3) + $a3*($b1*$c2-$c1*$b2);
+    // }
 
     /**
     * Busca imagem e converte para cinza
@@ -272,7 +272,12 @@ class Image {
      */
     private function loadTemplate($template) {
         $this->template = $template;
-        $this->medidas = include __DIR__.'/../data/template/' . $template . '.php';
+
+        $templateFile = __DIR__.'/../data/template/' . $template . '.json';
+        $str = file_get_contents($templateFile);
+        $data = json_decode($str,true);
+        $this->medidas = $data;
+
         $assinaturas = array();
         for ($i = 1; $i < 5; $i++) {
             $image = Helper::load(__DIR__.'/ancoras/ancora' . $i . '.jpg');
