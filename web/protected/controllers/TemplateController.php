@@ -3,6 +3,8 @@
 
 class TemplateController extends BaseController {
 
+	private $dirGeracaoTempalte = '/data/gerarTemplate';
+
 	public function actionIndex(){
 		$this->render('index',[
 			'templates'=>$this->getTemplate(),
@@ -10,11 +12,24 @@ class TemplateController extends BaseController {
 	}
 
 	public function actionCriar(){
-		include_once(Yii::getPathOfAlias('webroot') . '/../src/GeraTemplate.php');
-		$img = Yii::getPathOfAlias('webroot') . '/../data/gerarTemplate/a.jpg';
-		$g = new GeraTemplate();
-		$config = $this->getConfig();
-		$g->gerarTemplate($img,$config);
+		$files = CFileHelper::findFiles(Yii::getPathOfAlias('webroot').'/..'.$this->dirGeracaoTempalte,[
+			'fileTypes' => ['jpg'],
+		]);
+
+		if(isset($_FILES['file'])){
+			$filename = Yii::getPathOfAlias('webroot').'/../'.$this->dirGeracaoTempalte.'/a.jpg';
+			rename($_FILES['file']['tmp_name'],$filename);
+			chmod($filename,0777);
+		}
+
+		$this->render('upload',[
+			'files' => $files,
+		]);
+	}
+
+	public function actionGerar(){
+		$this->layout = '//layouts/base';
+		$this->render('gerar');
 	}
 
 
