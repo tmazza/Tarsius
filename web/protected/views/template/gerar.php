@@ -1,13 +1,23 @@
 <br>
+<ul class="uk-list uk-margin-left">
+  <li>(E) região com elipses</li>
+  <li>(B) região com código de barras</li>
+  <li>(Esc) Desfaz seleção</li>
+</ul>
 <div onkeypress="" onload="updateView();">
-  <canvas id="myCanvas" width="20" height="20" style='border:1px solid red;'>Browser não suporta canvas!</canvas>
-
+  <canvas id="myCanvas" width="20" height="20" style='border:1px solid red;margin:0 auto!important;display: block;'>Browser não suporta canvas!</canvas>
+  <div id='pontos'></div>
   <div class='bottom-bar'>
-    <div id='pontos'></div>
-    <form action="<?=$this->createUrl('default/applyCut')?>" method="post">
-      <button type='button' onclick="undo();" class='btn black waves-effect waves-red'>Desfazer</button>
-      <div id='state' class='estado'></div>
+    <form action="<?=$this->createUrl('/template/processar')?>" method="post">
+      <div class="uk-button-group">
+        <?=CHtml::link("Voltar",$this->createUrl('/template/index'),[
+          'class'=>'uk-button uk-button-primary',
+        ]); ?>
+        <button type='button' onclick="undo();" class='uk-button'>Desfazer seleção</button>
+        <div id='state' class='uk-button estado'></div>
+      </div>
       <input type="hidden" name="pontos" id="to-send" />
+      <button type="submit" class="uk-button uk-button-success">Gerar template</button>
     </form>
   </div>
 </div>
@@ -19,12 +29,14 @@ $('body').keypress(function(event){
   changeState(event);
 });
 
-var pontos = [];
+var pontos = {};
+var contadorBlocos = 0;
+var aberturaPonto = {}; 
+var emEdicao = false;
+
 img = new Image();
 img.src = '<?=$urlImage;?>';
-// img.src = 'http://www.almanaque.cnt.br/paradoxoPK05.jpg';
 
-// Get a reference to the element.
 var elem = document.getElementById('myCanvas');
 
 if (elem && elem.getContext) {
@@ -43,20 +55,19 @@ state = 0;
 lastState = false;
 open = true;
 
+
 function changeState(e){
     var keynum;
-
     if(window.event){ // IE
       keynum = e.keyCode;
-    }else
-        if(e.which){ // Netscape/Firefox/Opera
-        keynum = e.which;
+    } else if(e.which){ // Netscape/Firefox/Opera
+      keynum = e.which;
     }
     char = String.fromCharCode(keynum);
     lastState = state;
-    if(char == 'q'){ 
+    if(char == 'e'){ 
       state = 0;
-    } else if(char == 'f') {
+    } else if(char == 'b') {
       state = 1;
     } else if(e.keyCode === 27) {
       undo();
@@ -73,32 +84,38 @@ function pick(event) {
   var x = event.layerX - elem.left;
   var y = event.layerY - elem.top;
 
-
   if(!open) { // Verifica se segundo ponto está acima e a direita do primeiro
-    ultimoPonto = pontos[pontos.length-1];
-    if(x < ultimoPonto['x'] || y > ultimoPonto['y']){
+    fechamentoPonto = {x: x,y: y,state:state};
+    if(fechamentoPonto['x'] < aberturaPonto['x'] || fechamentoPonto['y'] > aberturaPonto['y']){
       alert('Faça a seleção de uma das diagonaisl do retângulo. Marque primeiro o ponto inferior esquerdo e depois o ponto superior direito.');
       return false;
     }
+    pontos[contadorBlocos] = {
+      'p1' : aberturaPonto,
+      'p2': fechamentoPonto,
+      'tipo' : state,
+    };
+    emEdicao = contadorBlocos;
+    contadorBlocos++;
+    abreEdicao();
   }
 
-  pontos.push({x: x,y: y,state:state});
+  aberturaPonto = {x: x,y: y,state:state};
   dc(x,y);
-
-  if(!open) { // close
-    checkSwitch();
-  }
-  context.save();
+  if(!open) { checkSwitch();  }
   if(!open){
-    p1 = pontos[pontos.length - 1];
-    p2 = pontos[pontos.length - 2];
+    context.save();
+    bloco = pontos[contadorBlocos-1];
+    p1 = bloco['p1'];
+    p2 = bloco['p2'];
     color = getCor();
     context.globalAlpha=0.25;
     context.fillRect(p2['x'],p2['y'] - (p2['y'] - p1['y']),p1['x'] - p2['x'],p2['y'] - p1['y']);
     context.strokeStyle = color;
     context.stroke();
+    context.restore();
   }
-  context.restore();
+
   open = !open;
   updateView();
   cPush();
@@ -115,7 +132,6 @@ function undo(){
 
 function checkSwitch(){}
 
-// INterface
 function dc(x,y,w){
   color = getCor(w);
   context.beginPath();
@@ -139,30 +155,31 @@ function getCor(w){
 
 function updateView(){
   content = '';
-  for(i=pontos.length-1;i>=0;i--){
-    content += '(' + pontos[i]['x'] + ',' + pontos[i]['y'] + ')';
-  }
-//  $('#pontos').html(content);
+  $.each(pontos, function(k,v){
+    content += 'B' + (parseInt(k)+1) + ' | ';
+    content += v['tipo'] + ' | ';
+    content += v['p1']['x'].toFixed(2) + ',' + v['p1']['y'].toFixed(2);
+    content += ' &#8599; ';
+    content += v['p2']['x'].toFixed(2) + ',' + v['p2']['y'].toFixed(2);
+    content += ' <a onclick="editarBloco(' + k + ')">Editar</a>';
+    content += '<br>';
+  });
+  $('#pontos').html(content);
   $('#to-send').val(JSON.stringify(pontos));
   atualizaEstado();
 }
 
 function atualizaEstado(){
+  txtState = 'Elipses';
 
-  txtState = 'Questão';
-  if(state == 1){
-    txtState = 'Compartilhado Desconexo';
-  } else if(state == 2){
-    txtState = 'Imagem';
-  }
+  if(state == 1) txtState = 'Barcode';
+  else if(state == 2) txtState = 'Imagem';
+  
   content = '<div class="state state'+state+'">' + txtState;
-
-  if(!open){
-    content += ' (em aberto)';
-  }
+  
+  if(!open) content += ' (em aberto)';
 
   content += '</div>';
-
   $("#state").html(content);
 
 }
@@ -194,15 +211,12 @@ function atualizaEstado(){
 // }
 
 $(window).mousemove(function(e){
-  p1 = pontos[pontos.length-1];
+  p1 = aberturaPonto;
   if(p1 !== undefined && !open){
     x = p1['x'];
     y = e.pageY;
     w = e.pageX - x;
     h = (p1['y'] + $('#myCanvas').position().top) - y;
-
-    console.log(w);
-    console.log(h);
 
     marginCanvas = $('#myCanvas').position().left;
 
@@ -220,11 +234,113 @@ $(window).mousemove(function(e){
     });
   }
 });
-
 $(document).ready(function(){
   atualizaEstado();
 });
+
+
+function abreEdicao(){
+  bloco = pontos[emEdicao];
+  $('.bloco-cfg').each(function( index ) {
+    name = $(this).attr('name');
+    if(bloco.hasOwnProperty(name)){
+      $(this).val(bloco[name])
+    } else {
+      $(this).val('');
+    }
+  });
+
+
+  UIkit.modal('#edicao-bloco').show();
+}
+
+function gravaEdicao(){
+  bloco = pontos[emEdicao];
+  $('.bloco-cfg').each(function( index ) {
+    val = $(this).val();
+    if(val.length > 0){
+      name = $(this).attr('name');
+      bloco[name] = val;
+    }    
+  });
+  pontos[emEdicao] = bloco;
+  UIkit.modal('#edicao-bloco').hide();
+}
+
+function editarBloco(numBloco){
+  emEdicao = numBloco;
+  abreEdicao();
+}
+
+
 </script>
+
+<div id="edicao-bloco" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        <form class="uk-form uk-form-horizontal">
+          <div class="uk-form-row">
+            <label class="uk-form-label">colunasPorLinha</label>
+            <input name='colunasPorLinha' class="bloco-cfg" /><br>
+          </div>
+          <div class="uk-form-row">
+            <label class="uk-form-label">agrupaObjetos</label>
+            <input name='agrupaObjetos' class="bloco-cfg" /><br>
+          </div>
+          <div class="uk-form-row">
+            <label class="uk-form-label">minArea</label>
+             <input name='minArea'  class="bloco-cfg"/><br>
+          </div>
+          <div class="uk-form-row">
+            <label class="uk-form-label">maxArea</label>
+            <input name='maxArea'  class="bloco-cfg"/><br>
+          </div>
+          <div class="uk-form-row">
+            <label class="uk-form-label">id</label>
+            <input name='id'  class="bloco-cfg"/><br>
+          </div>
+          <div class="uk-form-row">
+            <label class="uk-form-label">tipo</label>
+            <input name='tipo'  class="bloco-cfg"/><br>
+          </div>
+          <div class="uk-form-row">
+            <label class="uk-form-label">casoTrue</label>
+            <input name='casoTrue'  class="bloco-cfg"/><br>
+          </div>
+          <div class="uk-form-row">
+            <label class="uk-form-label">casoFalse</label>
+            <input name='casoFalse'  class="bloco-cfg"/><br>
+          </div>
+        </form>
+        <br>
+        <button class="uk-button uk-button-primary" onclick="gravaEdicao()">Salvar edição</button>
+<!--         'colunasPorLinha' => 15,
+        'agrupaObjetos' => 5,
+        'minArea' => 400,         # Em pixel
+        'maxArea' => 3000,      # Em pixel
+
+        # definição do id dos elementos
+        'id' => function($b,$l,$o) {
+          $idQuestao = str_pad($b*20 + $l+1,3,'0',STR_PAD_LEFT);
+          return 'e-'.$idQuestao.'-'.($o+1);
+        },
+        # tipo da região (cada tipo requer parametros diferentes ...) // TODO: criar definição dos tipos
+        'tipo' => 0, // TODO: criar constantes para os tipos
+        # especifico para elementos de match (com saida true|false, exemplo: elipses)
+        'casoTrue' => function($b,$l,$o) { 
+          switch ($o){
+            case 0: return 'A';
+            case 1: return 'B';
+            case 2: return 'C';
+            case 3: return 'D';
+            case 4: return 'E';
+          }
+        },
+        'casoFalse' => 'W', -->
+
+    </div>
+</div>
+
 <style>
 <!--
 .preview {
@@ -238,8 +354,8 @@ $(document).ready(function(){
   color: red;
   opacity: 0.6;
 }
-.state0 { background: red; }
-.state1 { background: blue; }
+.state0 { background: #f22; }
+.state1 { background: #00a; }
 table td { border:2px solid #03a9f4; }
 .container { width: 100%; }
 .bottom-bar {
@@ -248,7 +364,7 @@ table td { border:2px solid #03a9f4; }
   position:fixed;
   bottom:0px;
   right:0px;
-  padding-bottom: 60px;
+  padding-bottom: 20px;
   padding-right: 40px;
 }
 .estado {
@@ -257,6 +373,23 @@ table td { border:2px solid #03a9f4; }
   display:inline-block;
   width:300px;
   color: white;
+}
+#pontos {
+  padding: 12px;
+  position:fixed;
+  left: 0px;
+  bottom: 0px;
+  font-family: monospace;
+  font-size: 18px;  
+  display: block;
+  width: 100%;
+  max-width: 1000px;
+  height: 140px;
+  background: #000;
+  overflow: hidden;
+  overflow-y: auto;
+  color: white;
+  opacity: 0.8;
 }
 -->
 </style>

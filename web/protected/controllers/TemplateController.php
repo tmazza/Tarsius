@@ -33,4 +33,10 @@ class TemplateController extends BaseController {
 	}
 
 
+	public function actionProcessar(){
+		echo '<pre>';
+		print_r(json_decode($_POST['pontos'],true));
+		exit;
+	}
+
 }

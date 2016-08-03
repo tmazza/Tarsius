@@ -1,7 +1,6 @@
 <?php if(count($files) > 0): ?>
-	Imagem para geração de template:
+	<h3>Imagem disponível para geração do template:</h3>
 	<?php foreach ($files as $f): ?>
-		<?=Yii::app()->baseUrl . '/../data/gerarTemplate/a.jpg'?>
 		<?=CHtml::image(Yii::app()->baseUrl . '/../data/gerarTemplate/a.jpg','',[
 			'width'=>'400px',
 		])?>
