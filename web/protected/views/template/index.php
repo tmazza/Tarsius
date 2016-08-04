@@ -4,9 +4,31 @@ $this->menu = [
 ];
 ?>
 <ul class="uk-list uk-list-striped">
-	<?php
-	foreach ($templates as $t) {
-		echo "<li>{$t}</li>";
-	}
-	?>
+	<?php foreach ($templates as $t): ?>
+		<li>
+			<?=$t;?>
+			<div class="uk-button-group uk-align-right">
+			<?=CHtml::ajaxLink('Ver regiões',$this->createUrl('/template/preview',[
+				'template'=>$t,
+			]),[
+				'complete'=>'js:function(html){
+					$("#preview .content").html(html);
+  					UIkit.modal("#preview").show();					
+				}',
+				'update'=>'#preview',
+			],[
+				'class'=>'uk-button uk-button-link'
+			]);?>
+			<?=CHtml::link('Editar',$this->createUrl('/template/editar',[
+				'template'=>$t,
+			]),[
+				'class'=>'uk-button uk-button-link'
+			]);?>
+			</div>
+		</li>
+	<?php endforeach; ?>
 </ul>
+<div id="preview" class="uk-modal">
+	<div class="uk-modal-dialog uk-modal-dialog-large content">
+    </div>
+</div>

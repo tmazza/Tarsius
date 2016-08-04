@@ -3,6 +3,8 @@ include_once(Yii::getPathOfAlias('webroot') . '/../src/GeraTemplate.php');
 
 class TemplateController extends BaseController {
 
+	public $strFuncoes=[];
+
 	protected function beforeAction($action){
 		return parent::beforeAction($action);
 	}
@@ -44,14 +46,42 @@ class TemplateController extends BaseController {
 
 	public function actionEditar($template){
 		$this->layout = '//layouts/base';
-		# TODO: verificar se arquivo 'gerar.php' já foi criado e utilizá-lo na edição
+
+		$dir = Yii::app()->params['templatesDir'] . '/' . $template ;
+		if(file_exists($dir.'/gerador.php')){
+			$config = include $dir.'/gerador.php';
+			$blocos = $this->regiosFormatadas($config);			
+		}
+
 		$urlImage = Yii::app()->baseUrl . '/../data/template/'.$template.'/base.jpg';
 		$this->render('gerar',[
+			'blocos' => isset($blocos) ? $blocos : false,
+			'qtdBlocos' => isset($blocos) ? count($config['regioes']) : false,
 			'template' => $template,
 			'urlImage' => $urlImage,
 		]);
 	}
 
+	private function regiosFormatadas($config){
+		$regioes = $config['regioes'];
+		$formatadas = [];
+		foreach ($regioes as $r) {
+			$strFuncoes = unserialize(base64_decode($r['strFuncoes']));
+			$formatadas[] = [
+				'p1' => ['x'=>ceil($r['p1'][0]),'y'=>ceil($r['p2'][1]),'state'=>$r['tipo']],
+				'p2' => ['x'=>ceil($r['p2'][0]),'y'=>ceil($r['p1'][1]),'state'=>$r['tipo']],
+				'tipo' => (int) $r['tipo'],
+				'colunasPorLinha' => $r['colunasPorLinha'],
+			    'agrupaObjetos' => $r['agrupaObjetos'],
+			    'minArea' => $r['minArea'],
+			    'maxArea' => $r['maxArea'],
+			    'id' => is_string($r['id']) ? $r['id'] : base64_encode($strFuncoes['id']),
+			    'casoTrue' => is_string($r['casoTrue']) ? $r['casoTrue'] : base64_encode($strFuncoes['casoTrue']),
+			    'casoFalse' => is_string($r['casoFalse']) ? $r['casoFalse'] : base64_encode($strFuncoes['casoFalse']),
+			];
+		}
+		return CJSON::encode($formatadas);
+   	}
 
 	public function actionProcessar($template){
 		$blocos = json_decode($_POST['pontos'],true);
@@ -59,6 +89,7 @@ class TemplateController extends BaseController {
 
 		# formata arquivo gerador de template
 		$regioes = $this->gerRegioesFormatadas($blocos,$dir);
+		$strFuncoes = serialize($this->strFuncoes);
 		$templateGerador = include $dir . '/../baseGerador.php';
 
 		# grava arquivo gerador de template
@@ -70,6 +101,10 @@ class TemplateController extends BaseController {
 		$this->redirect($this->createUrl('/template/index'));
 	}
 
+	public function actionPreview($template){
+		$urlImage = Yii::app()->baseUrl . '/../data/template/'.$template.'/preview.jpg';
+		echo CHtml::image($urlImage,'',['style'=>'width:100%']);	
+	}
 
 	/**
 	 * Gerar arquivo .json com cada uma das regiões encontradas
@@ -87,6 +122,7 @@ class TemplateController extends BaseController {
 	private function gerRegioesFormatadas($regioes,$dir){
 		$strRegioes = '';
 		foreach ($regioes as $r) {
+			$this->strFuncoes = [];
 			$tipo = (int) $r['tipo']; 
 			$p1x = (float) $r['p1']['x']; 
 			$p1y = (float) $r['p2']['y'];
@@ -99,6 +135,7 @@ class TemplateController extends BaseController {
 			$id = $this->getAttr($r,'id');
 			$casoTrue = $this->getAttr($r,'casoTrue');
 			$casoFalse = $this->getAttr($r,'casoFalse') ;
+			$strFuncoes = "'" . base64_encode(serialize($this->strFuncoes)) . "'";
 			$strRegioes .= include $dir . '/../baseRegiao.php';
 		}
 		return $strRegioes;
@@ -111,6 +148,7 @@ class TemplateController extends BaseController {
 	private function getAttr($r,$attr){
 		if(in_array($attr, ['id','casoTrue','casoFalse'])){ # campos que podem conter callback como valor
 			$return = isset($r[$attr]) ? $r[$attr] : $this->getDefault($attr);
+			$this->strFuncoes[$attr] = "'" . $return . "'";
 			return strpos($return, 'function') === false ? "'{$return}'" : $return;
 		} else {
 			return isset($r[$attr]) ? $r[$attr] : $this->getDefault($attr);

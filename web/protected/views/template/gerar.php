@@ -30,9 +30,13 @@
 $('body').keypress(function(event){
   changeState(event);
 });
-
-var pontos = {};
-var contadorBlocos = 0;
+<?php if($blocos): ?>
+  var pontos = JSON.parse('<?=$blocos;?>');
+  var contadorBlocos = <?=$qtdBlocos;?> 
+<?php else: ?>
+  var pontos = {};
+  var contadorBlocos = 0;
+<?php endif; ?>
 var aberturaPonto = {}; 
 var emEdicao = false;
 
@@ -238,6 +242,7 @@ $(window).mousemove(function(e){
 });
 $(document).ready(function(){
   atualizaEstado();
+    initDraw();
 });
 
 
@@ -271,6 +276,29 @@ function editarBloco(numBloco){
   emEdicao = numBloco;
   abreEdicao();
 }
+
+function initDraw(){
+setTimeout(function(){ 
+  
+  $.each(pontos, function(k,v){
+    p1 = v['p1']
+    p2 = v['p2']
+    state = v['tipo']
+    // alert(JSON.stringify(p1));
+    // alert(JSON.stringify(p2));
+    context.save();
+    bloco = pontos[contadorBlocos-1];
+    color = getCor();
+    context.globalAlpha=0.25;
+    context.fillRect(p2['x'],p2['y'] - (p2['y'] - p1['y']),p1['x'] - p2['x'],p2['y'] - p1['y']);
+    context.strokeStyle = color;
+    context.stroke();
+    context.restore();
+  });
+
+},1000);
+}
+
 
 </script>
 
