@@ -1,9 +1,11 @@
 <?php
-
+include_once(Yii::getPathOfAlias('webroot') . '/../src/GeraTemplate.php');
 
 class TemplateController extends BaseController {
 
-	private $dirGeracaoTempalte = '/data/gerarTemplate';
+	protected function beforeAction($action){
+		return parent::beforeAction($action);
+	}
 
 	public function actionIndex(){
 		$this->render('index',[
@@ -12,31 +14,122 @@ class TemplateController extends BaseController {
 	}
 
 	public function actionCriar(){
-		$files = CFileHelper::findFiles(Yii::getPathOfAlias('webroot').'/..'.$this->dirGeracaoTempalte,[
-			'fileTypes' => ['jpg'],
-		]);
+		$model = new Template();
 
-		if(isset($_FILES['file'])){
-			$filename = Yii::getPathOfAlias('webroot').'/../'.$this->dirGeracaoTempalte.'/a.jpg';
+		if(isset($_FILES['file']) && isset($_POST['nome'])){
+			$model->nome = $_POST['nome'];
+			$model->file = $_FILES['file']['name'];
+
+			# Cria diretorio para template
+			$dirBasename = HView::dirname($model->nome);
+			$dir = Yii::app()->params['templatesDir'] . '/' . $dirBasename ;
+			if(!is_dir($dir))
+				CFileHelper::createDirectory($dir,0777);
+
+			# Move imagem para diretorio criado
+			$filename = $dir.'/base.jpg';
 			rename($_FILES['file']['tmp_name'],$filename);
 			chmod($filename,0777);
+
+			# Rediriona para tela edição/criação
+			$this->redirect($this->createUrl('/template/editar',[
+				'template'=>$dirBasename,
+			]));
 		}
 
 		$this->render('upload',[
-			'files' => $files,
+			'model'=>$model,
 		]);
 	}
 
-	public function actionGerar(){
+	public function actionEditar($template){
 		$this->layout = '//layouts/base';
-		$this->render('gerar');
+		# TODO: verificar se arquivo 'gerar.php' já foi criado e utilizá-lo na edição
+		$urlImage = Yii::app()->baseUrl . '/../data/template/'.$template.'/base.jpg';
+		$this->render('gerar',[
+			'template' => $template,
+			'urlImage' => $urlImage,
+		]);
 	}
 
 
-	public function actionProcessar(){
-		echo '<pre>';
-		print_r(json_decode($_POST['pontos'],true));
-		exit;
+	public function actionProcessar($template){
+		$blocos = json_decode($_POST['pontos'],true);
+		$dir = Yii::app()->params['templatesDir'] . '/' . $template;
+
+		# formata arquivo gerador de template
+		$regioes = $this->gerRegioesFormatadas($blocos,$dir);
+		$templateGerador = include $dir . '/../baseGerador.php';
+
+		# grava arquivo gerador de template
+		$handle = fopen($dir.'/'.'gerador.php', 'w+');
+		fwrite($handle,"<?php\n".$templateGerador . "\n?>");
+		fclose($handle);
+
+		$this->gerarTempalteEstatico($dir);
+		$this->redirect($this->createUrl('/template/index'));
+	}
+
+
+	/**
+	 * Gerar arquivo .json com cada uma das regiões encontradas
+	 */
+	private function gerarTempalteEstatico($dir){
+		$img = $dir . '/base.jpg';
+		$config = include $dir . '/gerador.php';
+		$g = new GeraTemplate();
+		$g->gerarTemplate($img,$config,300);
+	}
+
+	/**
+	 * Gera string com sintaxe em PHP da lista de regiõs.
+	 */
+	private function gerRegioesFormatadas($regioes,$dir){
+		$strRegioes = '';
+		foreach ($regioes as $r) {
+			$tipo = (int) $r['tipo']; 
+			$p1x = (float) $r['p1']['x']; 
+			$p1y = (float) $r['p2']['y'];
+			$p2x = (float) $r['p2']['x'];
+			$p2y = (float) $r['p1']['y'];
+			$colPorLin = (int) $this->getAttr($r,'colunasPorLinha');
+			$agrupa = (int) $this->getAttr($r,'agrupaObjetos');
+			$minArea = (int) $this->getAttr($r,'minArea');
+			$maxArea = (int) $this->getAttr($r,'maxArea');
+			$id = $this->getAttr($r,'id');
+			$casoTrue = $this->getAttr($r,'casoTrue');
+			$casoFalse = $this->getAttr($r,'casoFalse') ;
+			$strRegioes .= include $dir . '/../baseRegiao.php';
+		}
+		return $strRegioes;
+	}
+	
+	/**
+	 * Retorna valor de $attr em $r. Caso $attr não exista, retorna o valor default
+	 * definido para $attr.
+	 */
+	private function getAttr($r,$attr){
+		if(in_array($attr, ['id','casoTrue','casoFalse'])){ # campos que podem conter callback como valor
+			$return = isset($r[$attr]) ? $r[$attr] : $this->getDefault($attr);
+			return strpos($return, 'function') === false ? "'{$return}'" : $return;
+		} else {
+			return isset($r[$attr]) ? $r[$attr] : $this->getDefault($attr);
+		}
+	}
+
+	/**
+	 * Definição dos valores default dos attributos do arquivo gerador de template
+	 */
+	private function getDefault($attr){
+		switch ($attr) {
+			case 'colunasPorLinha': return 0;
+			case 'agrupaObjetos': return 0;
+			case 'minArea': return 300;
+			case 'maxArea': return 3000;
+			case 'id': return 0;
+			case 'casoTrue': return 'S';
+			case 'casoFalse': return 'N';
+		}
 	}
 
 }

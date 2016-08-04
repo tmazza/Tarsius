@@ -33,7 +33,7 @@ class DistribuidoController extends BaseController {
 			if(!file_exists($originalFile)) throw new Exception("Arquivo '{originalFile}' não encontrado.", 1);
 			$original = imagecreatefromjpeg($originalFile);
 
-			$strTempalte = file_get_contents(Yii::app()->params['templatesDir'] . '/' . $dist->trabalho->template . '.json');
+			$strTempalte = file_get_contents(Yii::app()->params['templatesDir'] . '/' . $dist->trabalho->template . '/template.json');
 			$template = json_decode($strTempalte,true);
 			$preenchimentoMinimo = $dist->trabalho->taxaPreenchimento;
 			$escala = $output['escala'];

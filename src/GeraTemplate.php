@@ -8,14 +8,14 @@ define('EXPANSAO_BUSCA', 0.4); # taxa de aumento da área de busca
 define('QTD_EXPANSOES_BUSCA', 10);
 
 define('MATCH_ANCORA', 0.85);
-include __DIR__.'/Buscador.php';
-include __DIR__.'/BuscarAncoras.php';
-include __DIR__.'/Objeto.php';
-include __DIR__.'/Helper.php';
-include __DIR__.'/ConnectedComponent.php';
-include __DIR__.'/ConnectedComponent.php';
-include __DIR__.'/Assinatura.php';
-include __DIR__.'/AnalisarRegioes.php';
+include_once __DIR__.'/Buscador.php';
+include_once __DIR__.'/BuscarAncoras.php';
+include_once __DIR__.'/Objeto.php';
+include_once __DIR__.'/Helper.php';
+include_once __DIR__.'/ConnectedComponent.php';
+include_once __DIR__.'/ConnectedComponent.php';
+include_once __DIR__.'/Assinatura.php';
+include_once __DIR__.'/AnalisarRegioes.php';
 
 
 bcscale(14); # precisão nos operações float
@@ -64,9 +64,7 @@ class GeraTemplate {
     }
 
     # arquivos de saida (template, debug)
-    $baseDir = __DIR__.'/../data/template/';# . strtolower(str_replace(' ','_', $config['nome']));
-    if(!is_dir($baseDir))
-      mkdir($baseDir);
+    $baseDir = __DIR__.'/../data/template/' . $config['nome'] . '/';# . strtolower(str_replace(' ','_', $config['nome']));
 
     $this->criaArquivoTemplate($config,$regioes,$baseDir);
     $this->criaImagensDebug($regioes,$baseDir);

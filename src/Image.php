@@ -257,7 +257,7 @@ class Image {
     private function loadTemplate($template) {
         $this->template = $template;
 
-        $templateFile = __DIR__.'/../data/template/' . $template . '.json';
+        $templateFile = __DIR__.'/../data/template/' . $template . '/template.json';
         $str = file_get_contents($templateFile);
         $data = json_decode($str,true);
 

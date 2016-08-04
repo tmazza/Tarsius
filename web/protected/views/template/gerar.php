@@ -1,3 +1,4 @@
+<h2><?=$template?></h2>
 <br>
 <ul class="uk-list uk-margin-left">
   <li>(E) região com elipses</li>
@@ -8,7 +9,9 @@
   <canvas id="myCanvas" width="20" height="20" style='border:1px solid red;margin:0 auto!important;display: block;'>Browser não suporta canvas!</canvas>
   <div id='pontos'></div>
   <div class='bottom-bar'>
-    <form action="<?=$this->createUrl('/template/processar')?>" method="post">
+    <form action="<?=$this->createUrl('/template/processar',[
+      'template'=>$template,
+    ])?>" method="post">
       <div class="uk-button-group">
         <?=CHtml::link("Voltar",$this->createUrl('/template/index'),[
           'class'=>'uk-button uk-button-primary',
@@ -23,7 +26,6 @@
 </div>
 <div class="preview"></div>
 
-<?php $urlImage = Yii::app()->baseUrl . '/../data/gerarTemplate/a.jpg'; ?>
 <script>
 $('body').keypress(function(event){
   changeState(event);
@@ -246,11 +248,9 @@ function abreEdicao(){
     if(bloco.hasOwnProperty(name)){
       $(this).val(bloco[name])
     } else {
-      $(this).val('');
+      $(this).val($(this).attr('data-default'));
     }
   });
-
-
   UIkit.modal('#edicao-bloco').show();
 }
 
@@ -272,72 +272,57 @@ function editarBloco(numBloco){
   abreEdicao();
 }
 
-
 </script>
 
 <div id="edicao-bloco" class="uk-modal">
     <div class="uk-modal-dialog">
         <a class="uk-modal-close uk-close"></a>
+        <div class="uk-modal-header">
+          <h2>Definições do bloco</h2>
+        </div>
         <form class="uk-form uk-form-horizontal">
           <div class="uk-form-row">
             <label class="uk-form-label">colunasPorLinha</label>
-            <input name='colunasPorLinha' class="bloco-cfg" /><br>
+            <input name='colunasPorLinha' class="bloco-cfg" data-default='15'/><br>
           </div>
           <div class="uk-form-row">
             <label class="uk-form-label">agrupaObjetos</label>
-            <input name='agrupaObjetos' class="bloco-cfg" /><br>
+            <input name='agrupaObjetos' class="bloco-cfg" data-default='5'/><br>
           </div>
           <div class="uk-form-row">
             <label class="uk-form-label">minArea</label>
-             <input name='minArea'  class="bloco-cfg"/><br>
+             <input name='minArea'  class="bloco-cfg"  data-default='300'/><br>
           </div>
           <div class="uk-form-row">
             <label class="uk-form-label">maxArea</label>
-            <input name='maxArea'  class="bloco-cfg"/><br>
+            <input name='maxArea'  class="bloco-cfg"  data-default='3000'/><br>
           </div>
           <div class="uk-form-row">
             <label class="uk-form-label">id</label>
-            <input name='id'  class="bloco-cfg"/><br>
-          </div>
-          <div class="uk-form-row">
-            <label class="uk-form-label">tipo</label>
-            <input name='tipo'  class="bloco-cfg"/><br>
+            <input name='id' style='width:600px;height:140px'; class="bloco-cfg" data-default="function($b,$l,$o) {
+  $idQuestao = str_pad($b*20 + $l+1,3,'0',STR_PAD_LEFT);
+  return 'e-'.$idQuestao.'-'.($o+1);
+}"/>
           </div>
           <div class="uk-form-row">
             <label class="uk-form-label">casoTrue</label>
-            <input name='casoTrue'  class="bloco-cfg"/><br>
+            <textarea name='casoTrue' style='width:600px;height:200px'; class="bloco-cfg" data-default="function($b,$l,$o) { 
+  switch ($o){
+    case 0: return 'A';
+    case 1: return 'B';
+    case 2: return 'C';
+    case 3: return 'D';
+    case 4: return 'E';
+  }
+}"></textarea><br>
           </div>
           <div class="uk-form-row">
             <label class="uk-form-label">casoFalse</label>
-            <input name='casoFalse'  class="bloco-cfg"/><br>
+            <textarea name='casoFalse'  class="bloco-cfg" data-default="W" style='width:600px;height:140px';></textarea>
           </div>
         </form>
         <br>
         <button class="uk-button uk-button-primary" onclick="gravaEdicao()">Salvar edição</button>
-<!--         'colunasPorLinha' => 15,
-        'agrupaObjetos' => 5,
-        'minArea' => 400,         # Em pixel
-        'maxArea' => 3000,      # Em pixel
-
-        # definição do id dos elementos
-        'id' => function($b,$l,$o) {
-          $idQuestao = str_pad($b*20 + $l+1,3,'0',STR_PAD_LEFT);
-          return 'e-'.$idQuestao.'-'.($o+1);
-        },
-        # tipo da região (cada tipo requer parametros diferentes ...) // TODO: criar definição dos tipos
-        'tipo' => 0, // TODO: criar constantes para os tipos
-        # especifico para elementos de match (com saida true|false, exemplo: elipses)
-        'casoTrue' => function($b,$l,$o) { 
-          switch ($o){
-            case 0: return 'A';
-            case 1: return 'B';
-            case 2: return 'C';
-            case 3: return 'D';
-            case 4: return 'E';
-          }
-        },
-        'casoFalse' => 'W', -->
-
     </div>
 </div>
 
@@ -383,13 +368,13 @@ table td { border:2px solid #03a9f4; }
   font-size: 18px;  
   display: block;
   width: 100%;
-  max-width: 1000px;
-  height: 140px;
+  max-width: 400px;
+  height: 100px;
   background: #000;
   overflow: hidden;
   overflow-y: auto;
   color: white;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 -->
 </style>

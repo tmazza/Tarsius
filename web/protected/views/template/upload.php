@@ -1,22 +1,22 @@
-<?php if(count($files) > 0): ?>
-	<h3>Imagem disponível para geração do template:</h3>
-	<?php foreach ($files as $f): ?>
-		<?=CHtml::image(Yii::app()->baseUrl . '/../data/gerarTemplate/a.jpg','',[
-			'width'=>'400px',
-		])?>
-		<?=CHtml::link("Criar tempate usando esse arquivo",$this->createUrl('/template/gerar'),[
-			'class'=>'uk-button uk-button-primary',
-		])?>
-	<?php endforeach; ?>
-<?php else: ?>
-	Nenhum arquivo com formato '.jpg'.
-<?php endif; ?>
-
+<?php
+$this->menu = [
+	['Cancelar',$this->createUrl('/template/index')],
+];
+?>
 <hr>
-<h3>Novo arquivo para geração de template</h3>
+<h3>Geração de template</h3>
 <div class="form">
-	<form enctype="multipart/form-data" method="POST">
+	<form enctype="multipart/form-data" method="POST" class="uk-form">
+		<h4>Nome:</h4>		
+	   	<input name="nome" value="<?=$model->nome?>" class="" style="width:200px;" />
+	   	<small>Sem espaços, acentos ou caracteres especiais.</small>
+	   	<br>
+	   	<h4>Imagem de base:</h4>
 	    <?= CHtml::fileField('file', null,array('size' => 36, 'maxlength' => 255)); ?>
-	    <button type="submit">Salvar</button>
+	   	<br><br>
+	   	<br><br>
+	    <button type="submit" class="uk-button uk-button-primary">
+	    	Salvar
+	    </button>
     </form>
 </div>

@@ -12,9 +12,14 @@ class BaseController extends CController {
 
 	protected function getTemplate(){
 		$templatesDir = Yii::app()->params['templatesDir'];
+		
+		$diretorios = array_filter(scandir($templatesDir),function($i) use($templatesDir) {
+			return strlen($i) > 2 && is_dir($templatesDir.'/'.$i); 
+		});
+
 		$valores = array_map(function($i){ 
 			return pathinfo(basename($i),PATHINFO_FILENAME); 
-		},CFileHelper::findFiles($templatesDir));
+		},$diretorios);
 		return array_combine($valores,$valores);
 	}
 }
