@@ -6,21 +6,22 @@
   <li>(Esc) Desfaz seleção</li>
 </ul>
 <div onkeypress="" onload="updateView();">
-  <canvas id="myCanvas" width="20" height="20" style='border:1px solid red;margin:0 auto!important;display: block;'>Browser não suporta canvas!</canvas>
+  <canvas id="myCanvas" width="20" height="20" style='border:1px solid red;margin:0px auto!important;display: block;'>Browser não suporta canvas!</canvas>
+  <div style="margin-bottom:200px"></div>
   <div id='pontos'></div>
   <div class='bottom-bar'>
     <form action="<?=$this->createUrl('/template/processar',[
       'template'=>$template,
     ])?>" method="post">
       <div class="uk-button-group">
-        <?=CHtml::link("Voltar",$this->createUrl('/template/index'),[
+        <?=CHtml::link("Cancelar",$this->createUrl('/template/index'),[
           'class'=>'uk-button uk-button-primary',
         ]); ?>
         <button type='button' onclick="undo();" class='uk-button'>Desfazer seleção</button>
-        <div id='state' class='uk-button estado'></div>
+        <div style="padding:0px;" id='state' class='uk-button estado'></div>
+        <button type="submit" class="uk-button uk-button-success">Gerar template</button>
       </div>
       <input type="hidden" name="pontos" id="to-send" />
-      <button type="submit" class="uk-button uk-button-success">Gerar template</button>
     </form>
   </div>
 </div>
@@ -102,8 +103,8 @@ function pick(event) {
       'tipo' : state,
     };
     emEdicao = contadorBlocos;
-    contadorBlocos++;
     abreEdicao();
+    contadorBlocos++;
   }
 
   aberturaPonto = {x: x,y: y,state:state};
@@ -162,11 +163,7 @@ function getCor(w){
 function updateView(){
   content = '';
   $.each(pontos, function(k,v){
-    content += 'B' + (parseInt(k)+1) + ' | ';
-    content += v['tipo'] + ' | ';
-    content += v['p1']['x'].toFixed(2) + ',' + v['p1']['y'].toFixed(2);
-    content += ' &#8599; ';
-    content += v['p2']['x'].toFixed(2) + ',' + v['p2']['y'].toFixed(2);
+    content += 'Bloco ' + (parseInt(k)+1) + ' | ';
     content += ' <a onclick="editarBloco(' + k + ')">Editar</a>';
     content += '<br>';
   });
@@ -269,6 +266,7 @@ function gravaEdicao(){
     }    
   });
   pontos[emEdicao] = bloco;
+  $('#to-send').val(JSON.stringify(pontos));
   UIkit.modal('#edicao-bloco').hide();
 }
 
@@ -284,8 +282,6 @@ setTimeout(function(){
     p1 = v['p1']
     p2 = v['p2']
     state = v['tipo']
-    // alert(JSON.stringify(p1));
-    // alert(JSON.stringify(p2));
     context.save();
     bloco = pontos[contadorBlocos-1];
     color = getCor();
@@ -295,6 +291,8 @@ setTimeout(function(){
     context.stroke();
     context.restore();
   });
+
+  updateView();
 
 },1000);
 }
@@ -327,10 +325,10 @@ setTimeout(function(){
           </div>
           <div class="uk-form-row">
             <label class="uk-form-label">id</label>
-            <input name='id' style='width:600px;height:140px'; class="bloco-cfg" data-default="function($b,$l,$o) {
+            <textarea name='id' style='width:600px;height:140px'; class="bloco-cfg" data-default="function($b,$l,$o) {
   $idQuestao = str_pad($b*20 + $l+1,3,'0',STR_PAD_LEFT);
   return 'e-'.$idQuestao.'-'.($o+1);
-}"/>
+}"></textarea>
           </div>
           <div class="uk-form-row">
             <label class="uk-form-label">casoTrue</label>
@@ -377,32 +375,29 @@ table td { border:2px solid #03a9f4; }
   position:fixed;
   bottom:0px;
   right:0px;
-  padding-bottom: 20px;
-  padding-right: 40px;
+  padding-right: 20px;
 }
 .estado {
   text-align: center;
   font-size: 23px;
-  display:inline-block;
   width:300px;
   color: white;
 }
 #pontos {
   padding: 12px;
   position:fixed;
-  left: 0px;
-  bottom: 0px;
+  right: 0px;
+  bottom: 40px;
   font-family: monospace;
   font-size: 18px;  
   display: block;
-  width: 100%;
-  max-width: 400px;
+  width: 609px;
   height: 100px;
-  background: #000;
   overflow: hidden;
   overflow-y: auto;
-  color: white;
+  background: #ddd;
   opacity: 0.9;
+  margin-right: 20px;
 }
 -->
 </style>

@@ -3,6 +3,7 @@ $this->menu = [
 	['Novo template',$this->createUrl('/template/criar')],
 ];
 ?>
+<h2>Templates</h2>
 <ul class="uk-list uk-list-striped">
 	<?php foreach ($templates as $t): ?>
 		<li>
