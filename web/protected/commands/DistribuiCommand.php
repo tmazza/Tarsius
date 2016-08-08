@@ -163,7 +163,7 @@ class DistribuiCommand extends CConsoleCommand
 
       try {
         $model = new Leitura;
-        $model->NomeArquivo = hash('crc32',$NomeArquivo+microtime(true));
+        $model->NomeArquivo = $NomeArquivo;
         $model->attributes = $export;
 
         if($model->validate()){

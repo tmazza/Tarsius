@@ -4,6 +4,7 @@ class DistribuidoController extends BaseController {
 	public function actionVer($id){
 		include_once __DIR__ . '/../../../src/Helper.php';
 		$model = Distribuido::model()->findByPk((int)$id);
+		Yii::app()->clientScript->registerScriptFile($this->wb.'/jquery.elevatezoom.min.js');
 		$this->render('ver',[
 			'model'=>$model,
 			'debugImage'=>$this->getDebugImage($model),
@@ -11,14 +12,13 @@ class DistribuidoController extends BaseController {
 	}
 
 	private function getDebugImage($dist){
-		$baseDir = __DIR__ . '/../../../data/runtime/trab-'.$dist->trabalho->id;
+		$baseDir	 = __DIR__ . '/../../../data/runtime/trab-'.$dist->trabalho->id;
 		$file = $dist->nome;
 
 		$imgDir = $baseDir.'/img/';
 		$reviewImage = $imgDir.substr($file,0,-9) . '.png';
 
 		
-
 		if(!file_exists($reviewImage)){
 			# cria diretorio para imagens de debug
 			if(!is_dir($imgDir)) mkdir($imgDir,0777);
@@ -45,7 +45,7 @@ class DistribuidoController extends BaseController {
 			    
 			    $w = $escala * $template['elpLargura'] ;
 			    $h = $escala * $template['elpAltura'];
-			    list($x,$y) = Helper::rotaciona([$r[2],$r[3]],$output['ancoras'][1],$output['rotacao']);
+			    list($x,$y) = Helper::rotaciona([$r[2],$r[3]],$output['ancoras'][1],0);
 
 			    if($r[1] > $preenchimentoMinimo) { # todo: adicionar taxa de PREENCHIMENTO_MINIMO no template!
 			      imagefilledellipse($original,$x,$y,$w,$h, imagecolorallocatealpha($original,255,255,0,75));
@@ -59,9 +59,7 @@ class DistribuidoController extends BaseController {
 			}
 			imagepng($original,$reviewImage);
 		}
-
-		return 'data:image/png;base64,' . base64_encode(file_get_contents($reviewImage));
-		 
+		return  Yii::app()->baseUrl . '/../data/runtime/trab-'.$dist->trabalho->id.'/img/'.substr($file,0,-9) . '.png';
 	}
 
 
