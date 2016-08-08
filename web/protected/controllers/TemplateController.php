@@ -90,7 +90,7 @@ class TemplateController extends BaseController {
 		# formata arquivo gerador de template
 		$regioes = $this->gerRegioesFormatadas($blocos,$dir);
 		$strFuncoes = serialize($this->strFuncoes);
-		$templateGerador = include $dir . '/../baseGerador.php';
+		$templateGerador = $this->getBaseGerador($template,$regioes);
 
 		# grava arquivo gerador de template
 		$handle = fopen($dir.'/'.'gerador.php', 'w+');
@@ -136,7 +136,7 @@ class TemplateController extends BaseController {
 			$casoTrue = $this->getAttr($r,'casoTrue');
 			$casoFalse = $this->getAttr($r,'casoFalse') ;
 			$strFuncoes = "'" . base64_encode(serialize($this->strFuncoes)) . "'";
-			$strRegioes .= include $dir . '/../baseRegiao.php';
+			$strRegioes .= $this->getTemplateRegiao($tipo,$p1x,$p1y,$p2x,$p2y,$colPorLin,$agrupa,$minArea,$maxArea,$id,$casoTrue,$casoFalse,$strFuncoes);
 		}
 		return $strRegioes;
 	}
@@ -169,5 +169,42 @@ class TemplateController extends BaseController {
 			case 'casoFalse': return 'N';
 		}
 	}
+
+	private function getBaseGerador($template,$regioes){
+		return <<<BASEGERADOR
+return [
+  'nome' => '{$template}',
+  'regioes' => [
+    {$regioes}
+  ],
+  'formatoSaida' => [
+    'ausente' => 'eAusente',
+    'respostas' => [
+      'match' => '/^e-.*-\d$/',
+      'order' => false
+    ],
+  ],
+];
+BASEGERADOR;
+	}
+
+	private function getTemplateRegiao($tipo,$p1x,$p1y,$p2x,$p2y,$colPorLin,$agrupa,$minArea,$maxArea,$id,$casoTrue,$casoFalse,$strFuncoes){
+		return <<<TEMPLATEREGIAO
+[
+  'tipo' => $tipo,
+  'p1' => [$p1x,$p1y],
+  'p2' => [$p2x,$p2y],
+  'colunasPorLinha' => $colPorLin,
+  'agrupaObjetos' => $agrupa,
+  'minArea' => $minArea,
+  'maxArea' => $maxArea,
+  'id' => $id,
+  'casoTrue' => $casoTrue,
+  'casoFalse' => $casoFalse,
+  'strFuncoes' => $strFuncoes,
+],
+TEMPLATEREGIAO;
+	}
+
 
 }
