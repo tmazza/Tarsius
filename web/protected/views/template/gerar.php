@@ -325,14 +325,14 @@ setTimeout(function(){
           </div>
           <div class="uk-form-row">
             <label class="uk-form-label">id</label>
-            <textarea name='id' style='width:600px;height:140px'; class="bloco-cfg" data-default="function($b,$l,$o) {
+            <textarea name='id' style='width:600px;height:140px'; class="bloco-cfg"  id='t-id' data-default="function($b,$l,$o) {
   $idQuestao = str_pad($b*20 + $l+1,3,'0',STR_PAD_LEFT);
   return 'e-'.$idQuestao.'-'.($o+1);
 }"></textarea>
           </div>
           <div class="uk-form-row">
             <label class="uk-form-label">casoTrue</label>
-            <textarea name='casoTrue' style='width:600px;height:200px'; class="bloco-cfg" data-default="function($b,$l,$o) { 
+            <textarea name='casoTrue' style='width:600px;height:200px'; class="bloco-cfg"   id='t-ct' data-default="function($b,$l,$o) { 
   switch ($o){
     case 0: return 'A';
     case 1: return 'B';
@@ -344,13 +344,34 @@ setTimeout(function(){
           </div>
           <div class="uk-form-row">
             <label class="uk-form-label">casoFalse</label>
-            <textarea name='casoFalse'  class="bloco-cfg" data-default="W" style='width:600px;height:140px';></textarea>
+            <textarea name='casoFalse'  class="bloco-cfg" data-default="W"   id='t-cf' style='width:600px;height:140px';></textarea>
           </div>
         </form>
         <br>
         <button class="uk-button uk-button-primary" onclick="gravaEdicao()">Salvar edição</button>
     </div>
 </div>
+<!-- 
+<link rel="stylesheet" href="<?=$this->wb;?>/codemirror/lib/codemirror.css">
+<script src="<?=$this->wb;?>/codemirror/lib/codemirror.js"></script>
+<script>
+  var modoPHP = {
+    lineNumbers: true,
+    matchBrackets: true,
+    mode: "application/x-httpd-php",
+    indentUnit: 4,
+    indentWithTabs: true,
+    enterMode: "keep",
+    tabMode: "shift"
+  };
+  var editorID = CodeMirror.fromTextArea(document.getElementById("t-id"), modoPHP);
+  var editorCT = CodeMirror.fromTextArea(document.getElementById("t-ct"), modoPHP);
+  var editorCF = CodeMirror.fromTextArea(document.getElementById("t-cf"), modoPHP);
+</script> -->
+
+
+
+
 
 <style>
 <!--

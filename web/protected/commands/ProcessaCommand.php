@@ -34,7 +34,7 @@ class ProcessaCommand extends CConsoleCommand {
 		$first = true;
 		foreach ($files as $i => $f) {
 		  	$count++;
-		  	if($first || $count % 50 == 0){
+		  	if($first || $count % 10 == 0){
 		  		$this->trabalho = Trabalho::model()->findByPk($trabId);
 			}
 
@@ -44,43 +44,42 @@ class ProcessaCommand extends CConsoleCommand {
 	   	 	$arquivoDest = $this->dirOut.'/'.$f;
 
 
-		  if($this->trabalho->status == 1){
-		    $start = time();
+			if($this->trabalho->status == 1){
+				$start = time();
 
-		    try {
-		      $image = new Image($template,$this->trabalho->taxaPreenchimento);
-		      $image->exec($arquivo);
-		      // altera referencia para o arquivo
-		      $image->output['arquivo'] = $arquivoDest;
-		      $imageOutPut = $image->output;
+				try {
+				  $image = new Image($template,$this->trabalho->taxaPreenchimento);
+				  $image->exec($arquivo);
+				  // altera referencia para o arquivo
+				  $image->output['arquivo'] = $arquivoDest;
+				  $imageOutPut = $image->output;
 
-		      $presenca = '1'; # TODO: 1 presente - 2 ausente  (ausente = marcada)
-		      $str = '';
-		      foreach ($image->output['regioes'] as $r) { $str .= $r[0]; }
-		      $str = $str;
-		      $tempos = $image->getTimes();
-		      $tempoExec = $tempos['timeAll'];
-		    } catch(Exception $e){
-		      $presenca = '?';
-		      $str = $e->getMessage();
-		      $tempoExec = '??';
-		      $imageOutPut = ['erro'=>$e->getMessage()];
-		      // echo $e->getMessage();
-		    }
-		    	
-		    $output = json_encode($imageOutPut);
+				  $presenca = '1'; # TODO: 1 presente - 2 ausente  (ausente = marcada)
+				  $str = '';
+				  foreach ($image->output['regioes'] as $r) { $str .= $r[0]; }
+				  $str = $str;
+				  $tempos = $image->getTimes();
+				  $tempoExec = $tempos['timeAll'];
+				} catch(Exception $e){
+				  $presenca = '?';
+				  $str = $e->getMessage();
+				  $tempoExec = '??';
+				  $imageOutPut = ['erro'=>$e->getMessage()];
+				  // echo $e->getMessage();
+				}
+					
+				$output = json_encode($imageOutPut);
 
-		    // salva debug do arquivo
-		    $export = fopen($dirDoneFile.'/'.$f.'.json','w');
-		    fwrite($export,$output);
-		    fclose($export);
-		  }
+				// salva debug do arquivo
+				$export = fopen($dirDoneFile.'/'.$f.'.json','w');
+				fwrite($export,$output);
+				fclose($export);
+			}
 
 
+			// move imagem para pasta de finalizadas
+		 	rename($arquivo,$arquivoDest);
 
-		  	// move imagem para pasta de finalizadas
-	 	 	rename($arquivo,$arquivoDest);
-		
 			if($this->trabalho->status == 1){ // Trabalho executando | folha interpretada
 			  $qtd = Distribuido::model()->updateAll([
 			  	'status'=>2,	
@@ -107,7 +106,7 @@ class ProcessaCommand extends CConsoleCommand {
 			'dataFim'=>time(),
 		],"trabalho_id={$trabId} AND pid={$this->pid}");
 
-		rmdir ($this->dirIn);
+		rmdir($this->dirIn);
 
 		echo "ok\n";
 	}

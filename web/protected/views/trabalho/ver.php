@@ -16,6 +16,8 @@ if($trabalho->status == 1)
 
 $this->menu[] = ['Ver processadas',$this->createUrl('/trabalho/finalizadas',[
 	'id'=>$trabalho->id,])];
+$this->menu[] = ['Não exportadas',$this->createUrl('/trabalho/naoDistribuidas',[
+	'id'=>$trabalho->id,])];
 
 ?>
 <h3>
@@ -32,29 +34,14 @@ $this->menu[] = ['Ver processadas',$this->createUrl('/trabalho/finalizadas',[
 
 <?php if($trabalho->status != 0): ?>
 	<script>
-		function notifyMe() {
-		  if (("Notification" in window)) {
-			  if (Notification.permission === "granted") {
-			  	notify();
-			  } else if (Notification.permission !== 'denied') {
-			    Notification.requestPermission(function (permission) {
-			      if (permission === "granted")	notify();
-			    });
-			  }
-		  } 
-		}
-		function notify(){
-			// var notification = new Notification("Distribuindo...");
-		}
-		var count = 0;
-		setInterval(function(){ 
-			$.ajax({
-				url: '<?=$this->createUrl('/trabalho/updateVer',['id'=>$trabalho->id]);?>',
-			}).done(function(html) {
-			    $('#status').html(html);
-				if(count > 60) { notifyMe(); count = 0; }
-				else count++;
-			});
-		}, 1000);
+	if(typeof(EventSource) !== "undefined") {
+		var source = new EventSource('<?=$this->createUrl('/trabalho/updateVer',['id'=>$trabalho->id]);?>');
+		source.onmessage = function(event) {
+			data = JSON.parse(event.data);
+			$('#status').html(data['html']);
+		};
+	} else {
+		alert('Este navegador parece um pouco antigo e não suporta todos os recursos desta página. A página não será atualziada automaticamente quando houver alterações nas imagens sendo processadas');
+	} 	
 	</script>
 <?php endif; ?>

@@ -46,20 +46,30 @@ class TrabalhoController extends BaseController {
 		]);
 	}
 
+	public function actionNaoDistribuidas($id){
+		Yii::app()->clientScript->registerScriptFile($this->wb.'/jquery.elevatezoom.min.js');
+		$model = Trabalho::model()->findByPk((int)$id);
+		$naoDistribuidas = Distribuido::model()->findAll("trabalho_id={$model->id} AND exportado=0");
+		$this->render('naoDistribuidas',[
+			'trabalho'=>$model,
+			'naoDistribuidas'=>$naoDistribuidas,
+		]);
+	}
+
 	private function getInfoTrabalho($id){		
 		$trabalho = Trabalho::model()->findByPk((int)$id);
 
+
 		$data = Yii::app()->db->createCommand()
-			->select('p.id,d.status,count(*) as qtd')
-			->from('processo p ')
-			->join('distribuido d','d.tempDir = workDir AND d.status != ' . Trabalho::statusFinalizado)
-			->where('p.trabalho_id = ' . $trabalho->id)
-			->group('p.id')
+			->select('d.tempDir as id,d.status,count(*) as qtd')
+			->from('distribuido d')
+			->where('d.trabalho_id = ' . $trabalho->id . ' AND d.status != ' . Trabalho::statusFinalizado)
+			->group('d.tempDir')
 			->queryAll();
 
 		$faltaProcessar = [];
 		foreach ($data as $d)
-			$faltaProcessar[$d['id']] = $d['qtd'];
+			$faltaProcessar[trim($d['id'])] = $d['qtd'];
 		return [
 			'trabalho'=>$trabalho,
 			'faltaProcessar'=>$faltaProcessar,
@@ -101,7 +111,16 @@ class TrabalhoController extends BaseController {
 	}
 
 	public function actionUpdateVer($id){
-		$this->renderPartial('_ver',$this->getInfoTrabalho($id));
+		$data = [];
+		$data['html'] = $this->renderPartial('_ver',$this->getInfoTrabalho($id),true);
+	  	header('Content-Type: text/event-stream');
+		header('Cache-Control: no-cache');
+		echo "data: ";
+		echo json_encode($data);
+		echo "\n\n";
+		flush();
+		ob_flush();
+		sleep(1);
 	}
 
 	public function actionFinalizadas($id){

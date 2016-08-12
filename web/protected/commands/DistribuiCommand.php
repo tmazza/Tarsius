@@ -100,13 +100,11 @@ class DistribuiCommand extends CConsoleCommand
           echo "\n";
       }
 
-      $this->trabalho = Trabalho::model()->findByPk($this->trabalho->id);
 
 
       echo "\r" . 'Aguardando...';
       sleep($this->trabalho->tempoDistribuicao);
-
-      $this->exportaResultados();
+      $this->trabalho = Trabalho::model()->findByPk($this->trabalho->id);
     } while ($this->trabalho->status == 1);
   }
 
@@ -139,44 +137,19 @@ class DistribuiCommand extends CConsoleCommand
       die("\t ***Diretório de trabalho não existe.\n");
   }
 
-  private function exportaResultados(){
-    $distribuidas = Distribuido::model()->findAll([
-      'condition'=>"trabalho_id={$this->trabalho->id} AND exportado=0 AND output IS NOT NULL",
-    ]);
-    foreach ($distribuidas as $d) {
-       $output = json_decode($d->output,true);
-       if(isset($output['saidaFormatada'])){
-        print_r($output['saidaFormatada']);
-        $this->export($d,$output['saidaFormatada'],basename($output['arquivo']));
-      }
-    }
-  }
+  // private function exportaResultados(){
+  //   $distribuidas = Distribuido::model()->findAll([
+  //     'condition'=>"trabalho_id={$this->trabalho->id} AND exportado=0 AND output IS NOT NULL",
+  //     'limit'=>300,
+  //   ]);
+  //   foreach ($distribuidas as $d) {
+  //      $output = json_decode($d->output,true);
+  //      if(isset($output['saidaFormatada'])){
+  //       print_r($output['saidaFormatada']);
+  //       $this->export($d,$output['saidaFormatada'],basename($output['arquivo']));
+  //     }
+  //   }
+  // }
 
-  private function export($controleExportada,$valor,$NomeArquivo){
-      $export = [
-        'Ausente' => 'ausente',
-        'RespostasOriginais' => 'respostas',
-      ];
-      $export = array_map(function($i) use($valor) {
-        return $valor[$i];
-      },$export);
-
-      try {
-        $model = new Leitura;
-        $model->NomeArquivo = $NomeArquivo;
-        $model->attributes = $export;
-
-        if($model->validate()){
-          if($model->save()){
-            $controleExportada->exportado=1;
-            $controleExportada->update(['exportado']);
-          }
-        } else {
-          print_r($model->getErrors());
-        }
-      } catch(Exception $e){
-        echo $e->getMessage();
-      }
-  }
 
 }
