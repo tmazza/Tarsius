@@ -140,4 +140,46 @@ class TrabalhoController extends BaseController {
 	    $runner->run($args);
 	}
 
+	  public function actionExportaResultado(){
+	    $distribuidas = Distribuido::model()->findAll([
+	      'condition'=>"trabalho_id=7 AND exportado=0 AND output IS NOT NULL",
+	      'limit'=>2000,
+	    ]);
+	    foreach ($distribuidas as $d) {
+	       $output = json_decode($d->output,true);
+	       if(isset($output['saidaFormatada'])){
+	        $this->export($d,$output['saidaFormatada'],basename($output['arquivo']));
+	      }
+	    }
+	  }
+
+
+	  private function export($controleExportada,$valor,$NomeArquivo){
+	      $export = [
+	        'Ausente' => 'ausente',
+	        'RespostasOriginais' => 'respostas',
+	      ];
+	      $export = array_map(function($i) use($valor) {
+	        return $valor[$i];
+	      },$export);
+
+	      try {
+	        $model = new Leitura;
+	        $model->NomeArquivo = substr($NomeArquivo, 0,-4);
+	        $model->attributes = $export;
+
+	        if($model->validate()){
+	          if($model->save()){
+	            $controleExportada->exportado=1;
+	            $controleExportada->update(['exportado']);
+	          }
+	        } else {
+	          print_r($model->getErrors());
+	        }
+	      } catch(Exception $e){
+	        echo $e->getMessage();
+	      }
+	  }
+
+
 }

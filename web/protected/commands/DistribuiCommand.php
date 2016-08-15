@@ -21,28 +21,36 @@ class DistribuiCommand extends CConsoleCommand
       $this->qtdProcessadores = $processadores;      
     # Quantidade máxima de processos
     $this->qtdProcessos = $this->qtdProcessadores + ceil(0.10*$processadores);
-
     $this->dirBase = __DIR__ . '/../../../data/runtime';
-
   }
 
   public function actionIndex($trabId=false){
+
     if($trabId){
-      $this->setTrabalho($trabId);  
+      Yii::log('Iniciando distribuição T:' . $trabId,'trace','tarsius.distribui');
 
-      # Diretório de trabalho
-      if (!is_dir($this->dirBase . '/trab-'.$trabId)) mkdir($this->dirBase . '/trab-'.$trabId,0777);
+      try{
 
-      $this->dirExec = $this->dirBase . '/trab-'.$trabId.'/exec';
-      if (!is_dir($this->dirExec)) mkdir($this->dirExec,0777);
+        $this->setTrabalho($trabId);  
 
-      $this->dirReady = $this->dirExec . '/ready';
-      if (!is_dir($this->dirReady)) mkdir($this->dirReady,0777);
+        # Diretório de trabalho
+        if (!is_dir($this->dirBase . '/trab-'.$trabId)) mkdir($this->dirBase . '/trab-'.$trabId,0777);
 
-      $this->loop();
-      $this->trabalho->status = 0;
-      $this->trabalho->update(['status']); # para trabalho
+        $this->dirExec = $this->dirBase . '/trab-'.$trabId.'/exec';
+        if (!is_dir($this->dirExec)) mkdir($this->dirExec,0777);
 
+        $this->dirReady = $this->dirExec . '/ready';
+        if (!is_dir($this->dirReady)) mkdir($this->dirReady,0777);
+
+        $this->loop();
+        $this->trabalho->status = 0;
+        $this->trabalho->update(['status']); # para trabalho
+
+
+      } catch(Exception $e) {
+        Yii::log($e->getMessage(),'trace','tarsius.distribui');
+
+      }
     } else {
       echo "Qual o trabalho?\n";
     }
@@ -51,7 +59,6 @@ class DistribuiCommand extends CConsoleCommand
   private function loop(){
     do {
       $processosNaoFinalizados = $this->trabalho->qtdProcessosAtivos();
-
       $files = array_filter(scandir($this->trabalho->sourceDir), function($i){
         return pathinfo($i, PATHINFO_EXTENSION) == 'jpg';
       });
@@ -60,6 +67,7 @@ class DistribuiCommand extends CConsoleCommand
       $processosParaCriar = $this->qtdProcessos - $processosNaoFinalizados;   
       $qtdArquivos = count($files);
 
+  
       if ($processosParaCriar > 0 && $qtdArquivos > 0) {
 
           $tamBlocoPorProcesso = ceil($qtdArquivos / $processosParaCriar);
@@ -79,10 +87,11 @@ class DistribuiCommand extends CConsoleCommand
             $dirDest = $this->dirExec . '/' . $dirHash . '/';
             mkdir($dirDest); # temporario enquanto busca imagens de sourceDir
             foreach ($bloco as $file) {
-              if (rename($this->trabalho->sourceDir . '/' . $file, $dirDest . $file)) 
+              if (rename($this->trabalho->sourceDir . '/' . $file, $dirDest . $file)){
                 $this->setJaDistribuido($file,$dirHash);
-              else
+              } else {
                 echo "Falha ao mover arquivo: {$file} \n";
+              }
             }
 
             rename($dirDest, $this->dirReady . '/' . $dirHash); # Diretorio final após buscar todas imagens do processo
@@ -100,12 +109,20 @@ class DistribuiCommand extends CConsoleCommand
           echo "\n";
       }
 
-
-
       echo "\r" . 'Aguardando...';
       sleep($this->trabalho->tempoDistribuicao);
       $this->trabalho = Trabalho::model()->findByPk($this->trabalho->id);
     } while ($this->trabalho->status == 1);
+  }
+  
+  private function setJaDistribuido($file,$dirHash){
+    $model = new Distribuido();
+    $model->nome = $file;
+    $model->status = 1;
+    $model->trabalho_id = $this->trabalho->id;
+    $model->tempDir = $dirHash;
+    $model->dataDistribuicao = time();
+    $model->save();
   }
 
   private function criarProcesso($pid,$dirHash,$qtdArquivos){
@@ -119,16 +136,6 @@ class DistribuiCommand extends CConsoleCommand
     $model->save();
   }
 
-  private function setJaDistribuido($file,$dirHash){
-    $model = new Distribuido();
-    $model->nome = $file;
-    $model->status = 1;
-    $model->trabalho_id = $this->trabalho->id;
-    $model->tempDir = $dirHash;
-    $model->dataDistribuicao = time();
-    $model->save();
-  }
-
   private function setTrabalho($id){
     $this->trabalho = Trabalho::model()->findByPk((int)$id);
     if(is_null($this->trabalho->sourceDir))
@@ -136,20 +143,6 @@ class DistribuiCommand extends CConsoleCommand
     if(!is_dir($this->trabalho->sourceDir))
       die("\t ***Diretório de trabalho não existe.\n");
   }
-
-  // private function exportaResultados(){
-  //   $distribuidas = Distribuido::model()->findAll([
-  //     'condition'=>"trabalho_id={$this->trabalho->id} AND exportado=0 AND output IS NOT NULL",
-  //     'limit'=>300,
-  //   ]);
-  //   foreach ($distribuidas as $d) {
-  //      $output = json_decode($d->output,true);
-  //      if(isset($output['saidaFormatada'])){
-  //       print_r($output['saidaFormatada']);
-  //       $this->export($d,$output['saidaFormatada'],basename($output['arquivo']));
-  //     }
-  //   }
-  // }
 
 
 }

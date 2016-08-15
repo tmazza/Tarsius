@@ -51,7 +51,7 @@ class Trabalho extends CActiveRecord
 	public function relations() {
 		return array(
 			'processos' => array(self::HAS_MANY, 'Processo', 'trabalho_id', 'order'=>'id DESC', 'condition' => 'status != 2'),
-			'distribuidos' => array(self::HAS_MANY, 'Distribuido', 'trabalho_id'),
+			'distribuidos' => array(self::HAS_MANY, 'Distribuido', 'trabalho_id', 'select'=>'nome'),
 		);
 	}
 
