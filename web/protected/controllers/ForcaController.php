@@ -27,6 +27,7 @@ class ForcaController extends BaseController {
 		if($ok){
 			$this->redirect($this->createUrl('/distribuido/ver',[
 				'id'=>$model->id,
+				'renovar'=>1,
 			]));
 		} else {
 			$this->redirect($this->createUrl('/forca/index',[

@@ -1,10 +1,19 @@
-<div style="margin: 0 auto;width: 3000px;">
-	<h3>Reprocessar imagem <?=$model->nome?></h3>
+<h3>Reprocessar imagem <?=$model->nome?></h3>
 
-	<canvas id="myCanvas" width="20" height="20" style='border:1px solid red;margin:0px auto!important;display: block;'>
-	Browser não suporta canvas!
-	</canvas>
+<canvas id="myCanvas" style='border:1px solid red;'>
+Browser não suporta canvas!
+</canvas>
+
+<div class="uk-panel uk-panel-box">
+<?=CHtml::beginForm();?>
+	<?=CHtml::textField('pontos','',[
+		'id'=>'pontos',
+		'style'=>'width:600px',
+	]);?>
+<?=CHtml::submitButton('Aplicar máscara');?>
+<?=CHtml::endForm();?>
 </div>
+
 <script>
 
 var canvas;
@@ -49,19 +58,11 @@ function addPonto(e){
   ctx.fillStyle = "#f00";
   rect(x-5, y-5, 10, 10);
 
-  if(pontos.length > 1)
-  	geraImagemPreview();
+  if(pontos.length > 1){
+  	$('#pontos').val(JSON.stringify(pontos));
+  }
 }
 
 init();
 canvas.onclick = addPonto;
-
-
-function geraImagemPreview(){
-	$.ajax({
-		type:'POST',		
-		url: '<?=$this->createUrl('/reprocessa/preview');?>',
-		data: {pontos:pontos,dist:<?=$model->id?>},
-	});	
-}
 </script>

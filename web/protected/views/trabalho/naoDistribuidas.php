@@ -18,10 +18,11 @@ $this->menu[] = ['Voltar',$this->createUrl('/trabalho/ver',[
 	?>
 	<li>
 		<hr>
-		<?=$nd->nome;?> | <?//=CHtml::link("Informar âncoras",$this->createUrl('/reprocessa/ancora',['id'=>$nd->id,]));?>
-		<?=CHtml::link("Aplicar máscara com tolerância",$this->createUrl('/Forca/index',[
+		<?=$nd->nome;?> 
+		| <?=CHtml::link("Aplicar máscara com tolerância",$this->createUrl('/Forca/index',[
 			'id'=>$nd->id,
 		]));?>
+		| <?=CHtml::link("Informar âncoras manualmente",$this->createUrl('/reprocessa/ancora',['id'=>$nd->id,]));?>
 		<?php $linkImg = str_replace('repositorios', '..', $trabalho->sourceDir).'/'.$nd->nome; ?>
 		<?=CHtml::image($linkImg,'',[
 			'class'=>'zoom',

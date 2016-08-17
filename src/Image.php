@@ -91,6 +91,24 @@ class Image {
     }
 
     /**
+     * Processa imagem recebendo a posição das âncporas
+     */
+    public function execComAncoras($arquivo,$pontos,$resolucao=300) {
+      $this->inicializar($arquivo,$resolucao);
+      $this->setAncoras($pontos);
+      $this->analisarRegioes();
+      $this->organizarSaida();
+      imagedestroy($this->image);
+    }
+
+    private function setAncoras($pontos){
+      foreach ($pontos as $k => $p) {
+        $this->ancoras[$k+1] = new Objeto();
+        $this->ancoras[$k+1]->setCentro(array_values($p));        
+      }
+    }
+
+    /**
     * Busca imagem e converte para cinza
     */
     protected function inicializar($arquivo,$resolucao){
@@ -131,8 +149,8 @@ class Image {
       $this->output['ancoras'] = array(
         '1' => $this->ancoras[1]->getCentro(),
         '2' => $this->ancoras[2]->getCentro(),
-        '3' => $this->ancoras[2]->getCentro(),
-        '4' => $this->ancoras[3]->getCentro(),
+        '3' => $this->ancoras[3]->getCentro(),
+        '4' => $this->ancoras[4]->getCentro(),
       );
 
       $this->output['CORTE_PRETO'] = CORTE_PRETO;

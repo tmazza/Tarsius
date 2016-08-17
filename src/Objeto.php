@@ -58,6 +58,13 @@ class Objeto {
     }
 
     /**
+     * Sobreescreve posição da âncora
+     */
+    public function setCentro($ponto){
+        $this->centro = $ponto;
+    }
+
+    /**
      * Calcula o maior raio.
      * TODO: otimizar. Sendo usado algoritmo ingênuo. 
      * A partir do centro calcula a distancia entre todos os pontos do 	 * objeto, a maior distância é selecionada.

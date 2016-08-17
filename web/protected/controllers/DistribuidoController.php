@@ -1,17 +1,17 @@
 <?php
 class DistribuidoController extends BaseController {
 
-	public function actionVer($id){
+	public function actionVer($id,$renovar=false){
 		include_once __DIR__ . '/../../../src/Helper.php';
 		$model = Distribuido::model()->findByPk((int)$id);
 		Yii::app()->clientScript->registerScriptFile($this->wb.'/jquery.elevatezoom.min.js');
 		$this->render('ver',[
 			'model'=>$model,
-			'debugImage'=>$this->getDebugImage($model),
+			'debugImage'=>$this->getDebugImage($model,$renovar),
 		]);
 	}
 
-	private function getDebugImage($dist){
+	private function getDebugImage($dist,$renovar=false){
 		$baseDir	 = __DIR__ . '/../../../data/runtime/trab-'.$dist->trabalho->id;
 		$file = $dist->nome;
 
@@ -19,7 +19,7 @@ class DistribuidoController extends BaseController {
 		$reviewImage = $imgDir.substr($file,0,-9) . '.png';
 
 		
-		if(!file_exists($reviewImage)){
+		if(!file_exists($reviewImage) || $renovar){
 			# cria diretorio para imagens de debug
 			if(!is_dir($imgDir)) mkdir($imgDir,0777);
 			# busca json de debug
