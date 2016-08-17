@@ -18,7 +18,9 @@ $this->menu[] = ['Voltar',$this->createUrl('/trabalho/ver',[
 	?>
 	<li>
 		<hr>
-		<?=$nd->nome;?> | <?//=$output->erro?>
+		<?=$nd->nome;?> | <?=CHtml::link("Informar âncoras",$this->createUrl('/reprocessa/ancora',[
+			'id'=>$nd->id,
+		]));?>
 		<?php $linkImg = str_replace('repositorios', '..', $trabalho->sourceDir).'/'.$nd->nome; ?>
 		<?=CHtml::image($linkImg,'',[
 			'class'=>'zoom',
