@@ -43,4 +43,13 @@ class ReprocessaController extends BaseController {
 		return json_decode($strTempalte,true);
 	}
 
+
+	public function actionTeste(){
+		$leitura = Leitura::model()->findAll([
+			'condition'=>"Concurso=1607",
+			'limit'=>10
+		]);
+		print_r($leitura);
+
+	}
 }

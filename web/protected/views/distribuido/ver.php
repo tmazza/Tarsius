@@ -5,6 +5,14 @@ $this->menu = [
 ?>
 <h3><?=$model->nome?></h3>
 <hr>
+
+<?php if(!$model->exportado): ?>
+	<?=CHtml::link('Exportar',$this->createUrl('/trabalho/forcaExport',[
+		'id'=>$model->id,
+	]))?>
+	<hr>
+<?php endif; ?>
+
 <!-- <img id='main' src="<?=$debugImage;?>" style="width:100%;" /> -->
 
 <img id="zoom_01" src="<?=$debugImage;?>" data-zoom-image="<?=$debugImage;?>"/>

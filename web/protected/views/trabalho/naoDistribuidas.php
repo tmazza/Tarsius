@@ -18,7 +18,8 @@ $this->menu[] = ['Voltar',$this->createUrl('/trabalho/ver',[
 	?>
 	<li>
 		<hr>
-		<?=$nd->nome;?> | <?=CHtml::link("Informar âncoras",$this->createUrl('/reprocessa/ancora',[
+		<?=$nd->nome;?> | <?//=CHtml::link("Informar âncoras",$this->createUrl('/reprocessa/ancora',['id'=>$nd->id,]));?>
+		<?=CHtml::link("Aplicar máscara com tolerância",$this->createUrl('/Forca/index',[
 			'id'=>$nd->id,
 		]));?>
 		<?php $linkImg = str_replace('repositorios', '..', $trabalho->sourceDir).'/'.$nd->nome; ?>

@@ -24,10 +24,11 @@ class DistribuidoController extends BaseController {
 			if(!is_dir($imgDir)) mkdir($imgDir,0777);
 			# busca json de debug
 			$jsonFile = $baseDir.'/file/' . $file . '.json';
-			$handle = fopen($jsonFile,'r');
-			$json = fread($handle,filesize ($jsonFile));
-			fclose($handle);
-			$output = json_decode($json,true);
+			// $handle = fopen($jsonFile,'r');
+			// $json = fread($handle,filesize ($jsonFile));
+			// fclose($handle);
+			// $output = json_decode($json,true);
+			$output = json_decode($dist->output,true);
 			# carrega imagem original
 			$originalFile = $dist->trabalho->sourceDir.'/'.$dist->nome;
 			if(!file_exists($originalFile)) throw new Exception("Arquivo '{originalFile}' não encontrado.", 1);

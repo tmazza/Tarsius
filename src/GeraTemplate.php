@@ -228,6 +228,7 @@ class GeraTemplate {
       $this->resolucao = $resolucao;
       $this->escala = bcdiv($this->resolucao,25.4);
       $this->buscador = new Buscador; #Instancia buscador de Objetos
+      $this->buscador->minMatch = 0.85;
       $this->qtdExpansoes = 10;
       $this->assAncoras = [
         1 => $this->getAssinatura(Helper::load(__DIR__.'/ancoras/ancora1.jpg')), # TODO: definir valores de busca de acordo com resolução da imagem

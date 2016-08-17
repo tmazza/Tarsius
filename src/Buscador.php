@@ -7,7 +7,7 @@ class Buscador {
     public $areaMaxima = 5000; // Valor base é alterado após localizacao da ancora 1
     public $areaBuscaInicial = 100;
     public $qtdExpansoes = QTD_EXPANSOES_BUSCA;
-    public $minMatch = MATCH_ANCORA;
+    public $minMatch = 0.85;
 
     /**
      * Localiza $obj em $image. Com centro de busca em $ponto.

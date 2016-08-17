@@ -152,7 +152,20 @@ class TrabalhoController extends BaseController {
 	      }
 	    }
 	  }
-
+	
+		public function actionForcaExport($id){
+			$model = Distribuido::model()->findByPk((int)$id);
+			$output = json_decode($model->output,true);
+	        if(isset($output['saidaFormatada'])) {
+	        	$this->export($model,$output['saidaFormatada'],$model->nome);
+	        	Yii::app()->user->setFlash('success','Export realizado.');
+	        } else {
+	        	Yii::app()->user->setFlash('error','Falha ao exportar.');
+	        }
+	        $this->redirect($this->createUrl('/trabalho/naoDistribuidas',[
+	        	'id'=>$model->trabalho_id,
+	        ]));
+		}
 
 	  private function export($controleExportada,$valor,$NomeArquivo){
 	      $export = [

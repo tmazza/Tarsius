@@ -8,8 +8,6 @@ define('TOLERANCIA_MATCH', 0.4); # eg: areabase  = 1000. busca triangulos de are
 define('EXPANSAO_BUSCA', 0.4); # taxa de aumento da área de busca
 define('QTD_EXPANSOES_BUSCA', 5);
 
-define('MATCH_ANCORA', 0.85);
-
 include __DIR__.'/Buscador.php';
 include __DIR__.'/BuscarAncoras.php';
 include __DIR__.'/Objeto.php';
@@ -47,15 +45,19 @@ class Image {
 
     public $coefA;
     public $coefB;
+    
+    public $minMatchAncora;
 
-    public function __construct($template,$preenchimentoMinimo=0.3) {
+    public function __construct($template,$preenchimentoMinimo=0.3,$minMatchAncora=0.85) {
       $this->template = $template;
       $this->preenchimentoMinimo = $preenchimentoMinimo; 
+      $this->minMatchAncora = $minMatchAncora;
     }
 
     private function depoisDeDefinirResolucao(){
       $this->escala = bcdiv($this->resolucao,25.4);
       $this->buscador = new Buscador; #Instancia buscador de Objetos
+      $this->buscador->minMatch = $this->minMatchAncora;
       $this->assAncoras = $this->loadTemplate($this->template);
       $this->distancias = $this->defineDistancias($this->medidas); #Define distancias baseado na escala inicial
     }
@@ -134,7 +136,7 @@ class Image {
       );
 
       $this->output['CORTE_PRETO'] = CORTE_PRETO;
-      $this->output['MATCH_ANCORA'] = MATCH_ANCORA;
+      $this->output['MATCH_ANCORA'] = $this->minMatchAncora;
       $this->output['PREENCHIMENTO_MINIMO'] = $this->preenchimentoMinimo;
       $this->output['RESOLUCAO_IMAGEM'] = $this->resolucao;
 
