@@ -3,8 +3,8 @@ class DistribuiCommand extends CConsoleCommand
 {
 
   private $qtdProcessadores = 1;
-  private $qtdProcessos = 1;
-  private $tamMaxBlocoPorProcesso = 250;
+  private $limiteProcessos = 1;
+  private $tamMaxBlocoPorProcesso = 80;
 
   private $trabalho;
   private $dirBase;
@@ -20,7 +20,7 @@ class DistribuiCommand extends CConsoleCommand
     else
       $this->qtdProcessadores = $processadores;      
     # Quantidade máxima de processos
-    $this->qtdProcessos = $this->qtdProcessadores + ceil(0.10*$processadores);
+    $this->limiteProcessos = $this->qtdProcessadores + ceil(0.10*$processadores);
     $this->dirBase = __DIR__ . '/../../../data/runtime';
   }
 
@@ -57,30 +57,32 @@ class DistribuiCommand extends CConsoleCommand
   }
 
   private function loop(){
+
+
     do {
-      $processosNaoFinalizados = $this->trabalho->qtdProcessosAtivos();
-      $files = array_filter(scandir($this->trabalho->sourceDir), function($i){
-        return pathinfo($i, PATHINFO_EXTENSION) == 'jpg';
-      });
-
+      $files = CFileHelper::findFiles($this->trabalho->sourceDir,[
+        'fileTypes'=>['jpg'],
+        'absolutePaths'=>false,
+      ]);
+      # desconsidera arquivos que já foram processados
       $files = array_diff($files, $this->trabalho->getJaDistribuidos());
-      $processosParaCriar = $this->qtdProcessos - $processosNaoFinalizados;   
+
+      $porcessosAtivos = $this->trabalho->qtdProcessosAtivos();
+      $processosLivres = $this->limiteProcessos - $porcessosAtivos;   
       $qtdArquivos = count($files);
-
   
-      if ($processosParaCriar > 0 && $qtdArquivos > 0) {
+      if ($qtdArquivos > 0 && $processosLivres > 0) {
 
-          $tamBlocoPorProcesso = ceil($qtdArquivos / $processosParaCriar);
+          $tamBlocoPorProcesso = ceil($qtdArquivos / $processosLivres);
           if ($tamBlocoPorProcesso > $this->tamMaxBlocoPorProcesso)
               $tamBlocoPorProcesso = $this->tamMaxBlocoPorProcesso;
 
-          $files = array_slice($files, 0, $tamBlocoPorProcesso * $processosParaCriar); # Limita quantidade processada
-          $tamBloco = ceil($qtdArquivos / $processosParaCriar); # quebra em n pedacos de acordo com o tamnho da entrada
-          $blocos = array_chunk($files, $tamBloco);
+          $files = array_slice($files, 0, $tamBlocoPorProcesso * $processosLivres); # Limita quantidade processada
+          $blocos = array_chunk($files, $tamBlocoPorProcesso);
           
           echo str_pad($qtdArquivos, 5,' ', STR_PAD_LEFT) . ' imagens. ' . 
                str_pad(count($blocos), 3,' ', STR_PAD_LEFT) . ' blocos de ' . 
-               str_pad($tamBloco, 3,' ', STR_PAD_LEFT) . ' | ';
+               str_pad($tamBlocoPorProcesso, 3,' ', STR_PAD_LEFT) . ' | ';
 
           foreach ($blocos as $i => $bloco) {
             $dirHash = hash('crc32', microtime(true) . rand(0, 999999)); # workdir do processo

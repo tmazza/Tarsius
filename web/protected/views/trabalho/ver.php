@@ -34,14 +34,14 @@ $this->menu[] = ['Não exportadas',$this->createUrl('/trabalho/naoDistribuidas',
 
 <?php if($trabalho->status != 0): ?>
 	<script>
-	if(typeof(EventSource) !== "undefined") {
-		var source = new EventSource('<?=$this->createUrl('/trabalho/updateVer',['id'=>$trabalho->id]);?>');
-		source.onmessage = function(event) {
-			data = JSON.parse(event.data);
-			$('#status').html(data['html']);
-		};
-	} else {
-		alert('Este navegador parece um pouco antigo e não suporta todos os recursos desta página. A página não será atualziada automaticamente quando houver alterações nas imagens sendo processadas');
-	} 	
+	setInterval(function(){
+		$.ajax({
+			url: '<?=$this->createUrl('/trabalho/updateVer',['id'=>$trabalho->id]);?>',
+		}).done(function(html) {
+		    $('#status').html(html);
+			if(count > 60) { notifyMe(); count = 0; }
+			else count++;
+		});
+	}, 2500);
 	</script>
 <?php endif; ?>

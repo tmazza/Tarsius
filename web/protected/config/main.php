@@ -1,5 +1,4 @@
 <?php
-
 return array(
     'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
     'defaultController' => 'site',
@@ -7,6 +6,7 @@ return array(
     'import' => array(
         'application.models.*',
         'application.controllers.*',
+        'application.helpers.*',
     ),
     'modules' => array(
       'gii' => array(
@@ -38,8 +38,8 @@ return array(
                 ),
                 array(
                     'class' => 'CFileLogRoute',
-                    'levels' => 'trace',
-                    'logFile' => 'trace',
+                    'logFile' => 'tarsius',
+                    'categories'=>'tarsius.*',
                 ),
             ),
         ),

@@ -116,8 +116,6 @@ class Buscador {
                 }
             }
         }
-
-
         return $pontos;
     }
 

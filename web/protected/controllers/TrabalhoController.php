@@ -111,22 +111,12 @@ class TrabalhoController extends BaseController {
 	}
 
 	public function actionUpdateVer($id){
-		$data = [];
-		$data['html'] = $this->renderPartial('_ver',$this->getInfoTrabalho($id),true);
-	  	header('Content-Type: text/event-stream');
-		header('Cache-Control: no-cache');
-		echo "data: ";
-		echo json_encode($data);
-		echo "\n\n";
-		flush();
-		ob_flush();
-		sleep(1);
+		$this->renderPartial('_ver',$this->getInfoTrabalho($id));
 	}
 
 	public function actionFinalizadas($id){
-		$trabalho = Trabalho::model()->findByPk((int)$id);
 		$this->render('finalizadas',[
-			'trabalho'=>$trabalho,
+			'trabalho'=>Trabalho::model()->findByPk((int)$id),
 		]);		
 	}
 

@@ -48,7 +48,7 @@ class ProcessaCommand extends CConsoleCommand {
   			 	  $this->log('Erro ao processamento ' . $f);
 				  $imageOutPut = $e->getMessage();
 				}
-				$this->export($f,$imageOutPut);
+				#$this->export($f,$imageOutPut);
 			}
 			$ok = rename($arquivo,$arquivoDest);
 

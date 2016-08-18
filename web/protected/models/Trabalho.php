@@ -139,4 +139,17 @@ class Trabalho extends CActiveRecord
 		return Distribuido::model()->count("trabalho_id={$this->id} AND exportado=0 AND output IS NOT NULL");
 	}
 
+	public function getFinalizados(){
+		return new CActiveDataProvider('Distribuido', array(
+		    'criteria'=>array(
+		    	'select'=>'id,nome,status',
+		        'condition'=>'trabalho_id='.$this->id,
+		        // 'order'=>'?',
+		    ),
+		    'pagination'=>array(
+		        'pageSize'=>100,
+		    ),
+		));
+	}
+
 }
