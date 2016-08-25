@@ -27,7 +27,7 @@ class AnalisarRegioes {
     $medidas = $this->image->medidas['regioes'];
 
     foreach ($this->image->getRegioes() as $id => $r) {
-      $e = $this->getPontoNormalizado($r,$medidas[$id]);
+      $e = $this->getPontoNormalizadoDouble($r,$medidas[$id]);
       list($px,$py) = $e;
 
       $tipo = $r[0];
@@ -56,6 +56,9 @@ class AnalisarRegioes {
     $py = $r[2];
 
     $ancBase = isset($d[5]) ? $d[5] : 1;
+
+    echo 'BASE: ' . $ancBase . "\n";
+
     $base = $this->image->ancoras[$ancBase]->getCentro();
     if($px > 0 && $py > 0){
       $base = $this->image->ancoras[1]->getCentro();
@@ -69,13 +72,8 @@ class AnalisarRegioes {
     $px += $base[0];
     $py += $base[1];
 
-    // TODO: de acordo com o template ou fixo para cada resolução? (perspectiva da image, gera o erro!)
-    // Tem como calcular esse valou ou depende da quantidade real de pixel utilizadas?
-    $erroBaseX = -0.0035; $erroBaseX = 0; # <-- Note que o erro base não está sendo utilizado
-    $erroBaseY = -0.0081; $erroBaseY = 0; # <-- Note que o erro base não está sendo utilizado
-
-    $px += bcmul($d[1],$this->getErroX() - $erroBaseX);
-    $py += bcmul($d[2],$this->getErroY() - $erroBaseY);
+    # $px += bcmul($d[1],$this->getErroX() - $erroBaseX);
+    # $py += bcmul($d[2],$this->getErroY() - $erroBaseY);
 
     $p = [$px,$py];
 
@@ -83,78 +81,86 @@ class AnalisarRegioes {
 
   }
 
-  private function interpretaElipse($id,$r,$e){
-  $taxaPreenchimento = $this->getTaxaPreenchimento($e);
-  $minMatch = $this->image->preenchimentoMinimo;
+  private function getPontoNormalizadoDouble($r,$d){
+    list($px1,$py1) = $r[1];
+    list($px3,$py3) = $r[2];
+    $ancora1 = $this->image->ancoras[1]->getCentro();
+    $ancora3 = $this->image->ancoras[3]->getCentro();
 
-  if(DEBUG){
-
-    $closest = $this->getAncoraMaisProx($e);
 
     $cor = imagecolorallocate($this->debugImage, 255, 0, 0);
-    // switch ($closest) {
-    //   case 1: $cor = imagecolorallocate($this->debugImage, 255, 0, 0); break;
-    //   case 2: $cor = imagecolorallocate($this->debugImage, 0, 255, 0); break;
-    //   case 3: $cor = imagecolorallocate($this->debugImage, 0, 255, 255); break;
-    //   case 4: $cor = imagecolorallocate($this->debugImage, 255, 255, 0); break;
-    // }
+    $cor2 = imagecolorallocate($this->debugImage, 0, 255, 0);
+    $cor3 = imagecolorallocate($this->debugImage, 0, 0, 255);
+    $cor4 = imagecolorallocate($this->debugImage, 0, 100, 255);
+    $cor5 = imagecolorallocate($this->debugImage, 0, 0, 0);
 
-    if($taxaPreenchimento >= $minMatch){
-      imagefilledellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], $cor);
-    } else {
-      imageellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], $cor);
+
+    $px1 = bcadd($px1,$ancora1[0]);
+    $py1 = bcadd($py1,$ancora1[1]);
+    $px3 = bcadd($px3,$ancora3[0]);
+    $py3 = bcadd($py3,$ancora3[1]);
+
+    imagefilledellipse($this->debugImage, $px1, $py1, 5, 5, $cor);
+    imagefilledellipse($this->debugImage, $px3, $py3, 5, 5, $cor2);
+
+    list($px1,$py1) = Helper::rotaciona([$px1,$py1],$ancora1,$this->image->rot);
+    list($px3,$py3) = Helper::rotaciona([$px3,$py3],$ancora3,$this->image->rot);
+
+    imagefilledellipse($this->debugImage, $px1, $py1, 5, 5, $cor3);
+    imagefilledellipse($this->debugImage, $px3, $py3, 5, 5, $cor4);
+
+    $px = $px1 < $px3 ? $px1+abs($px1-$px3)/2 : $px3-abs($px1-$px3)/2;
+    $py = $py1 < $py3 ? $py1-abs($py1-$py3)/2 : $py3+abs($py1-$py3)/2;
+
+
+    imagefilledellipse($this->debugImage, $px, $py, 5, 5, $cor5);
+
+    return [$px,$py];
+  }
+
+  private function interpretaElipse($id,$r,$e){
+    $taxaPreenchimento = $this->getTaxaPreenchimento($e);
+    $minMatch = $this->image->preenchimentoMinimo;
+
+    if(DEBUG){
+      $cor = imagecolorallocate($this->debugImage, 255, 0, 0);
+      if($taxaPreenchimento >= $minMatch){
+        imagefilledellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], $cor);
+      } else {
+        imageellipse($this->debugImage, $e[0], $e[1], $this->image->distancias['elpLargura'], $this->image->distancias['elpAltura'], $cor);
+      }
     }
-  }
 
-  return [
-    $taxaPreenchimento,
-    ($taxaPreenchimento >= $minMatch) ? $r[3] : $r[4],
-  ];
+    return [
+      $taxaPreenchimento,
+      ($taxaPreenchimento >= $minMatch) ? $r[3] : $r[4],
+    ];
 
 }
 
+  // private function getErroX(){
+  //   if(!$this->erroX){
+  //     $a1 = $this->image->ancoras[1]->getCentro();
+  //     $a2 = $this->image->ancoras[2]->getCentro();
+  //     // Correção de erro de escala em X
+  //     $avaliado = bcsub($a2[0],$a1[0]);
+  //     $esperado = bcmul($this->image->medidas['distAncHor'],$this->image->escala);
+  //     $this->erroX = bcdiv(bcsub($avaliado,$esperado),$this->image->medidas['distAncHor']);
+  //   }
+  //   return $this->erroX;
+  // }
 
-
-// TODO: só para teste!!! ?
-private function getAncoraMaisProx($ponto){
-  $a1 = $this->image->ancoras[1]->getCentro();
-  $a2 = $this->image->ancoras[2]->getCentro();
-  $a3 = $this->image->ancoras[3]->getCentro();
-  $a4 = $this->image->ancoras[4]->getCentro();
-  $ancoras = [$a1,$a2,$a3,$a4];
-  $dists = array_map(function($i) use($ponto){
-    return Helper::dist($ponto,$i);
-  },$ancoras);
-
-  $indice = array_keys($dists, min($dists));
-
-  return $indice[0]+1;
-}
-// FIM TESTE
-
-private function getErroX(){
-  if(!$this->erroX){
-    $a1 = $this->image->ancoras[1]->getCentro();
-    $a2 = $this->image->ancoras[2]->getCentro();
-    // Correção de erro de escala em X
-    $avaliado = bcsub($a2[0],$a1[0]);
-    $esperado = bcmul($this->image->medidas['distAncHor'],$this->image->escala);
-    $this->erroX = bcdiv(bcsub($avaliado,$esperado),$this->image->medidas['distAncHor']);
-  }
-  return $this->erroX;
-}
-
-private function getErroY(){
-  if(!$this->erroY){
-    $a1 = $this->image->ancoras[1]->getCentro();
-    $a4 = $this->image->ancoras[4]->getCentro();
-    // Correção de erro de escala em Y
-    $avaliado = bcsub($a4[1],$a1[1]);
-    $esperado = bcmul($this->image->medidas['distAncVer'],$this->image->escala);
-    $this->erroY = bcdiv(bcsub($avaliado,$esperado),$this->image->medidas['distAncVer']);
-  }
-  return $this->erroY;
-}
+  // private function getErroY(){
+  //   if(!$this->erroY){
+  //     $a1 = $this->image->ancoras[1]->getCentro();
+  //     $a4 = $this->image->ancoras[4]->getCentro();
+  //     // Correção de erro de escala em Y
+  //     $avaliado = bcsub($a4[1],$a1[1]);
+  //     $esperado = bcmul($this->image->medidas['distAncVer'],$this->image->escala);
+  //     $this->erroY = bcdiv(bcsub($avaliado,$esperado),$this->image->medidas['distAncVer']);
+  //   }
+  //   return $this->erroY;
+  // }
 
 
 

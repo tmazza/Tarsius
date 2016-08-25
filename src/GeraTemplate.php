@@ -41,6 +41,9 @@ class GeraTemplate {
   public $qtdExpansoes;
   public $assAncoras;
 
+  public $closestAncora = true;
+  public $ancorasDaImagem = false;
+
   /**
    * Cria lista de objetos em {@param arquivo} baseado nas definições de {@param $config}
    * Definição de config
@@ -76,7 +79,7 @@ class GeraTemplate {
    * junto com a fomatação da saída e os valores necessários para interpretação
    * da folha. 
    */
-  private function criaArquivoTemplate($config,$regioes,$baseDir){
+  protected function criaArquivoTemplate($config,$regioes,$baseDir){
     $content = [
       'raioTriangulo' => (14 * sqrt(2)) / 2, # diagonal / 2
       'ancora1' => [$this->ancoraBase[0]/$this->escala,$this->ancoraBase[1]/$this->escala],
@@ -97,20 +100,61 @@ class GeraTemplate {
   /**
    * Imagens para visualização do resultado da interpretação
    */
-  private function criaImagensDebug($regioes,$baseDir){
+  protected function criaImagensDebug($regioes,$baseDir){
     # Posições dos objetos e seus labels
     $copia = Helper::copia($this->image);
     $corTex = imagecolorallocate($copia,0,150,255);
     $corObj = imagecolorallocatealpha ($copia,150,255,0,50);
+
     foreach ($regioes as $id => $r) {
-      $x = $r[1]*$this->escala+$this->ancoraBase[0];
-      $y = $r[2]*$this->escala+$this->ancoraBase[1];
+      if($this->closestAncora){
+        $ancoraBase = $this->ancorasDaImagem[$r[5]]->getCentro();
+        if($r[5] == 2){
+          $corObj = imagecolorallocatealpha ($copia,150,0,255,50);
+        } elseif ($r[5] == 3) {
+          $corObj = imagecolorallocatealpha ($copia,0,150,255,50);
+        } elseif ($r[5] == 4) {
+          $corObj = imagecolorallocatealpha ($copia,255,0,150,50);
+        }
+      } else {
+        $ancoraBase = $this->ancoraBase;
+        
+      }
+
+      $x = $r[1]*$this->escala+$ancoraBase[0];
+      $y = $r[2]*$this->escala+$ancoraBase[1];
 
       imagefilledellipse($copia,$x,$y,30,30,$corObj);
       imagettftext ($copia,17.0,0.0,$x-5,$y+5,$corTex,__DIR__.'/SIXTY.TTF',$id);
     }
     imagejpeg($copia,$baseDir.'/preview.jpg');
     imagedestroy($this->image);
+  }
+
+
+  private function buscaAncoraMaisProxima($regiao){
+    $ancoras = $this->getAncoras();
+    $closest = 1;
+
+    foreach ($ancoras as $k => $a) {
+      $atual = Helper::distBC($ancoras[$closest]->getCentro(),$regiao);
+      $novo = Helper::distBC($a->getCentro(),$regiao);
+      if($novo < $atual){
+        $closest = $k;
+      }
+    }
+    return $closest;
+  }
+
+  protected function getAncoras(){
+    if(!$this->ancorasDaImagem){
+      $buscarAncoras = new BuscarAncoras($this);
+      $this->ancorasDaImagem[1] = $buscarAncoras->getAncora(1,[0,0]);
+      $this->ancorasDaImagem[2] = $buscarAncoras->getAncora(2,[imagesx($this->image),0]);
+      $this->ancorasDaImagem[3] = $buscarAncoras->getAncora(3,[imagesx($this->image),imagesy($this->image)]);
+      $this->ancorasDaImagem[4] = $buscarAncoras->getAncora(4,[0,imagesy($this->image)]);
+    }
+    return $this->ancorasDaImagem;
   }
 
   /**
@@ -122,18 +166,27 @@ class GeraTemplate {
    *      | @param casoFalse string ou function sendo que funcao equivalente ao casoTrue
    *      
    */
-  private function formataRegioes($cb,$blocos){
+  protected function formataRegioes($cb,$blocos){
     $regioes = [];
     foreach ($blocos as $cBloco => $lista) {
       foreach ($lista as $cLinha => $l) {
         $count = 0;
         foreach ($l as $cObjeto => $c) {
-          $x = ($c[0] - $this->ancoraBase[0])/$this->escala; # Converte para milimetros
-          $y = ($c[1] - $this->ancoraBase[1])/$this->escala; # Converte para milimetros
+
+          if($this->closestAncora){
+            $closest = $this->buscaAncoraMaisProxima($c);
+            $ancoraBase = $this->ancorasDaImagem[$closest]->getCentro();
+          } else {
+            $closest = 1;
+            $ancoraBase = $this->ancoraBase;
+          }
+
+          $x = ($c[0] - $ancoraBase[0])/$this->escala; # Converte para milimetros
+          $y = ($c[1] - $ancoraBase[1])/$this->escala; # Converte para milimetros
 
           $genId = $cb['id'];
           $idRegiao = is_string($genId) ? $genId : $genId($cBloco,$cLinha,$cObjeto);
-          $regioes[$idRegiao] = $this->formataTipoRegiao($cb,$x,$y,$cBloco,$cLinha,$cObjeto);
+          $regioes[$idRegiao] = $this->formataTipoRegiao($cb,$x,$y,$cBloco,$cLinha,$cObjeto,$closest);
           $count++;
         }
       }
@@ -144,7 +197,7 @@ class GeraTemplate {
   /**
    * Monta lisda com parâmetros da região de acordo com seu tipo.
    */
-  private function formataTipoRegiao($cb,$x,$y,$cBloco,$cLinha,$cObjeto){
+  protected function formataTipoRegiao($cb,$x,$y,$cBloco,$cLinha,$cObjeto,$closest){
     $tipo = $cb['tipo'];
 
     $regiao = [$tipo,$x,$y];
@@ -154,6 +207,7 @@ class GeraTemplate {
       $casoFalse = $cb['casoFalse'];
       $regiao[] = is_string($casoTrue) ? $casoTrue : $casoTrue($cBloco,$cLinha,$cObjeto);
       $regiao[] = is_string($casoFalse) ? $casoFalse : $casoFalse($cBloco,$cLinha,$cObjeto);
+      $regiao[] = $closest;
     }
 
     return $regiao;
@@ -179,7 +233,7 @@ class GeraTemplate {
    *    L0: b b b
    *    L1: B B B
    */
-  private function gerarBlocos($cb){
+  protected function gerarBlocos($cb){
     $pontos = $this->buscador->getPontosDeQuadrado($this->image, $cb['p1'][0],  $cb['p1'][1], $cb['p2'][0],  $cb['p2'][1]);
     $objetos = array_map(function($i){ 
       return $i->getCentro(); 
@@ -223,7 +277,7 @@ class GeraTemplate {
   /**
    * Define resolução, busca âncoras e instancia função de ordenamento
    */
-  private function init($arquivo,$resolucao){
+  protected function init($arquivo,$resolucao){
       ini_set('memory_limit', '2048M');
       $this->resolucao = $resolucao;
       $this->escala = bcdiv($this->resolucao,25.4);
@@ -232,6 +286,9 @@ class GeraTemplate {
       $this->qtdExpansoes = 10;
       $this->assAncoras = [
         1 => $this->getAssinatura(Helper::load(__DIR__.'/ancoras/ancora1.jpg')), # TODO: definir valores de busca de acordo com resolução da imagem
+        2 => $this->getAssinatura(Helper::load(__DIR__.'/ancoras/ancora2.jpg')),
+        3 => $this->getAssinatura(Helper::load(__DIR__.'/ancoras/ancora3.jpg')),
+        4 => $this->getAssinatura(Helper::load(__DIR__.'/ancoras/ancora4.jpg')),
       ];
       $this->image = Helper::load($arquivo);
       if (!imagefilter($this->image, IMG_FILTER_GRAYSCALE))

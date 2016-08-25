@@ -15,25 +15,22 @@ class BuscarAncoras {
   private function run(){
     # ANCORA 1
     $this->image->ancoras[1] = $this->getAncora(1, $this->image->distancias['ancora1']);
-    # ESCALA:Baseado no tamanho esperado do raio x tamanho real em pixel encontrado, infere a escala da imagem.
-    ## $this->image->setEscala($this->image->ancoras[1]->getMaiorRaio() / $this->image->medidas['raioTriangulo']);
 
     # ANCORA 2
     $this->image->buscador->setTolerancia($this->image->ancoras[1]->getArea()); // Atualiza tolerância de busca de ancora baseado na área encontrada para a ancora 1
     $this->image->buscador->areaBuscaInicial = ($this->image->ancoras[1]->getMaiorRaio() * 3); // Adapta tamanho da área de busca em relação ao raio da ancora
     $this->image->ancoras[2] = $this->getAncora(2, $this->posicaoEsperadaAncora2());
-    # ESCALA:Baseado no tamanho esperado do raio y tamanho real em pixel encontrado, inferir a escala da imagem.
-    $distanciaEntreAncoras = $this->image->ancoras[2]->getCentro()[0] - $this->image->ancoras[1]->getCentro()[0];
-    ## $this->image->setEscala($distanciaEntreAncoras / $this->image->medidas['distAncHor']);
     # ROTACAO: Define angulo de rotação baseado em ancora 1 e 2
     $this->image->rot = atan($this->calcCoefReta($this->image->ancoras[1]->getCentro(), $this->image->ancoras[2]->getCentro()));
 
     # ANCORA 3
     $this->image->ancoras[3] = $this->getAncora(3, $this->posicaoEsperadaAncora3());
+
     # ANCORA 4
     $this->image->ancoras[4] = $this->getAncora(4, $this->posicaoEsperadaAncora4());
     # ROTACAO:TODO: quando usar? Localiza quarta ancora
-    $this->image->rot = ($this->image->rot + atan($this->calcCoefReta($this->image->ancoras[1]->getCentro(), $this->image->ancoras[4]->getCentro(), true))) / 2;
+    $novaRotacao = atan($this->calcCoefReta($this->image->ancoras[1]->getCentro(), $this->image->ancoras[4]->getCentro(), true));
+    $this->image->rot = ($this->image->rot + $novaRotacao) / 2;
   }
 
 

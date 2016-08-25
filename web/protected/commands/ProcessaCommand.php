@@ -82,6 +82,12 @@ class ProcessaCommand extends CConsoleCommand {
 
 		$this->log('Finalizado');
 	}
+
+	public function actionFile($arquivo,$template){
+		$image = new Image($template,0.3);
+		$image->exec($arquivo);
+		print_r($image->output);
+	}
 	
 	private function criaValidaDiretorios($dirIn,$dirOut,$trabId)
 	{
