@@ -1,7 +1,7 @@
 <?php
 bcscale(14);
 
-define('DEBUG',true);
+define('DEBUG',false);
 
 define('CORTE_PRETO', 150);
 define('TOLERANCIA_MATCH', 0.4); # eg: areabase  = 1000. busca triangulos de area entre 500 e 1500

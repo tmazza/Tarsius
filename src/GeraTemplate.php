@@ -44,6 +44,8 @@ class GeraTemplate {
   public $closestAncora = true;
   public $ancorasDaImagem = false;
 
+  public $refAncoras = 1; # valores possíveis: 1,2,4. 1:coordenada basead na ancora 1,2: anc 1 e 3. 4: anc 1e3 e 2e4
+
   /**
    * Cria lista de objetos em {@param arquivo} baseado nas definições de {@param $config}
    * Definição de config
@@ -88,6 +90,7 @@ class GeraTemplate {
       'elpAltura' => 2.5,
       'elpLargura' => 4.36,
       'regioes' => $regioes,
+      'refAncoras' => $this->refAncoras,
       'formatoSaida' => isset($config['formatoSaida']) ? CJSON::encode($config['formatoSaida']) : false,
     ];
 

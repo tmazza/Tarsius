@@ -42,6 +42,6 @@ $this->menu[] = ['Não exportadas',$this->createUrl('/trabalho/naoDistribuidas',
 			if(count > 60) { notifyMe(); count = 0; }
 			else count++;
 		});
-	}, 2500);
+	}, 5000);
 	</script>
 <?php endif; ?>

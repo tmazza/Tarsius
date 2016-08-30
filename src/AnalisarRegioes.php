@@ -27,7 +27,7 @@ class AnalisarRegioes {
     $medidas = $this->image->medidas['regioes'];
 
     foreach ($this->image->getRegioes() as $id => $r) {
-      $e = $this->getPontoNormalizadoDouble($r,$medidas[$id]);
+      $e = $this->getPontoNormalizado($r,$medidas[$id]);
       list($px,$py) = $e;
 
       $tipo = $r[0];
@@ -52,6 +52,18 @@ class AnalisarRegioes {
   }
 
   private function getPontoNormalizado($r,$d){
+    if(isset($this->image->medidas['refAncoras'])){
+      $refAncoras = $this->image->medidas['refAncoras'];
+      if($refAncoras==2){
+        return $this->getPontoNormalizadoDouble($r,$d);
+      } elseif($refAncoras==4){
+        return $this->getPontoNormalizadoQuadruple($r,$d);
+      }
+    }
+    return $this->getPontoNormalizadoSingle($r,$d);
+  }
+
+  private function getPontoNormalizadoSingle($r,$d){
     $px = $r[1];
     $py = $r[2];
 
@@ -82,38 +94,85 @@ class AnalisarRegioes {
   }
 
   private function getPontoNormalizadoDouble($r,$d){
-    list($px1,$py1) = $r[1];
-    list($px3,$py3) = $r[2];
+    $cor3 = imagecolorallocate($this->debugImage, 0, 0, 255); # DEBUG
+    $cor4 = imagecolorallocate($this->debugImage, 255, 255, 0); # DEBUG
+    $cor5 = imagecolorallocate($this->debugImage, 0, 0, 0); # DEBUG
+
+    $p1 = $r[1];
+    $p3 = $r[2];
+
     $ancora1 = $this->image->ancoras[1]->getCentro();
     $ancora3 = $this->image->ancoras[3]->getCentro();
 
+    $p1 = [bcadd($p1[0],$ancora1[0]),bcadd($p1[1],$ancora1[1])];
+    $p3 = [bcadd($p3[0],$ancora3[0]),bcadd($p3[1],$ancora3[1])];
 
-    $cor = imagecolorallocate($this->debugImage, 255, 0, 0);
-    $cor2 = imagecolorallocate($this->debugImage, 0, 255, 0);
-    $cor3 = imagecolorallocate($this->debugImage, 0, 0, 255);
-    $cor4 = imagecolorallocate($this->debugImage, 0, 100, 255);
-    $cor5 = imagecolorallocate($this->debugImage, 0, 0, 0);
-
-
-    $px1 = bcadd($px1,$ancora1[0]);
-    $py1 = bcadd($py1,$ancora1[1]);
-    $px3 = bcadd($px3,$ancora3[0]);
-    $py3 = bcadd($py3,$ancora3[1]);
-
-    imagefilledellipse($this->debugImage, $px1, $py1, 5, 5, $cor);
-    imagefilledellipse($this->debugImage, $px3, $py3, 5, 5, $cor2);
-
-    list($px1,$py1) = Helper::rotaciona([$px1,$py1],$ancora1,$this->image->rot);
-    list($px3,$py3) = Helper::rotaciona([$px3,$py3],$ancora3,$this->image->rot);
-
-    imagefilledellipse($this->debugImage, $px1, $py1, 5, 5, $cor3);
-    imagefilledellipse($this->debugImage, $px3, $py3, 5, 5, $cor4);
-
-    $px = $px1 < $px3 ? $px1+abs($px1-$px3)/2 : $px3-abs($px1-$px3)/2;
-    $py = $py1 < $py3 ? $py1-abs($py1-$py3)/2 : $py3+abs($py1-$py3)/2;
+    imagefilledellipse($this->debugImage, $ancora1[0], $ancora1[1], 3, 3, $cor3); # DEBUG
+    imagefilledellipse($this->debugImage, $ancora3[0], $ancora3[1], 3, 3, $cor4); # DEBUG
 
 
-    imagefilledellipse($this->debugImage, $px, $py, 5, 5, $cor5);
+    $p1 = Helper::rotaciona($p1,$ancora1,$this->image->rot);
+    $p3 = Helper::rotaciona($p3,$ancora3,$this->image->rot);
+
+    imagefilledellipse($this->debugImage, $p1[0], $p1[1], 3, 3, $cor3); # DEBUG
+    imagefilledellipse($this->debugImage, $p3[0], $p3[1], 3, 3, $cor4); # DEBUG
+
+    $px1 = $p1[0] < $p3[0] ? $p1[0]+abs($p1[0]-$p3[0])/2 : $p3[0]-abs($p1[0]-$p3[0])/2;
+    $py1 = $p1[1] < $p3[1] ? $p1[1]-abs($p1[1]-$p3[1])/2 : $p3[1]+abs($p1[1]-$p3[1])/2;
+    imagefilledellipse($this->debugImage, $px1, $py1, 3, 3, $cor5); # DEBUG
+
+    return [$px1,$py1];
+  }
+
+  private function getPontoNormalizadoQuadruple($r,$d){
+    $cor = imagecolorallocate($this->debugImage, 255, 0, 0); # DEBUG
+    $cor2 = imagecolorallocate($this->debugImage, 0, 255, 0); # DEBUG
+    $cor3 = imagecolorallocate($this->debugImage, 0, 0, 255); # DEBUG
+    $cor4 = imagecolorallocate($this->debugImage, 255, 255, 0); # DEBUG
+    $cor5 = imagecolorallocate($this->debugImage, 0, 0, 0); # DEBUG
+    $cor6 = imagecolorallocate($this->debugImage, 255, 0, 255); # DEBUG
+
+    list($p1,$p3) = $r[1];
+    list($p2,$p4) = $r[2];
+
+    $ancora1 = $this->image->ancoras[1]->getCentro();
+    $ancora3 = $this->image->ancoras[3]->getCentro();
+    $ancora2 = $this->image->ancoras[2]->getCentro();
+    $ancora4 = $this->image->ancoras[4]->getCentro();
+
+    $p1 = [bcadd($p1[0],$ancora1[0]),bcadd($p1[1],$ancora1[1])];
+    $p3 = [bcadd($p3[0],$ancora3[0]),bcadd($p3[1],$ancora3[1])];
+    $p2 = [bcadd($p2[0],$ancora2[0]),bcadd($p2[1],$ancora2[1])];
+    $p4 = [bcadd($p4[0],$ancora4[0]),bcadd($p4[1],$ancora4[1])];
+
+    imagefilledellipse($this->debugImage, $ancora1[0], $ancora1[1], 3, 3, $cor3); # DEBUG
+    imagefilledellipse($this->debugImage, $ancora3[0], $ancora3[1], 3, 3, $cor4); # DEBUG
+    imagefilledellipse($this->debugImage, $ancora2[0], $ancora2[1], 3, 3, $cor); # DEBUG
+    imagefilledellipse($this->debugImage, $ancora4[0], $ancora4[1], 3, 3, $cor2); # DEBUG
+
+    $p1 = Helper::rotaciona($p1,$ancora1,$this->image->rot);
+    $p3 = Helper::rotaciona($p3,$ancora3,$this->image->rot);
+    $p2 = Helper::rotaciona($p2,$ancora2,$this->image->rot);
+    $p4 = Helper::rotaciona($p4,$ancora4,$this->image->rot);
+
+    // imagefilledellipse($this->debugImage, $p2[0], $p2[1], 3, 3, $cor); # DEBUG
+    // imagefilledellipse($this->debugImage, $p4[0], $p4[1], 3, 3, $cor2); # DEBUG
+    // imagefilledellipse($this->debugImage, $p1[0], $p1[1], 3, 3, $cor3); # DEBUG
+    // imagefilledellipse($this->debugImage, $p3[0], $p3[1], 3, 3, $cor4); # DEBUG
+
+    $px1 = $p1[0] < $p3[0] ? $p1[0]+abs($p1[0]-$p3[0])/2 : $p3[0]-abs($p1[0]-$p3[0])/2;
+    $py1 = $p1[1] < $p3[1] ? $p1[1]+abs($p1[1]-$p3[1])/2 : $p3[1]-abs($p1[1]-$p3[1])/2;
+    imagefilledellipse($this->debugImage, $px1, $py1, 3, 3, $cor5); # DEBUG
+
+    $px2 = $p2[0] > $p4[0] ? $p2[0]-abs($p2[0]-$p4[0])/2 : $p4[0]+abs($p2[0]-$p4[0])/2;
+    $py2 = $p2[1] > $p4[1] ? $p2[1]-abs($p2[1]-$p4[1])/2 : $p4[1]+abs($p2[1]-$p4[1])/2;
+    imagefilledellipse($this->debugImage, $px2, $py2, 3, 3, $cor6); # DEBUG
+
+    $pf1 = [$px1,$py1];
+    $pf2 = [$px2,$py2];
+    $px = $pf1[0] > $pf2[0] ? $pf1[0]-abs($pf1[0]-$pf2[0])/2 : $pf2[0]-abs($pf1[0]-$pf2[0])/2;
+    $py = $pf1[1] > $pf2[1] ? $pf1[1]+abs($pf1[1]-$pf2[1])/2 : $pf2[1]-abs($pf1[1]-$pf2[1])/2;
+    imagefilledellipse($this->debugImage, $px, $py, 3, 3, $cor); # DEBUG
 
     return [$px,$py];
   }
