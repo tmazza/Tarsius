@@ -94,9 +94,11 @@ class AnalisarRegioes {
   }
 
   private function getPontoNormalizadoDouble($r,$d){
-    $cor3 = imagecolorallocate($this->debugImage, 0, 0, 255); # DEBUG
-    $cor4 = imagecolorallocate($this->debugImage, 255, 255, 0); # DEBUG
-    $cor5 = imagecolorallocate($this->debugImage, 0, 0, 0); # DEBUG
+    if(DEBUG){
+      $cor3 = imagecolorallocate($this->debugImage, 0, 0, 255); # DEBUG
+      $cor4 = imagecolorallocate($this->debugImage, 255, 255, 0); # DEBUG
+      $cor5 = imagecolorallocate($this->debugImage, 0, 0, 0); # DEBUG
+    }
 
     $p1 = $r[1];
     $p3 = $r[2];
@@ -107,20 +109,25 @@ class AnalisarRegioes {
     $p1 = [bcadd($p1[0],$ancora1[0]),bcadd($p1[1],$ancora1[1])];
     $p3 = [bcadd($p3[0],$ancora3[0]),bcadd($p3[1],$ancora3[1])];
 
-    imagefilledellipse($this->debugImage, $ancora1[0], $ancora1[1], 3, 3, $cor3); # DEBUG
-    imagefilledellipse($this->debugImage, $ancora3[0], $ancora3[1], 3, 3, $cor4); # DEBUG
+    if(DEBUG){
+      imagefilledellipse($this->debugImage, $ancora1[0], $ancora1[1], 3, 3, $cor3); # DEBUG
+      imagefilledellipse($this->debugImage, $ancora3[0], $ancora3[1], 3, 3, $cor4); # DEBUG
+    }
 
 
     $p1 = Helper::rotaciona($p1,$ancora1,$this->image->rot);
     $p3 = Helper::rotaciona($p3,$ancora3,$this->image->rot);
 
-    imagefilledellipse($this->debugImage, $p1[0], $p1[1], 3, 3, $cor3); # DEBUG
-    imagefilledellipse($this->debugImage, $p3[0], $p3[1], 3, 3, $cor4); # DEBUG
+    if(DEBUG){
+      imagefilledellipse($this->debugImage, $p1[0], $p1[1], 3, 3, $cor3); # DEBUG
+      imagefilledellipse($this->debugImage, $p3[0], $p3[1], 3, 3, $cor4); # DEBUG
+    }
 
     $px1 = $p1[0] < $p3[0] ? $p1[0]+abs($p1[0]-$p3[0])/2 : $p3[0]-abs($p1[0]-$p3[0])/2;
     $py1 = $p1[1] < $p3[1] ? $p1[1]-abs($p1[1]-$p3[1])/2 : $p3[1]+abs($p1[1]-$p3[1])/2;
-    imagefilledellipse($this->debugImage, $px1, $py1, 3, 3, $cor5); # DEBUG
-
+    if(DEBUG){
+      imagefilledellipse($this->debugImage, $px1, $py1, 3, 3, $cor5); # DEBUG
+    }
     return [$px1,$py1];
   }
 

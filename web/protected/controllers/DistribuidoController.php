@@ -5,10 +5,17 @@ class DistribuidoController extends BaseController {
 		include_once __DIR__ . '/../../../src/Helper.php';
 		$model = Distribuido::model()->findByPk((int)$id);
 		Yii::app()->clientScript->registerScriptFile($this->wb.'/jquery.elevatezoom.min.js');
-		$this->render('ver',[
-			'model'=>$model,
-			'debugImage'=>$this->getDebugImage($model,$renovar),
-		]);
+		try {
+			$debugImage = $this->getDebugImage($model,$renovar);
+			$this->render('ver',[
+				'model'=>$model,
+				'debugImage'=>$debugImage,
+			]);
+		} catch(Exception $e){
+			HView::fMsg($e->getMessage());
+			$this->redirect($this->createUrl('/trabalho/index'));
+		}
+
 	}
 
 	private function getDebugImage($dist,$renovar=false){

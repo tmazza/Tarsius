@@ -73,6 +73,8 @@ class DistribuiCommand extends CConsoleCommand
   
       if ($qtdArquivos > 0 && $processosLivres > 0) {
 
+          $this->trabalho->setDistribuindo(1);
+
           $tamBlocoPorProcesso = ceil($qtdArquivos / $processosLivres);
           if ($tamBlocoPorProcesso > $this->tamMaxBlocoPorProcesso)
               $tamBlocoPorProcesso = $this->tamMaxBlocoPorProcesso;
@@ -109,6 +111,8 @@ class DistribuiCommand extends CConsoleCommand
             echo ($i + 1) . ' ';
           }
           echo "\n";
+
+          $this->trabalho->setDistribuindo(0);
       }
 
       echo "\r" . 'Aguardando...';

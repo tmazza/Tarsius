@@ -31,6 +31,7 @@ $this->menu[] = ['Não exportadas',$this->createUrl('/trabalho/naoDistribuidas',
 	 	'distribuido'=>$distribuido,
 	 	'processado'=>$processado,
 	 	'processosAtivos'=>$processosAtivos,
+	 	'naoExportadas'=>$naoExportadas,
 	]); ?>
 </div>
 

@@ -26,6 +26,25 @@ class HView {
     return str_replace("'", '', preg_replace('/[^a-zA-Z0-9\']/', '_', $str));
   }
 
+  public static function plural($str,$count,$sufixoNao='',$sufixoSim='s'){
+    if($count == 0 || $count > 1){
+      return $str . $sufixoSim;
+    }
+    return $str . $sufixoNao;
+  }
+
+  public static function fMsg($msg){
+    Yii::app()->user->setFlash('msg',$msg);
+  }
+
+  public static function renderFlashes(){
+    $flashes = Yii::app()->user->getFlashes();
+    $html = '';
+    foreach ($flashes as $k => $msg) {
+      $html .= CHtml::tag($msg,['class'=>'uk-alert']);
+    }
+    return $html;
+  }
 
 
 }

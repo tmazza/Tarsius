@@ -53,20 +53,19 @@ class ProcessaCommand extends CConsoleCommand {
 			$ok = rename($arquivo,$arquivoDest);
 
 			if($this->trabalho->status == 1){ // Trabalho executando | folha interpretada
-			  $qtd = Distribuido::model()->updateAll([
-			  	'status'=>2,	
-			  	'dataFechamento'=>time(),	  	
-			  	'output'=>json_encode($imageOutPut),	
-			  ],[
-			  	'condition'=>"trabalho_id={$this->trabalho->id} AND nome='{$f}'",
-			  ]);
+	  			Yii::app()->db->createCommand()->insert('finalizado', array(
+				    'trabalho_id'=>$this->trabalho->id,
+				  	'nome'=>$f,	
+				    'conteudo'=>json_encode($imageOutPut),
+			  		'dataFechamento'=>time(),	  
+				));
 			} else {  # | folha somente renomeada
 			  $qtd = Distribuido::model()->updateAll([
 			  	'status'=>3,	
-			  	'nome'=>$f . ' (canelada em ' . date('d/m/Y H:i:s') . ')',	
+			  	'nome'=>$f . '-(canelada em ' . date('d/m/Y H:i:s') . ')',	
 			  	'dataFechamento'=>time(),	  
 			  ],[
-			  	'condition'=>"trabalho_id={$this->trabalho->id} AND nome='{$f}'",
+			  	'condition'=>"trabalho_id={$this->trabalho->id} AND status = 1  AND nome='{$f}'",
 			  ]);
 			}
 
@@ -108,10 +107,10 @@ class ProcessaCommand extends CConsoleCommand {
 
 	private function export($f,$imageOutPut)
 	{	
-		$output = json_encode($imageOutPut);
-		$export = fopen($this->dirDoneFile.'/'.$f.'.json','w');
-		fwrite($export,$output);
-		fclose($export);
+		// $output = json_encode($imageOutPut);
+		// $export = fopen($this->dirDoneFile.'/'.$f.'.json','w');
+		// fwrite($export,$output);
+		// fclose($export);
 	}
 
 	private function log($msg){

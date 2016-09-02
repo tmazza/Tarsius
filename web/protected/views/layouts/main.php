@@ -1,5 +1,7 @@
 <?php $this->beginContent('application.views.layouts.base'); ?>
     <div class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
+        <?= HView::renderFlashes(); ?>
+
         <div class="uk-grid" data-uk-grid-margin>
             <div class="uk-width-medium-3-4">
                 <?=$content;?>

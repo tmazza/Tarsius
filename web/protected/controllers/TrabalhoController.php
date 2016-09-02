@@ -49,31 +49,59 @@ class TrabalhoController extends BaseController {
 	public function actionNaoDistribuidas($id){
 		Yii::app()->clientScript->registerScriptFile($this->wb.'/jquery.elevatezoom.min.js');
 		$model = Trabalho::model()->findByPk((int)$id);
-		$naoDistribuidas = Distribuido::model()->findAll("trabalho_id={$model->id} AND exportado=0");
+		$naoDistribuidas = Distribuido::model()->findAll([
+			'alias' => 'd',
+			'with' => [
+				'resultado' => [
+					'alias'=>'f',
+					'condition' => 'f.exportado=0',
+				],
+			],
+			//'join'=>'JOIN finalizado f ON f.trabalho_id = d.trabalho_id AND f.nome = f.nome',
+			'condition'=>"d.trabalho_id={$model->id}",
+			'limit'=>20,
+		]);
+
 		$this->render('naoDistribuidas',[
 			'trabalho'=>$model,
 			'naoDistribuidas'=>$naoDistribuidas,
 		]);
 	}
 
-	private function getInfoTrabalho($id){		
+	private function getInfoTrabalho($id)
+	{		
 		$trabalho = Trabalho::model()->findByPk((int)$id);
+		$qtdDistribuida = Yii::app()->db->createCommand()
+				->select('count(*)')
+				->from('distribuido')
+				->where('trabalho_id = ' . $id . ' AND status = 1')
+				->queryColumn();
 
+		$qtdFinalizada = Yii::app()->db->createCommand()
+				->select('count(*)')
+				->from('finalizado')
+				->where('trabalho_id = ' . $id)
+				->queryColumn();
 
-		$data = Yii::app()->db->createCommand()
-			->select('d.tempDir as id,d.status,count(*) as qtd')
-			->from('distribuido d')
-			->where('d.trabalho_id = ' . $trabalho->id . ' AND d.status != ' . Trabalho::statusFinalizado)
-			->group('d.tempDir')
-			->queryAll();
+		$processosAtivos = Yii::app()->db->createCommand()
+				->select('*')
+				->from('processo')
+				->where('trabalho_id = ' . $id . ' AND status=1')
+				->queryAll();
 
-		$faltaProcessar = [];
-		foreach ($data as $d)
-			$faltaProcessar[trim($d['id'])] = $d['qtd'];
+		$naoExportadas = Yii::app()->db->createCommand()
+				->select('count(*)')
+				->from('finalizado')
+				->where('trabalho_id = ' . $id . ' AND exportado=0')
+				->queryColumn();
+
 		return [
-			'trabalho'=>$trabalho,
-			'faltaProcessar'=>$faltaProcessar,
-		];
+			'trabalho' => $trabalho,
+		 	'distribuido' => array_shift($qtdDistribuida),
+		 	'processado' => array_shift($qtdFinalizada),
+		 	'processosAtivos' => $processosAtivos,
+		 	'naoExportadas' => array_shift($naoExportadas),
+		 ];
 	}
 
 	public function actionIniciar($id){
@@ -105,6 +133,7 @@ class TrabalhoController extends BaseController {
 
 		Processo::model()->deleteAll("trabalho_id = {$trabalho->id}");
 		Distribuido::model()->deleteAll("trabalho_id = {$trabalho->id}");
+		Finalizado::model()->deleteAll("trabalho_id = {$trabalho->id}");
 
 		$this->redirect($this->createUrl('/trabalho/ver',['id'=>$trabalho->id]));
 
@@ -130,24 +159,29 @@ class TrabalhoController extends BaseController {
 	    $runner->run($args);
 	}
 
-	  public function actionExportaResultado(){
-	    $distribuidas = Distribuido::model()->findAll([
-	      'condition'=>"trabalho_id=7 AND exportado=0 AND output IS NOT NULL",
-	      'limit'=>2000,
+	  public function actionExportaResultado($id){
+	    $finalizadas = Finalizado::model()->findAll([
+	      'condition'=>"trabalho_id=$id AND exportado=0 AND conteudo IS NOT NULL",
+	      'limit'=>2048,
 	    ]);
-	    foreach ($distribuidas as $d) {
-	       $output = json_decode($d->output,true);
-	       if(isset($output['saidaFormatada'])){
-	        $this->export($d,$output['saidaFormatada'],basename($output['arquivo']));
+	    foreach ($finalizadas as $f) {
+	       $conteudo = json_decode($f->conteudo,true);
+	       if(isset($conteudo['saidaFormatada'])){
+	        $this->export($f,$conteudo['saidaFormatada'],basename($conteudo['arquivo']));
 	      }
 	    }
+	    $qtd = count($finalizadas);
+	    HView::fMsg($qtd . HView::plural('exportado',$qtd));
+	    $this->redirect($this->createUrl('/trabalho/ver',[
+	    	'id'=>$id,
+	    ]));
 	  }
 	
 		public function actionForcaExport($id){
 			$model = Distribuido::model()->findByPk((int)$id);
-			$output = json_decode($model->output,true);
+			$output = json_decode($model->resultado->conteudo,true);
 	        if(isset($output['saidaFormatada'])) {
-	        	$this->export($model,$output['saidaFormatada'],$model->nome);
+	        	$this->export($model->resultado,$output['saidaFormatada'],$model->nome);
 	        	Yii::app()->user->setFlash('success','Export realizado.');
 	        } else {
 	        	Yii::app()->user->setFlash('error','Falha ao exportar.');
@@ -165,7 +199,6 @@ class TrabalhoController extends BaseController {
 	      $export = array_map(function($i) use($valor) {
 	        return $valor[$i];
 	      },$export);
-
 	      try {
 	        $model = new Leitura;
 	        $model->NomeArquivo = substr($NomeArquivo, 0,-4);
@@ -177,10 +210,10 @@ class TrabalhoController extends BaseController {
 	            $controleExportada->update(['exportado']);
 	          }
 	        } else {
-	          print_r($model->getErrors());
+	          HView::fMsg(json_encode($model->getErrors()));
 	        }
 	      } catch(Exception $e){
-	        echo $e->getMessage();
+	      	HView::fMsg($e->getMessage());
 	      }
 	  }
 

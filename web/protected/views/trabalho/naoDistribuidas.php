@@ -14,7 +14,7 @@ $this->menu[] = ['Voltar',$this->createUrl('/trabalho/ver',[
 <ul>
 <?php foreach($naoDistribuidas as $nd): ?>
 	<?php
-	$output = json_decode($nd->output);
+	$output = json_decode($nd->resultado->conteudo);
 	?>
 	<li>
 		<hr>

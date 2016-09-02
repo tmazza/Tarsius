@@ -41,6 +41,7 @@ class Finalizado extends CActiveRecord
 	public function relations()
 	{
 		return array(
+			'trabalho' => [self::BELONGS_TO,'Trabalho','trabalho_id'],
 		);
 	}
 

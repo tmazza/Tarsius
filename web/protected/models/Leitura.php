@@ -26,13 +26,7 @@ class Leitura extends CActiveRecord {
 	 */
 	public function rules() {
 		return array(
-			array('NrFolha, NrParte, Local, Ordem, NumeroVirgem, FolhaIdentificada', 'default', 'value' => NULL, 'setOnEmpty' => true, 'message' => 'default'),
-			array('NrFolha, NrParte, Local, Situacao, FolhaIdentificada', 'numerical', 'message' => 'numerical'),
-			array('Anulada, ForaLocal, Ausente, UsoVirgem', 'in', 'range' => array('S', 'N'), 'message' => 'range'),
-			array('Anulada, ForaLocal, Ausente, UsoVirgem', 'default', 'value' => 'N', 'setOnEmpty' => true, 'message' => 'default'),
-			array('FolhaIdentificada', 'in', 'range' => array(0, 1), 'message' => 'range'),
-			array('RespostasOriginais, RespostasConvertidas, Situacao, NrFolha, NrParte, Local', 'safe'),
-			array('IdLeitura, Ordem, Concurso, TipoFolha, NomeArquivo, RespostasOriginais, RespostasConvertidas, Situacao, Ausente, AlinhamentoEsquerda, AlinhamentoDireita, ImagemInterna, CodigoBarras, FolhaIdentificada', 'safe', 'on' => 'search'),
+			['RespostasOriginais,Ausente,RespostasOriginais','safe'],
 		);
 	}
 
@@ -48,7 +42,7 @@ class Leitura extends CActiveRecord {
 			'Ordem' => 'Ordem',
 			'Inscricao' => 'Inscrição',
 			'RespostasOriginais' => 'Respostas originais',
-			'RespostasConvertidas' => 'Respostas convertidas',
+			'RespostasOriginais' => 'Respostas convertidas',
 			'Situacao' => 'Situação',
 			'Ausente' => 'Ausente',
 			'Anulada' => 'Anulada',

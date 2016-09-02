@@ -19,14 +19,12 @@ class ReprocessaController extends BaseController {
 
 	private function aplicaMascara($model,$pontos){
 		if(count($pontos) == 4){
-
-
 			$ok = true;
 			try {
 				$image = new Image($model->trabalho->template,$model->trabalho->taxaPreenchimento);
 				$image->execComAncoras($model->trabalho->sourceDir.'/'.$model->nome,$pontos);
-				$model->output = json_encode($image->output);
-				$model->update(['output']);
+				$model->resultado->conteudo = json_encode($image->output);
+				$model->resultado->update(['conteudo']);
 			} catch (Exception $e) {
 				$ok = false;
 				$msg = $e->getMessage();

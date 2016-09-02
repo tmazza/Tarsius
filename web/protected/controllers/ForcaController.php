@@ -17,8 +17,8 @@ class ForcaController extends BaseController {
 		try {
 			$image = new Image($model->trabalho->template,$model->trabalho->taxaPreenchimento,$minMatch);
 			$image->exec($model->trabalho->sourceDir.'/'.$model->nome);
-			$model->output = json_encode($image->output);
-			$model->update(['output']);
+			$model->resultado->conteudo = json_encode($image->output);
+			$model->resultado->update(['conteudo']);
 		} catch (Exception $e) {
 			$ok = false;
 			$msg = $e->getMessage();

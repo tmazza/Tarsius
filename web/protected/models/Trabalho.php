@@ -154,4 +154,9 @@ class Trabalho extends CActiveRecord
 		));
 	}
 
+	public function setDistribuindo($status){
+		$this->distribuindo = $status;
+		$this->update(['distribuindo']);
+	}
+
 }
