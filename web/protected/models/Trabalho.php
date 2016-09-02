@@ -142,8 +142,10 @@ class Trabalho extends CActiveRecord
 	public function getFinalizados(){
 		return new CActiveDataProvider('Distribuido', array(
 		    'criteria'=>array(
-		    	'select'=>'id,nome,status',
-		        'condition'=>'trabalho_id='.$this->id,
+		    	'alias' => 'd',
+		    	'select'=>'d.id,d.nome',
+		        'condition'=>'d.trabalho_id='.$this->id,
+		        'join'=>'JOIN finalizado f ON d.trabalho_id = f.trabalho_id AND f.nome = d.nome',
 		        // 'order'=>'?',
 		    ),
 		    'pagination'=>array(

@@ -28,7 +28,9 @@ $this->menu[] = ['Não exportadas',$this->createUrl('/trabalho/naoDistribuidas',
 <div id='status'>
 	<?php $this->renderPartial('_ver',[
 		'trabalho'=>$trabalho,
-		'faltaProcessar'=>$faltaProcessar,
+	 	'distribuido'=>$distribuido,
+	 	'processado'=>$processado,
+	 	'processosAtivos'=>$processosAtivos,
 	]); ?>
 </div>
 
@@ -42,6 +44,6 @@ $this->menu[] = ['Não exportadas',$this->createUrl('/trabalho/naoDistribuidas',
 			if(count > 60) { notifyMe(); count = 0; }
 			else count++;
 		});
-	}, 5000);
+	}, 1000);
 	</script>
 <?php endif; ?>

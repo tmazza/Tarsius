@@ -106,6 +106,9 @@ class Image {
         $this->ancoras[$k+1] = new Objeto();
         $this->ancoras[$k+1]->setCentro(array_values($p));        
       }
+      # define rotação
+      $novaRotacao = atan(Helper::calcCoefReta($this->ancoras[1]->getCentro(), $this->ancoras[4]->getCentro(), true));
+      $this->rot = ($this->rot + $novaRotacao) / 2;
     }
 
     /**

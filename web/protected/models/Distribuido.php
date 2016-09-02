@@ -46,10 +46,9 @@ class Distribuido extends CActiveRecord
 	 */
 	public function relations()
 	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
 		return array(
 			'trabalho' => array(self::BELONGS_TO, 'Trabalho', 'trabalho_id'),
+			'resultado' => [self::BELONGS_TO,'Finalizado',['nome'=>'nome','trabalho_id'=>'trabalho_id']],
 		);
 	}
 
