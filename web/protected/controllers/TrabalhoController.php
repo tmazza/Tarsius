@@ -162,7 +162,7 @@ class TrabalhoController extends BaseController {
 	  public function actionExportaResultado($id){
 	    $finalizadas = Finalizado::model()->findAll([
 	      'condition'=>"trabalho_id=$id AND exportado=0 AND conteudo IS NOT NULL",
-	      'limit'=>2048,
+	      'limit'=>1024,
 	    ]);
 	    foreach ($finalizadas as $f) {
 	       $conteudo = json_decode($f->conteudo,true);
