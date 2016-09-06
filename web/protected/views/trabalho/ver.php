@@ -18,6 +18,8 @@ $this->menu[] = ['Ver processadas',$this->createUrl('/trabalho/finalizadas',[
 	'id'=>$trabalho->id,])];
 $this->menu[] = ['Não exportadas',$this->createUrl('/trabalho/naoDistribuidas',[
 	'id'=>$trabalho->id,])];
+$this->menu[] = ['Comparar resultados',$this->createUrl('/comparar/index',[
+	'id'=>$trabalho->id,])];
 
 ?>
 <h3>

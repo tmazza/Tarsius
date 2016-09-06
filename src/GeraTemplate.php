@@ -41,7 +41,7 @@ class GeraTemplate {
   public $qtdExpansoes;
   public $assAncoras;
 
-  public $closestAncora = true;
+  public $closestAncora = false;
   public $ancorasDaImagem = false;
 
   public $refAncoras = 1; # valores possíveis: 1,2,4. 1:coordenada basead na ancora 1,2: anc 1 e 3. 4: anc 1e3 e 2e4

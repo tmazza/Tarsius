@@ -35,4 +35,8 @@ return array(
             ),
         ),
     ),
+    'params' => [
+        'templatesDir'=>__DIR__.'/../../../data/template',
+        'urlBase'=>'https://imagens-concursos.ufrgs.br/',
+    ],
 );
