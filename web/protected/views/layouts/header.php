@@ -12,6 +12,9 @@
             <li class="<?=$this->id=='template'?'uk-active':'';?>">
                <?=CHtml::link('Templates',$this->createUrl('/template/index'));?>
             </li>
+            <li class="<?=$this->id=='avaliacao'?'uk-active':'';?>">
+               <?=CHtml::link('Avaliações',$this->createUrl('/avaliacao/index'));?>
+            </li>
         </ul>
         <a href="#offcanvas" class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas></a>
         <div class="uk-navbar-brand uk-navbar-center uk-visible-small">

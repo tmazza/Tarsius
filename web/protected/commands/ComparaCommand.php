@@ -77,6 +77,8 @@ class ComparaCommand extends CConsoleCommand {
 			'iguais'=>$iguais,
 			'naoEncontradas'=>$naoEncontradas,
 			'respNaoDefinida'=>$respNaoDefinida,
+			'trabalho'=>$this->trabalho,
+			'concurso'=>$this->concurso,
 			'url'=>str_replace('/repositorios/',Yii::app()->params['urlBase'],$model->sourceDir).'/',
 		]);
 
