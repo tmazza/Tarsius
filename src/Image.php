@@ -15,7 +15,6 @@ include __DIR__.'/Helper.php';
 include __DIR__.'/ConnectedComponent.php';
 include __DIR__.'/Assinatura.php';
 include __DIR__.'/AnalisarRegioes.php';
-// include __DIR__.'/OCR.php';
 // include __DIR__.'/OCR_teste.php';
 // include __DIR__.'/Barcode.php';
 
@@ -69,13 +68,6 @@ class Image {
       $this->timeAll = microtime(true);
       $this->inicializar($arquivo,$resolucao);
       $this->localizarAncoras();
-      // $aaa = microtime(true);
-      // $ocr = new OCR($this);
-      // // $ocr = new OCR($this);
-      // $template = $ocr->exec('code_template');
-      // $this->output['template'] = $template;
-      // echo 'TEMPLATE: ' . $template . "\n";
-      // $this->saveTime('ocr_template', $aaa); # tempo OCR
 
       // $aaa = microtime(true);
       // $ocr = new Barcode($this);
@@ -161,9 +153,24 @@ class Image {
       $this->output['PREENCHIMENTO_MINIMO'] = $this->preenchimentoMinimo;
       $this->output['RESOLUCAO_IMAGEM'] = $this->resolucao;
 
+      # Valida template baseado no valor avaliado de alguma região.
+      if(isset($this->medidas['validaReconhecimento'])){
+        list($regiao,$valorEsperado) = $this->medidas['validaReconhecimento'];
+        if(isset($this->output['regioes'][$regiao])){
+          $valorAvaliado = $this->output['regioes'][$regiao][0];
+          if(trim($valorAvaliado) != trim($valorEsperado)){
+            throw new Exception("Template não reconhecido, valor esperado '$valorEsperado' diferente do valor avaliado '$valorAvaliado'. ", 1);
+          }
+        } else {
+          throw new Exception("Template não reconhecido, região não encontrada.", 1);
+        }
+        
+      }
+
       if($this->formatoSaida){
         $this->output['saidaFormatada'] = $this->formatarSaida($this->formatoSaida,$this->output['regioes']);
       }
+
 
     }
 

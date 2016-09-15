@@ -1,7 +1,10 @@
 <?php
 
+include_once __DIR__.'/OCR.php';
+
 class AnalisarRegioes {
   const TipoELipse = 0;
+  const TipoOCR = 1;
 
 
   private $image;
@@ -30,7 +33,7 @@ class AnalisarRegioes {
       $e = $this->getPontoNormalizado($r,$medidas[$id]);
       list($px,$py) = $e;
 
-      $tipo = $r[0];
+      $tipo = $medidas[$id][0];
       if($tipo == self::TipoELipse){ # 0:ELIPSE
         list($taxaPreenchimento,$retorno) = $this->interpretaElipse($id,$r,$e);
         $regioes[$id] = [
@@ -38,6 +41,17 @@ class AnalisarRegioes {
           $taxaPreenchimento,
           $px,
           $py,
+        ];
+      } elseif ($tipo == self::TipoOCR) {
+        $ocr = new OCR();
+
+        $p1 = Helper::rotaciona($r[1],$this->image->ancoras[1]->getCentro(),$this->image->rot);
+        $p2 = Helper::rotaciona($r[2],$this->image->ancoras[1]->getCentro(),$this->image->rot);
+        $retorno = $ocr->exec($this->image->image,$p1,$p2);
+        $regioes[$id] = [
+          $retorno,
+          $p1,
+          $p2,
         ];
       } else {
         throw new Exception('Tipo de região desconhecida.', 500);
@@ -124,7 +138,7 @@ class AnalisarRegioes {
     }
 
     $px1 = $p1[0] < $p3[0] ? $p1[0]+abs($p1[0]-$p3[0])/2 : $p3[0]-abs($p1[0]-$p3[0])/2;
-    $py1 = $p1[1] < $p3[1] ? $p1[1]-abs($p1[1]-$p3[1])/2 : $p3[1]+abs($p1[1]-$p3[1])/2;
+    $py1 = $p1[1] < $p3[1] ? $p1[1]+abs($p1[1]-$p3[1])/2 : $p3[1]-abs($p1[1]-$p3[1])/2;
     if(DEBUG){
       imagefilledellipse($this->debugImage, $px1, $py1, 3, 3, $cor5); # DEBUG
     }
