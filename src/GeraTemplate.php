@@ -64,8 +64,15 @@ class GeraTemplate {
     $this->init($arquivo,$resolucao);
     $regioes = [];
     foreach ($config['regioes'] as $cb) { # Configuracao Bloco
-      $blocos = $this->gerarBlocos($cb);
-      $regioes = array_merge($regioes,$this->formataRegioes($cb,$blocos));
+      if($cb['tipo'] == 0) { # elipse
+        $blocos = $this->gerarBlocos($cb);
+        $regioes = array_merge($regioes,$this->formataRegioes($cb,$blocos));
+      } else if($cb['tipo'] == 1) { # OCR
+        $regiaoOCR = [
+          $cb['id'] => [$cb['tipo'],$cb['p1'],$cb['p2']],
+        ];
+        $regioes = array_merge($regioes,$regiaoOCR);
+      }
     }
 
     # arquivos de saida (template, debug)
@@ -110,25 +117,35 @@ class GeraTemplate {
     $corObj = imagecolorallocatealpha ($copia,150,255,0,50);
 
     foreach ($regioes as $id => $r) {
-      if($this->closestAncora){
-        $ancoraBase = $this->ancorasDaImagem[$r[5]]->getCentro();
-        if($r[5] == 2){
-          $corObj = imagecolorallocatealpha ($copia,150,0,255,50);
-        } elseif ($r[5] == 3) {
-          $corObj = imagecolorallocatealpha ($copia,0,150,255,50);
-        } elseif ($r[5] == 4) {
-          $corObj = imagecolorallocatealpha ($copia,255,0,150,50);
+      if($r[0] == 0){#elipse
+        if($this->closestAncora){
+          $ancoraBase = $this->ancorasDaImagem[$r[5]]->getCentro();
+          if($r[5] == 2){
+            $corObj = imagecolorallocatealpha ($copia,150,0,255,50);
+          } elseif ($r[5] == 3) {
+            $corObj = imagecolorallocatealpha ($copia,0,150,255,50);
+          } elseif ($r[5] == 4) {
+            $corObj = imagecolorallocatealpha ($copia,255,0,150,50);
+          }
+        } else {
+          $ancoraBase = $this->ancoraBase;          
         }
-      } else {
-        $ancoraBase = $this->ancoraBase;
-        
+
+        $x = $r[1]*$this->escala+$ancoraBase[0];
+        $y = $r[2]*$this->escala+$ancoraBase[1];
+
+        imagefilledellipse($copia,$x,$y,30,30,$corObj);
+        imagettftext ($copia,17.0,0.0,$x-5,$y+5,$corTex,__DIR__.'/SIXTY.TTF',$id);
+      } elseif($r[0] == 1){ #ocr
+        $p1 = $r[1]; $p2 = $r[2];
+        $x1 = $p1[0]*$this->escala + $this->ancoraBase[0];
+        $y1 = $p1[1]*$this->escala + $this->ancoraBase[1];
+        $x2 = $p2[0]*$this->escala + $this->ancoraBase[0];
+        $y2 = $p2[1]*$this->escala + $this->ancoraBase[1];
+
+        imagefilledrectangle($copia,$x1,$y1,$x2,$y2,$corObj);
+        imagettftext ($copia,17.0,0.0,$x1+10,$y1+10,$corTex,__DIR__.'/SIXTY.TTF',$id);
       }
-
-      $x = $r[1]*$this->escala+$ancoraBase[0];
-      $y = $r[2]*$this->escala+$ancoraBase[1];
-
-      imagefilledellipse($copia,$x,$y,30,30,$corObj);
-      imagettftext ($copia,17.0,0.0,$x-5,$y+5,$corTex,__DIR__.'/SIXTY.TTF',$id);
     }
     imagejpeg($copia,$baseDir.'/preview.jpg');
     imagedestroy($this->image);
@@ -205,7 +222,7 @@ class GeraTemplate {
 
     $regiao = [$tipo,$x,$y];
 
-    if($tipo == 0){ # elipse
+    if($tipo == 0) { # elipse
       $casoTrue = $cb['casoTrue'];
       $casoFalse = $cb['casoFalse'];
       $regiao[] = is_string($casoTrue) ? $casoTrue : $casoTrue($cBloco,$cLinha,$cObjeto);

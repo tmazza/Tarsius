@@ -5,6 +5,9 @@ include_once(Yii::getPathOfAlias('webroot') . '/../../src/GeraTemplateQuatroRefe
 
 class TemplateCommand extends CConsoleCommand {
 
+	/**
+	 * Usa como referência somente a âncora 1
+	 */
 	public function actionIndex($nome=false){
 		if($nome){
 			$dir = Yii::getPathOfAlias('webroot') . '/../../data/template/' . $nome;
@@ -19,6 +22,9 @@ class TemplateCommand extends CConsoleCommand {
 		}
 	}
 
+	/**
+	 * Usa como referência a média entre as âncora 1 e 3.
+	 */
 	public function actionDouble($nome=false){
 		if($nome){
 			$dir = Yii::getPathOfAlias('webroot') . '/../../data/template/' . $nome;
@@ -33,6 +39,11 @@ class TemplateCommand extends CConsoleCommand {
 		}
 	}
 
+
+	/**
+	 * Usa como referência somente todas as âncoras. Calculando a média entre
+	 * 1 e 3 e entre 2 e 4. Depois a média entre dois resultados.
+	 */
 	public function actionQuadruple($nome=false){
 		if($nome){
 			$dir = Yii::getPathOfAlias('webroot') . '/../../data/template/' . $nome;

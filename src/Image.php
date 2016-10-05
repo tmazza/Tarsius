@@ -75,6 +75,7 @@ class Image {
       // $this->output['barcode'] = $barcode;
       // echo ' BARCODE: ' . $barcode . "\n";
       // $this->saveTime('barcode', $aaa); # tempo OCR
+      
       $this->analisarRegioes();
       $this->organizarSaida();
       $this->saveTime('timeAll', $this->timeAll); # tempo total
