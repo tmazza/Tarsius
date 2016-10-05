@@ -88,8 +88,9 @@ class TemplateController extends BaseController {
 		$dir = Yii::app()->params['templatesDir'] . '/' . $template;
 
 		# formata arquivo gerador de template
-		$regioes = $this->gerRegioesFormatadas($blocos,$dir);
-		$templateGerador = $this->getBaseGerador($template,$regioes);
+		$regioes = $this->getRegioesFormatadas($blocos,$dir);
+		$formatoSaida = $this->getFormatoSaida();	
+		$templateGerador = $this->getBaseGerador($template,$regioes,$formatoSaida);
 
 		# grava arquivo gerador de template
 		$handle = fopen($dir.'/'.'gerador.php', 'w+');
@@ -118,7 +119,7 @@ class TemplateController extends BaseController {
 	/**
 	 * Gera string com sintaxe em PHP da lista de regiõs.
 	 */
-	private function gerRegioesFormatadas($regioes,$dir){
+	private function getRegioesFormatadas($regioes,$dir){
 		$strRegioes = '';
 		foreach ($regioes as $r) {
 			$tipo = (int) $r['tipo']; 
@@ -135,9 +136,49 @@ class TemplateController extends BaseController {
 			$casoFalse = $this->getAttr($r,'casoFalse') ;
 			$strRegioes .= $this->getTemplateRegiao($tipo,$p1x,$p1y,$p2x,$p2y,$colPorLin,$agrupa,$minArea,$maxArea,$id,$casoTrue,$casoFalse);
 		}
+
 		return $strRegioes;
 	}
+
+	/**
+	 * Array definindo a configuração da string final com os resultados.
+	 * A chave deve conter um ID identificando a seleçaõ de resultados.
+	 * O valor pode ser string o array.
+	 *   - Se for uma string ela ser o ID de um região do template
+	 * 	 - Se for array este deve possuir dous atributos.
+	 * 		- match: deve ser uma expressão regular definindo quais as regiões 
+	 *			do template serão selecionadas. A busca será feita pelo ID da
+     *			região.
+	 *		- order: pode ser uma boolean(false) ou uma função callback().
+	 * 			boolean: deve ser explicitada a intenção da ordem, caso não deva
+	 *				  ser aplica nenhuma ordem o valor false deve ser informado.
+	 *			callback: será aplicada na lista de elemento selecionadas usando
+	 *				usor() (http://php.net/manual/pt_BR/function.usort.php)
+	 */
+	public function getFormatoSaida(){
+		return $this->array2Str([
+		    'ausente' => 'eAusente',
+		    'respostas' => [
+		      'match' => '/^e-.*-\d$/',
+		      'order' => false
+		    ],
+	    ]);
+	}
 	
+	private function array2Str($array){
+	    $str = '';
+	    foreach ($array as $k => $v) {
+	    	if(is_string($v)){
+	    		$str .= "'{k}' => '$v',";
+	    	} else if(is_bool($v)) {
+	    		$str .= "'{k}' => " . ($v ? 'true' : 'false') . ",";
+	    	} else {
+	    		$str .= "'{k}' => " . $this->array2Str($v) . ",";
+	    	}
+	    }
+	    return "[{$str}]";
+	}
+
 	/**
 	 * Retorna valor de $attr em $r. Caso $attr não exista, retorna o valor default
 	 * definido para $attr.
@@ -167,20 +208,14 @@ class TemplateController extends BaseController {
 		}
 	}
 
-	private function getBaseGerador($template,$regioes){
+	private function getBaseGerador($template,$regioes,$formatoSaida){
 		return <<<BASEGERADOR
 return [
   'nome' => '{$template}',
   'regioes' => [
     {$regioes}
   ],
-  'formatoSaida' => [
-    'ausente' => 'eAusente',
-    'respostas' => [
-      'match' => '/^e-.*-\d$/',
-      'order' => false
-    ],
-  ],
+  'formatoSaida' => {$formatoSaida},
 ];
 BASEGERADOR;
 	}
