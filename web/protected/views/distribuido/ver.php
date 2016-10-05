@@ -6,38 +6,43 @@ $this->menu = [
 <h3><?=$model->nome?></h3>
 <hr>
 
+
+	<a href="#!" onclick="$(this).next().slideToggle();">Ver resultado em texto</a>
+	<div style="display: none;">
+		<?php $output = json_decode($model->resultado->conteudo,true); ?>
+		<h4>Taxa de preenchimento por região</h4>
+		<?php
+		if(isset($output['saidaFormatada'])){
+			echo '<pre>';
+			foreach ($output['regioes'] as $k => $r){
+				if($r[0] == 0){
+				 	echo $k . ' | ' . $r[0] . ' | ' . number_format(100*$r[1],2) . '%<br>';
+				} else {
+				 	echo $k . ' | ' . $r[0] . '<br>';
+				}
+			}
+			echo '</pre>';
+		}
+		?>
+		<hr>
+		<h4>Arquivo completo</h4>
+		<?php
+		echo '<pre>';
+		print_r($output);
+		echo '</pre>';
+		?>
+	</div>
 <?php if(!$model->exportado): ?>
-	Saída: 
-	<?php
-	$output = json_decode($model->output,true);
-	echo '<pre>';
-	print_r($output['saidaFormatada']);
-	echo '</pre>';
-	?>
 	<?=CHtml::link('Exportar',$this->createUrl('/trabalho/forcaExport',[
 		'id'=>$model->id,
 	]),[
-		'class'=>'uk-button uk-button-primary uk-button-small'
+		'class'=>'uk-button uk-button-primary uk-button-small uk-float-right'
 	])?>
-	<br>
-	<br>
 <?php endif; ?>
 
 <!-- <img id='main' src="<?=$debugImage;?>" style="width:100%;" /> -->
 <img id="zoom_01" src="<?=$debugImage;?>" data-zoom-image="<?=$debugImage;?>"/>
 
-<?php if(!$model->exportado): ?>
-	<hr>
-	<?php
-	if(isset($output['saidaFormatada'])){
-		echo '<pre>';
-		foreach ($output['regioes'] as $k => $r)
-			echo $k . ' | ' . $r[0] . ' | ' . number_format(100*$r[1],2) . '%<br>';
-		echo '</pre>';
-	}
-	?>
-	<hr>
-<?php endif; ?>
 
 <script type="text/javascript">
 $("#zoom_01").elevateZoom({

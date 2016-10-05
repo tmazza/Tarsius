@@ -1,7 +1,7 @@
 <?php
 bcscale(14);
 
-define('DEBUG',false);
+define('DEBUG',true);
 
 define('CORTE_PRETO', 150);
 define('TOLERANCIA_MATCH', 0.4); # eg: areabase  = 1000. busca triangulos de area entre 500 e 1500
@@ -158,7 +158,10 @@ class Image {
         list($regiao,$valorEsperado) = $this->medidas['validaReconhecimento'];
         if(isset($this->output['regioes'][$regiao])){
           $valorAvaliado = $this->output['regioes'][$regiao][0];
-          if(trim($valorAvaliado) != trim($valorEsperado)){
+          $valorAvaliado = (int) substr($valorAvaliado, 1,-1);
+          $valorEsperado = (int) substr($valorEsperado, 1,-1);
+
+          if($valorAvaliado != $valorEsperado){
             throw new Exception("Template não reconhecido, valor esperado '$valorEsperado' diferente do valor avaliado '$valorAvaliado'. ", 1);
           }
         } else {

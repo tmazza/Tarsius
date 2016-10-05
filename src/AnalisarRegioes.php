@@ -42,7 +42,7 @@ class AnalisarRegioes {
           $px,
           $py,
         ];
-      } elseif ($tipo == self::TipoOCR) {
+      } elseif ($tipo == self::TipoOCR) { # [1,[x1,y1],[x2,y2]]
         $ocr = new OCR();
 
         $p1 = Helper::rotaciona($r[1],$this->image->ancoras[1]->getCentro(),$this->image->rot);

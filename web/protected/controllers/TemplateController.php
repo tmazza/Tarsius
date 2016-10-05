@@ -89,7 +89,6 @@ class TemplateController extends BaseController {
 
 		# formata arquivo gerador de template
 		$regioes = $this->gerRegioesFormatadas($blocos,$dir);
-		$strFuncoes = serialize($this->strFuncoes);
 		$templateGerador = $this->getBaseGerador($template,$regioes);
 
 		# grava arquivo gerador de template
@@ -122,7 +121,6 @@ class TemplateController extends BaseController {
 	private function gerRegioesFormatadas($regioes,$dir){
 		$strRegioes = '';
 		foreach ($regioes as $r) {
-			$this->strFuncoes = [];
 			$tipo = (int) $r['tipo']; 
 			$p1x = (float) $r['p1']['x']; 
 			$p1y = (float) $r['p2']['y'];
@@ -135,8 +133,7 @@ class TemplateController extends BaseController {
 			$id = $this->getAttr($r,'id');
 			$casoTrue = $this->getAttr($r,'casoTrue');
 			$casoFalse = $this->getAttr($r,'casoFalse') ;
-			$strFuncoes = "'" . base64_encode(serialize($this->strFuncoes)) . "'";
-			$strRegioes .= $this->getTemplateRegiao($tipo,$p1x,$p1y,$p2x,$p2y,$colPorLin,$agrupa,$minArea,$maxArea,$id,$casoTrue,$casoFalse,$strFuncoes);
+			$strRegioes .= $this->getTemplateRegiao($tipo,$p1x,$p1y,$p2x,$p2y,$colPorLin,$agrupa,$minArea,$maxArea,$id,$casoTrue,$casoFalse);
 		}
 		return $strRegioes;
 	}
@@ -188,7 +185,7 @@ return [
 BASEGERADOR;
 	}
 
-	private function getTemplateRegiao($tipo,$p1x,$p1y,$p2x,$p2y,$colPorLin,$agrupa,$minArea,$maxArea,$id,$casoTrue,$casoFalse,$strFuncoes){
+	private function getTemplateRegiao($tipo,$p1x,$p1y,$p2x,$p2y,$colPorLin,$agrupa,$minArea,$maxArea,$id,$casoTrue,$casoFalse){
 		return <<<TEMPLATEREGIAO
 [
   'tipo' => $tipo,
@@ -201,7 +198,6 @@ BASEGERADOR;
   'id' => $id,
   'casoTrue' => $casoTrue,
   'casoFalse' => $casoFalse,
-  'strFuncoes' => $strFuncoes,
 ],
 TEMPLATEREGIAO;
 	}

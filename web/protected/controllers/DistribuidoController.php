@@ -6,32 +6,42 @@ class DistribuidoController extends BaseController {
 		$model = Distribuido::model()->findByPk((int)$id);
 		Yii::app()->clientScript->registerScriptFile($this->wb.'/jquery.elevatezoom.min.js');
 		try {
-			$debugImage = $this->getDebugImage($model,$renovar);
-			$this->render('ver',[
-				'model'=>$model,
-				'debugImage'=>$debugImage,
-			]);
+			if(is_null($model)){
+				throw new Exception("Registro finalizado ID:'$id' não encontrado.", 3);
+			} else {
+				$debugImage = $this->getDebugImage($model,$renovar);
+				$this->render('ver',[
+					'model'=>$model,
+					'debugImage'=>$debugImage,
+				]);
+			}
 		} catch(Exception $e){
-			HView::fMsg($e->getMessage());
-			$this->redirect($this->createUrl('/trabalho/index'));
+			$this->render('verComErro',[
+				'model'=>$model,
+				'msg' => $e->getMessage(),
+			]);
 		}
 
 	}
 
-	private function getDebugImage($dist,$renovar=false){
+	private function getDebugImage($dist,$renovar=false){		
 		$baseDir	 = __DIR__ . '/../../../data/runtime/trab-'.$dist->trabalho->id;
 		$file = $dist->nome;
 
 		$imgDir = $baseDir.'/img/';
-		$reviewImage = $imgDir.substr($file,0,-9) . '.png';
+		$reviewImage = $imgDir.substr($file,0,-4) . '.png';
 
-		
 		if(!file_exists($reviewImage) || $renovar){
+			
 			# cria diretorio para imagens de debug
 			if(!is_dir($imgDir)) mkdir($imgDir,0777);
 			# busca json de debug
 			$jsonFile = $baseDir.'/file/' . $file . '.json';
 			$output = json_decode($dist->resultado->conteudo,true);
+
+			if(is_string($output))
+				throw new Exception($output, 2);
+
 			# carrega imagem original
 			$originalFile = $dist->trabalho->sourceDir.'/'.$dist->nome;
 			if(!file_exists($originalFile)) throw new Exception("Arquivo '{originalFile}' não encontrado.", 1);
@@ -42,7 +52,6 @@ class DistribuidoController extends BaseController {
 			$preenchimentoMinimo = $dist->trabalho->taxaPreenchimento;
 			$escala = $output['escala'];
 			$regioes = $output['regioes'];
-
 			# Desenha formas nas posições avaliadas
 			foreach ($regioes as $r) {
 			  if($r[0] == 0) { # tipo elipse
@@ -56,14 +65,14 @@ class DistribuidoController extends BaseController {
 			    } else {
 			      imageellipse($original,$x,$y,$w,$h, imagecolorallocate($original, 255,0,255));
 			    }
-
 			  } else {
-			    throw new Exception("Tipo de região {$r[0]} desconhecido.", 1);
+			    ///throw new Exception("Tipo de região {$r[0]} desconhecido.", 1);
 			  }
 			}
+
 			imagepng($original,$reviewImage);
 		}
-		return  Yii::app()->baseUrl . '/../data/runtime/trab-'.$dist->trabalho->id.'/img/'.substr($file,0,-9) . '.png';
+		return  Yii::app()->baseUrl . '/../data/runtime/trab-'.$dist->trabalho->id.'/img/'.substr($file,0,-4) . '.png';
 	}
 
 
