@@ -74,7 +74,7 @@ function changeState(e){
     lastState = state;
     if(char == 'e'){ 
       state = 0;
-    } else if(char == 'b') {
+    } else if(char == 'o') {
       state = 1;
     } else if(e.keyCode === 27) {
       undo();
@@ -175,8 +175,7 @@ function updateView(){
 function atualizaEstado(){
   txtState = 'Elipses';
 
-  if(state == 1) txtState = 'Barcode';
-  else if(state == 2) txtState = 'Imagem';
+  if(state == 1) txtState = 'OCR';
   
   content = '<div class="state state'+state+'">' + txtState;
   
@@ -253,6 +252,9 @@ function abreEdicao(){
       $(this).val($(this).attr('data-default'));
     }
   });
+  $('.state-config').show();
+  if(state == 0) $('.not-state-0').hide();
+  if(state == 1) $('.not-state-1').hide();
   UIkit.modal('#edicao-bloco').show();
 }
 
@@ -307,19 +309,19 @@ setTimeout(function(){
           <h2>Definições do bloco</h2>
         </div>
         <form class="uk-form uk-form-horizontal">
-          <div class="uk-form-row">
+          <div class="uk-form-row state-config not-state-1">
             <label class="uk-form-label">colunasPorLinha</label>
             <input name='colunasPorLinha' class="bloco-cfg" data-default='15'/><br>
           </div>
-          <div class="uk-form-row">
+          <div class="uk-form-row state-config not-state-1">
             <label class="uk-form-label">agrupaObjetos</label>
             <input name='agrupaObjetos' class="bloco-cfg" data-default='5'/><br>
           </div>
-          <div class="uk-form-row">
+          <div class="uk-form-row state-config not-state-1">
             <label class="uk-form-label">minArea</label>
              <input name='minArea'  class="bloco-cfg"  data-default='300'/><br>
           </div>
-          <div class="uk-form-row">
+          <div class="uk-form-row state-config not-state-1">
             <label class="uk-form-label">maxArea</label>
             <input name='maxArea'  class="bloco-cfg"  data-default='3000'/><br>
           </div>
@@ -330,7 +332,7 @@ setTimeout(function(){
   return 'e-'.$idQuestao.'-'.($o+1);
 }"></textarea>
           </div>
-          <div class="uk-form-row">
+          <div class="uk-form-row state-config not-state-1">
             <label class="uk-form-label">casoTrue</label>
             <textarea name='casoTrue' style='width:600px;height:200px'; class="bloco-cfg"   id='t-ct' data-default="function($b,$l,$o) { 
   switch ($o){
@@ -342,7 +344,7 @@ setTimeout(function(){
   }
 }"></textarea><br>
           </div>
-          <div class="uk-form-row">
+          <div class="uk-form-row state-config not-state-1">
             <label class="uk-form-label">casoFalse</label>
             <textarea name='casoFalse'  class="bloco-cfg" data-default="W"   id='t-cf' style='width:600px;height:140px';></textarea>
           </div>
@@ -388,6 +390,7 @@ setTimeout(function(){
 }
 .state0 { background: #f22; }
 .state1 { background: #00a; }
+.state2 { background: #ff0; color: black; }
 table td { border:2px solid #03a9f4; }
 .container { width: 100%; }
 .bottom-bar {

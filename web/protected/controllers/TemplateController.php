@@ -169,11 +169,11 @@ class TemplateController extends BaseController {
 	    $str = '';
 	    foreach ($array as $k => $v) {
 	    	if(is_string($v)){
-	    		$str .= "'{k}' => '$v',";
+	    		$str .= "'{$k}' => '$v',";
 	    	} else if(is_bool($v)) {
-	    		$str .= "'{k}' => " . ($v ? 'true' : 'false') . ",";
+	    		$str .= "'{$k}' => " . ($v ? 'true' : 'false') . ",";
 	    	} else {
-	    		$str .= "'{k}' => " . $this->array2Str($v) . ",";
+	    		$str .= "'{$k}' => " . $this->array2Str($v) . ",";
 	    	}
 	    }
 	    return "[{$str}]";

@@ -68,8 +68,18 @@ class GeraTemplate {
         $blocos = $this->gerarBlocos($cb);
         $regioes = array_merge($regioes,$this->formataRegioes($cb,$blocos));
       } else if($cb['tipo'] == 1) { # OCR
+
+        list($x1,$y1) = $cb['p1'];
+        list($x2,$y2) = $cb['p2'];
+
+        echo $x1 . ' | ' . $y1 . ' | ' . $x2 . ' | ' . $y2 . "\n";
+        $x1 = ($x1 - $this->ancoraBase[0])/$this->escala; # Converte para milimetros
+        $y1 = ($y1 - $this->ancoraBase[1])/$this->escala; # Converte para milimetros
+        $x2 = ($x2 - $this->ancoraBase[0])/$this->escala; # Converte para milimetros
+        $y2 = ($y2 - $this->ancoraBase[1])/$this->escala; # Converte para milimetros
+
         $regiaoOCR = [
-          $cb['id'] => [$cb['tipo'],$cb['p1'],$cb['p2']],
+          $cb['id'] => [$cb['tipo'],[$x1,$y1],[$x2,$y2]],
         ];
         $regioes = array_merge($regioes,$regiaoOCR);
       }

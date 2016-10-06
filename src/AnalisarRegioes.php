@@ -30,11 +30,10 @@ class AnalisarRegioes {
     $medidas = $this->image->medidas['regioes'];
 
     foreach ($this->image->getRegioes() as $id => $r) {
-      $e = $this->getPontoNormalizado($r,$medidas[$id]);
-      list($px,$py) = $e;
-
       $tipo = $medidas[$id][0];
       if($tipo == self::TipoELipse){ # 0:ELIPSE
+        $e = $this->getPontoNormalizado($r,$medidas[$id]);
+        list($px,$py) = $e;
         list($taxaPreenchimento,$retorno) = $this->interpretaElipse($id,$r,$e);
         $regioes[$id] = [
           $retorno,
@@ -44,10 +43,19 @@ class AnalisarRegioes {
         ];
       } elseif ($tipo == self::TipoOCR) { # [1,[x1,y1],[x2,y2]]
         $ocr = new OCR();
-
-        $p1 = Helper::rotaciona($r[1],$this->image->ancoras[1]->getCentro(),$this->image->rot);
-        $p2 = Helper::rotaciona($r[2],$this->image->ancoras[1]->getCentro(),$this->image->rot);
+        $base = $this->image->ancoras[1]->getCentro();
+        $p1 = Helper::rotaciona($r[1],$base,$this->image->rot);
+        $p2 = Helper::rotaciona($r[2],$base,$this->image->rot);
+        $p1 = [$p1[0]+$base[0],$p1[1]+$base[1]];
+        $p2 = [$p2[0]+$base[0],$p2[1]+$base[1]];
         $retorno = $ocr->exec($this->image->image,$p1,$p2);
+
+        if(DEBUG){
+          echo 'adasdasdas';
+          $cor3 = imagecolorallocate($this->debugImage, 0, 0, 255); # DEBUG
+          imagefilledrectangle($this->debugImage,$p1[0],$p1[1],$p2[0],$p2[1],$cor3);
+        }
+
         $regioes[$id] = [
           $retorno,
           $p1,
@@ -83,8 +91,6 @@ class AnalisarRegioes {
 
     $ancBase = isset($d[5]) ? $d[5] : 1;
 
-    echo 'BASE: ' . $ancBase . "\n";
-
     $base = $this->image->ancoras[$ancBase]->getCentro();
     if($px > 0 && $py > 0){
       $base = $this->image->ancoras[1]->getCentro();
@@ -95,6 +101,7 @@ class AnalisarRegioes {
     } elseif($px > 0 && $py < 0){
       $base = $this->image->ancoras[4]->getCentro();
     }
+
     $px += $base[0];
     $py += $base[1];
 

@@ -2,7 +2,9 @@
 class TrabalhoController extends BaseController {
 
 	public function actionIndex(){
-	    $trabalhos = Trabalho::model()->findAll();
+	    $trabalhos = Trabalho::model()->findAll([
+	    	'order' => 'id DESC',
+	    ]);
 	    $this->render('index',[
 	      'trabalhos'=>$trabalhos,
 	    ]);
