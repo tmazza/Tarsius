@@ -112,7 +112,7 @@ class TrabalhoController extends BaseController {
 		$trabalho->status = 1;
 		$trabalho->update(['status']);
 
-		$cmd = 'php ' . Yii::getPathOfAlias('webroot') . '/protected/yiic distribui --trabId=' . $trabalho->id;
+		$cmd = 'php ' . Yii::getPathOfAlias('webroot') . '/protected/tarsius distribui --trabId=' . $trabalho->id;
 		$pid = exec($cmd . ' > /dev/null 2>&1 & echo $!; ');
 
 		$this->redirect($this->createUrl('/trabalho/ver',['id'=>$trabalho->id]));

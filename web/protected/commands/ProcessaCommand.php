@@ -69,7 +69,7 @@ class ProcessaCommand extends CConsoleCommand {
 			  ]);
 			}
 
-		 	$this->log(($ok ? 'OK':'FALHA') . ' | Renomando de {$arquivo} para {$arquivoDest} ');
+		 	$this->log(($ok ? 'OK':'FALHA') . " | Renomando de {$arquivo} para {$arquivoDest} ");
 		}
 
   		Processo::model()->updateAll([
