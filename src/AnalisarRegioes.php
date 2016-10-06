@@ -143,9 +143,12 @@ class AnalisarRegioes {
       imagefilledellipse($this->debugImage, $p1[0], $p1[1], 3, 3, $cor3); # DEBUG
       imagefilledellipse($this->debugImage, $p3[0], $p3[1], 3, 3, $cor4); # DEBUG
     }
+    $minX = min($p1[0],$p3[0]); $maxX = max($p1[0],$p3[0]);
+    $minY = min($p1[1],$p3[1]); $maxY = max($p1[1],$p3[1]);
 
-    $px1 = $p1[0] < $p3[0] ? $p1[0]+abs($p1[0]-$p3[0])/2 : $p3[0]-abs($p1[0]-$p3[0])/2;
-    $py1 = $p1[1] < $p3[1] ? $p1[1]+abs($p1[1]-$p3[1])/2 : $p3[1]-abs($p1[1]-$p3[1])/2;
+    $px1 = (($maxX - $minX) / 2) + $minX;
+    $py1 = (($maxY - $minY) / 2) + $minY;
+
     if(DEBUG){
       imagefilledellipse($this->debugImage, $px1, $py1, 3, 3, $cor5); # DEBUG
     }
@@ -188,18 +191,24 @@ class AnalisarRegioes {
     // imagefilledellipse($this->debugImage, $p1[0], $p1[1], 3, 3, $cor3); # DEBUG
     // imagefilledellipse($this->debugImage, $p3[0], $p3[1], 3, 3, $cor4); # DEBUG
 
-    $px1 = $p1[0] < $p3[0] ? $p1[0]+abs($p1[0]-$p3[0])/2 : $p3[0]-abs($p1[0]-$p3[0])/2;
-    $py1 = $p1[1] < $p3[1] ? $p1[1]+abs($p1[1]-$p3[1])/2 : $p3[1]-abs($p1[1]-$p3[1])/2;
+    $minX = min($p1[0],$p3[0]); $maxX = max($p1[0],$p3[0]);
+    $minY = min($p1[1],$p3[1]); $maxY = max($p1[1],$p3[1]);
+    $px1 = (($maxX - $minX) / 2) + $minX;
+    $py1 = (($maxY - $minY) / 2) + $minY;
     imagefilledellipse($this->debugImage, $px1, $py1, 3, 3, $cor5); # DEBUG
 
-    $px2 = $p2[0] > $p4[0] ? $p2[0]-abs($p2[0]-$p4[0])/2 : $p4[0]+abs($p2[0]-$p4[0])/2;
-    $py2 = $p2[1] > $p4[1] ? $p2[1]-abs($p2[1]-$p4[1])/2 : $p4[1]+abs($p2[1]-$p4[1])/2;
+    $minX = min($p2[0],$p4[0]); $maxX = max($p2[0],$p4[0]);
+    $minY = min($p2[1],$p4[1]); $maxY = max($p2[1],$p4[1]);
+    $px2 = (($maxX - $minX) / 2) + $minX;
+    $py2 = (($maxY - $minY) / 2) + $minY;
     imagefilledellipse($this->debugImage, $px2, $py2, 3, 3, $cor6); # DEBUG
 
     $pf1 = [$px1,$py1];
     $pf2 = [$px2,$py2];
-    $px = $pf1[0] > $pf2[0] ? $pf1[0]-abs($pf1[0]-$pf2[0])/2 : $pf2[0]-abs($pf1[0]-$pf2[0])/2;
-    $py = $pf1[1] > $pf2[1] ? $pf1[1]+abs($pf1[1]-$pf2[1])/2 : $pf2[1]-abs($pf1[1]-$pf2[1])/2;
+    $minX = min($pf1[0],$pf2[0]); $maxX = max($pf1[0],$pf2[0]);
+    $minY = min($pf1[1],$pf2[1]); $maxY = max($pf1[1],$pf2[1]);
+    $px = (($maxX - $minX) / 2) + $minX;
+    $py = (($maxY - $minY) / 2) + $minY;
     imagefilledellipse($this->debugImage, $px, $py, 3, 3, $cor); # DEBUG
 
     return [$px,$py];
