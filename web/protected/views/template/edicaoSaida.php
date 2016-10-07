@@ -10,6 +10,30 @@ $this->menu = [
 <textarea id=asd style="width:100%;height:640px;"><?=CHtml::encode($content);?></textarea>
 </pre>
 <button onclick="enviar()">Atualizar</button>
+<br><br>
+Dicas
+<br><br>
+<div>
+Definição de campo para validar tempalte:
+<pre>'validaReconhecimento' => ['ID-REGIAO','VALOR-ESPERADO'],</pre>
+Definição de saída agrupando mais de uma região.
+<pre>
+'NOME-SAIDA' => [
+  'match' => 'EXPRESSAO-REGULAR',
+  'order' => CLOSURE-PHP,
+ ],
+ </pre>
+ Onde EXPRESSAO-REGULAR, deve buscar pelo ID das regiões. Exemplo<br>
+<pre>
+/^e-.*$/
+</pre>
+para buscar todas as regiões que possuem o prefixo 'e-'<br>
+CLOSURE-PHP recebe dois IDS da seleção para definir a ordem, exemplo<br>
+ <pre>
+funtion ($a,$b){
+	return $a > $b; 	
+}</pre>
+</div>
 <hr>
 Highlight <small>Salve para atualizar</small><br>
 <?php highlight_string($content);?>

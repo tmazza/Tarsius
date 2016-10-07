@@ -109,6 +109,7 @@ class GeraTemplate {
       'regioes' => $regioes,
       'refAncoras' => $this->refAncoras,
       'formatoSaida' => isset($config['formatoSaida']) ? CJSON::encode($config['formatoSaida']) : false,
+      'validaReconhecimento' => isset($config['validaReconhecimento']) ? CJSON::encode($config['validaReconhecimento']) : false,
     ];
 
     $file = $baseDir.'/template.json';

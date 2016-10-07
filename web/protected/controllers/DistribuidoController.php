@@ -10,6 +10,7 @@ class DistribuidoController extends BaseController {
 				throw new Exception("Registro finalizado ID:'$id' não encontrado.", 3);
 			} else {
 				$debugImage = $this->getDebugImage($model,$renovar);
+
 				$this->render('ver',[
 					'model'=>$model,
 					'debugImage'=>$debugImage,
@@ -54,20 +55,17 @@ class DistribuidoController extends BaseController {
 			$regioes = $output['regioes'];
 			# Desenha formas nas posições avaliadas
 			foreach ($regioes as $r) {
-			  if($r[0] == 0) { # tipo elipse
-			    
-			    $w = $escala * $template['elpLargura'] ;
-			    $h = $escala * $template['elpAltura'];
-			    list($x,$y) = Helper::rotaciona([$r[2],$r[3]],$output['ancoras'][1],0);
+				if(!is_array($r[1])){ # skip OCR
+				    $w = $escala * $template['elpLargura'] ;
+				    $h = $escala * $template['elpAltura'];
+				    list($x,$y) = Helper::rotaciona([$r[2],$r[3]],$output['ancoras'][1],0);
 
-			    if($r[1] > $preenchimentoMinimo) { # todo: adicionar taxa de PREENCHIMENTO_MINIMO no template!
-			      imagefilledellipse($original,$x,$y,$w,$h, imagecolorallocatealpha($original,255,255,0,75));
-			    } else {
-			      imageellipse($original,$x,$y,$w,$h, imagecolorallocate($original, 255,0,255));
-			    }
-			  } else {
-			    ///throw new Exception("Tipo de região {$r[0]} desconhecido.", 1);
-			  }
+				    if($r[1] > $preenchimentoMinimo) { # todo: adicionar taxa de PREENCHIMENTO_MINIMO no template!
+				      imagefilledellipse($original,$x,$y,$w,$h, imagecolorallocatealpha($original,255,255,0,75));
+				    } else {
+				      imageellipse($original,$x,$y,$w,$h, imagecolorallocate($original, 255,0,255));
+				    }
+				}
 			}
 
 			imagepng($original,$reviewImage);

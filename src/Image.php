@@ -154,14 +154,15 @@ class Image {
       $this->output['PREENCHIMENTO_MINIMO'] = $this->preenchimentoMinimo;
       $this->output['RESOLUCAO_IMAGEM'] = $this->resolucao;
 
+
       # Valida template baseado no valor avaliado de alguma região.
-      if(isset($this->medidas['validaReconhecimento'])){
-        list($regiao,$valorEsperado) = $this->medidas['validaReconhecimento'];
+      if(isset($this->medidas['validaReconhecimento']) && $this->medidas['validaReconhecimento']){
+        list($regiao,$valorEsperado) = json_decode($this->medidas['validaReconhecimento'],true);
+
         if(isset($this->output['regioes'][$regiao])){
           $valorAvaliado = $this->output['regioes'][$regiao][0];
           $valorAvaliado = (int) substr($valorAvaliado, 1,-1);
           $valorEsperado = (int) substr($valorEsperado, 1,-1);
-
           if($valorAvaliado != $valorEsperado){
             throw new Exception("Template não reconhecido, valor esperado '$valorEsperado' diferente do valor avaliado '$valorAvaliado'. ", 1);
           }
@@ -171,15 +172,13 @@ class Image {
         
       }
 
-      if($this->formatoSaida){
-        $this->output['saidaFormatada'] = $this->formatarSaida($this->formatoSaida,$this->output['regioes']);
-      }
-
-
+      $saida = array_map(function($i) { return $i[0]; },$this->output['regioes']); 
+      $saidaFormatada = $this->formatoSaida ? $this->formatarSaida($this->formatoSaida,$this->output['regioes']) : [];
+      $this->output['saidaFormatada'] = array_merge($saida,$saidaFormatada);
     }
 
     /**
-     * Organiza saída da interpretaçaõ das regiões de acordo com o formato de saida.
+     * Organiza saída da interpretação das regiões de acordo com o formato de saida.
      * @param formatoSaida deve ser um dicionário tendo como chave o nome
      * esperado pra saída (qualquer nome) e como valor ou uma string ou 
      * um array. Caso seja string, deve ser igual ao ID de alguma região
@@ -191,8 +190,8 @@ class Image {
      * é possível passar um função de ordenação com índice 'sort'. Abaixo um
      * exemplo de formato de arquivo válido:
      * [
-     *   'ausente' => 'eAusente',
-     *   'respostas' => [
+     *   'ausente' => 'eAusente', // Serve somente como alias, porque haverá na saída um chave
+     *   'respostas' => [         // de nome 'eAusente' com o respectivo valor interpretado.
      *    'match' => '/^e-/', 
      *     'sort' => function($a,$b){
      *       return $a > $b;          

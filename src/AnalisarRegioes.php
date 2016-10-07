@@ -51,7 +51,6 @@ class AnalisarRegioes {
         $retorno = $ocr->exec($this->image->image,$p1,$p2);
 
         if(DEBUG){
-          echo 'adasdasdas';
           $cor3 = imagecolorallocate($this->debugImage, 0, 0, 255); # DEBUG
           imagefilledrectangle($this->debugImage,$p1[0],$p1[1],$p2[0],$p2[1],$cor3);
         }
