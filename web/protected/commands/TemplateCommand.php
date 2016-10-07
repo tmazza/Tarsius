@@ -12,8 +12,7 @@ class TemplateCommand extends CConsoleCommand {
 		if($nome){
 			$dir = Yii::getPathOfAlias('webroot') . '/../../data/template/' . $nome;
 			$img = $dir . '/base.jpg';
-			$config = include $dir . '/gerador.php';
-
+			$config = require $dir . '/gerador.php';
 			$g = new GeraTemplate();
 			$g->gerarTemplate($img,$config,300);
 		} else {

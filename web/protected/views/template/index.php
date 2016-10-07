@@ -20,7 +20,12 @@ $this->menu = [
 			],[
 				'class'=>'uk-button uk-button-link'
 			]);?>
-			<?=CHtml::link('Editar',$this->createUrl('/template/editar',[
+			<?//=CHtml::link('Editar',$this->createUrl('/template/editar',[
+			//	'template'=>$t,
+			//]),[
+			//	'class'=>'uk-button uk-button-link'
+			//]);?>
+			<?=CHtml::link('Editar gerador',$this->createUrl('/template/editarSaida',[
 				'template'=>$t,
 			]),[
 				'class'=>'uk-button uk-button-link'

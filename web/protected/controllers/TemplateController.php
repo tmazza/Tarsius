@@ -62,6 +62,34 @@ class TemplateController extends BaseController {
 		]);
 	}
 
+	public function actionEditarSaida($template)
+	{
+		$dir = Yii::app()->params['templatesDir'] . '/' . $template ;
+		if(!file_exists($dir.'/gerador.php')){
+			echo 'erro'; exit;	
+		}
+
+		$file = $dir.'/gerador.php';
+		$h = fopen($file,'r');
+		$content = fread($h, filesize($file));
+		fclose($h);
+
+		if(isset($_POST['config'])){
+			$content = $_POST['config'];
+			$content = trim(str_replace('<?phpre', "<?php\nre", $content));
+			$h = fopen($file,'w+');
+			fwrite($h, $content);
+			fclose($h);
+		}
+
+
+		$this->render('edicaoSaida',[
+			'template' => $template,
+			'content' => $content,
+		]);
+
+	}	
+
 	private function regiosFormatadas($config){
 		$regioes = $config['regioes'];
 		$formatadas = [];
@@ -153,14 +181,13 @@ class TemplateController extends BaseController {
 	 * 			boolean: deve ser explicitada a intenção da ordem, caso não deva
 	 *				  ser aplica nenhuma ordem o valor false deve ser informado.
 	 *			callback: será aplicada na lista de elemento selecionadas usando
-	 *				usor() (http://php.net/manual/pt_BR/function.usort.php)
+	 *				usort() (http://php.net/manual/pt_BR/function.usort.php)
 	 */
 	public function getFormatoSaida(){
 		return $this->array2Str([
-		    'ausente' => 'eAusente',
 		    'respostas' => [
 		      'match' => '/^e-.*-\d$/',
-		      'order' => false
+		      'order' => false,
 		    ],
 	    ]);
 	}
@@ -169,11 +196,11 @@ class TemplateController extends BaseController {
 	    $str = '';
 	    foreach ($array as $k => $v) {
 	    	if(is_string($v)){
-	    		$str .= "'{$k}' => '$v',";
+	    		$str .= "'{$k}' => '$v',\n";
 	    	} else if(is_bool($v)) {
-	    		$str .= "'{$k}' => " . ($v ? 'true' : 'false') . ",";
+	    		$str .= "'{$k}' => " . ($v ? 'true' : 'false') . ",\n";
 	    	} else {
-	    		$str .= "'{$k}' => " . $this->array2Str($v) . ",";
+	    		$str .= "'{$k}' => " . $this->array2Str($v) . ",\n";
 	    	}
 	    }
 	    return "[{$str}]";
