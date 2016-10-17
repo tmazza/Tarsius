@@ -19,6 +19,7 @@ class ProcessaCommand extends CConsoleCommand {
 		try {
 			$this->exec($dirIn,$dirOut,$trabId);
 		} catch(Exception $e) {
+			# TODO: devolver imagens e mudar status do processo
 			$erro = new Erro;
 			$erro->trabalho_id = $trabId;
 			$erro->texto = $e->getMessage() . json_encode($e);

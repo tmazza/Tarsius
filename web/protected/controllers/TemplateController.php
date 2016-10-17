@@ -90,6 +90,15 @@ class TemplateController extends BaseController {
 
 	}	
 
+	public function actionExcluir($template)
+	{
+		$dir = Yii::app()->params['templatesDir'] . '/' . $template ;
+		if(is_dir($dir)){
+			CFileHelper::removeDirectory($dir);
+		}
+		$this->redirect($this->createUrl('/template/index'));
+	}
+
 	private function regiosFormatadas($config){
 		$regioes = $config['regioes'];
 		$formatadas = [];

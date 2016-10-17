@@ -30,6 +30,12 @@ $this->menu = [
 			]),[
 				'class'=>'uk-button uk-button-link'
 			]);?>
+			<?=CHtml::link('<i class="uk-icon uk-icon-trash"></i>',$this->createUrl('/template/excluir',[
+				'template'=>$t,
+			]),[
+				'class'=>'uk-button uk-button-link',
+				'confirm'=>'Certeza?'
+			]);?>
 			</div>
 		</li>
 	<?php endforeach; ?>
