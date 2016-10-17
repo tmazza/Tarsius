@@ -69,6 +69,13 @@ class Image {
       $this->inicializar($arquivo,$resolucao);
       $this->localizarAncoras();
 
+      # atualiza escala com valor avaliado
+      $anc1 = $this->ancoras[1]->getCentro();
+      $anc4 = $this->ancoras[4]->getCentro();
+      $avaliado = Helper::distBC($anc1,$anc4);
+      $esperado = $this->medidas['distAncVer'];
+      $this->setEscala(bcdiv($avaliado,$esperado));
+
       // $aaa = microtime(true);
       // $ocr = new Barcode($this);
       // $barcode = $ocr->exec();
@@ -267,9 +274,8 @@ class Image {
      * @param type $escala
      */
     public function setEscala($escala) {
-        ///
-        // $this->escala = $escala;
-        // $this->distancias = $this->defineDistancias($this->medidas); # atualiza valor do tempolate de milimetros para pixels!
+        $this->escala = $escala;
+        $this->distancias = $this->defineDistancias($this->medidas); 
     }
 
     /**
