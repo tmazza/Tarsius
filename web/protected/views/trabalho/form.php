@@ -63,6 +63,20 @@ $this->menu = [
 		</div>
 	</div>
 	<br>
+	<div class="uk-form-row">
+	    <?php echo $form->labelEx($model,'export',['class'=>'uk-form-label']); ?>
+
+	    <div class="uk-form-controls">
+		    <?php echo $form->textArea($model,'export',[
+		    	'id'=>'taxPre',
+		    	'style'=>'width:100%;min-height:200px;',
+		    ]); 
+
+		    ?>
+		    <?php echo $form->error($model,'export'); ?>
+		</div>
+	</div>
+	<br>
 	<div class="uk-row">
 	    <?php echo CHtml::submitButton('Gravar',['class'=>'uk-button']); ?>
 	</div>
