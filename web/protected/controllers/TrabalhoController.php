@@ -142,6 +142,12 @@ class TrabalhoController extends BaseController {
 	}
 
 	public function actionUpdateVer($id){
+		$erros = Erro::model()->findAll("trabalho_id = $id");
+		if(count($erros) > 0){
+			echo CHtml::link('Erros encontrados',$this->createUrl('/trabalho/verErros',[
+				'id' => (int) $id,
+			])) . '<br>';
+		}
 		$this->renderPartial('_ver',$this->getInfoTrabalho($id));
 	}
 
@@ -169,7 +175,7 @@ class TrabalhoController extends BaseController {
 	    foreach ($finalizadas as $f) {
 	       $conteudo = json_decode($f->conteudo,true);
 	       if(isset($conteudo['saidaFormatada'])){
-	        $this->export($f,$conteudo['saidaFormatada'],basename($conteudo['arquivo']));
+	        $this->export($id,$f,$conteudo['saidaFormatada'],basename($conteudo['arquivo']));
 	      }
 	    }
 	    $qtd = count($finalizadas);
@@ -183,7 +189,7 @@ class TrabalhoController extends BaseController {
 			$model = Distribuido::model()->findByPk((int)$id);
 			$output = json_decode($model->resultado->conteudo,true);
 	        if(isset($output['saidaFormatada'])) {
-	        	$this->export($model->resultado,$output['saidaFormatada'],$model->nome);
+	        	$this->export($model->trabalho_id, $model->resultado,$output['saidaFormatada'],$model->nome);
 	        	Yii::app()->user->setFlash('success','Export realizado.');
 	        } else {
 	        	Yii::app()->user->setFlash('error','Falha ao exportar.');
@@ -193,7 +199,7 @@ class TrabalhoController extends BaseController {
 	        ]));
 		}
 
-	  private function export($controleExportada,$valor,$NomeArquivo){
+	  private function export($id,$controleExportada,$valor,$NomeArquivo){
 	      $export = [
 	        'Ausente' => 'ausente',
 	        'RespostasOriginais' => 'respostas',
@@ -202,8 +208,8 @@ class TrabalhoController extends BaseController {
 	        return $valor[$i];
 	      },$export);
 	      try {
-	        $model = new Leitura;
-	        $model->NomeArquivo = substr($NomeArquivo, 0,-4);
+	        $model = new Leitura();
+	      	$model->NomeArquivo = substr($NomeArquivo, 0,-4);
 	        $model->attributes = $export;
 
 	        if($model->validate()){
@@ -212,12 +218,34 @@ class TrabalhoController extends BaseController {
 	            $controleExportada->update(['exportado']);
 	          }
 	        } else {
-	          HView::fMsg(json_encode($model->getErrors()));
-	        }
+        	  throw new Exception(json_encode($model->getErrors()), 1);
+			}
 	      } catch(Exception $e){
-	      	HView::fMsg($e->getMessage());
+	        $erro = new Erro;
+	        $erro->trabalho_id = $id;
+	        $erro->texto = $e->getMessage() . ' | ' . json_encode($e);
+	        $erro->read = 0;
+	        $erro->save();
 	      }
 	  }
 
+	  public function actionVerErros($id)
+	  {
+	  	$erros = Erro::model()->findAll("trabalho_id = $id");
+	  	$this->render('erros',[
+	  		'erros' => $erros,
+	  		'id' => $id,
+	  	]);
+	  }
+
+	  public function actionDeleteErro($id)
+	  {
+	  	$model = Erro::model()->findByPk((int) $id);
+	  	$trabId = $model->trabalho_id;
+	  	$model->delete();
+	  	$this->redirect($this->createUrl('/trabalho/verErros',[
+	  		'id' => $trabId,
+	  	]));
+	  }
 
 }

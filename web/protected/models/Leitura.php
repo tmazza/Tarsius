@@ -61,16 +61,7 @@ class Leitura extends CActiveRecord {
 	}
 
 	public function getDbConnection() {
-		return $db=Yii::app()->dbExport;
-	    if(self::$db!==null)
-	        return self::$db;
-	    else
-	    {
-	        if(self::$db instanceof CDbConnection)
-	            return self::$db;
-	        else
-	            throw new CDbException(Yii::t('yii','Active Record requires a "dbExport" CDbConnection application component.'));
-	    }
+		return Yii::app()->dbExport;
 	}
 
 }

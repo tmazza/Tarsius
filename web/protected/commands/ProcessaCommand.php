@@ -16,6 +16,18 @@ class ProcessaCommand extends CConsoleCommand {
 	}
 
 	public function actionIndex($dirIn=false,$dirOut=false,$trabId=false){
+		try {
+			$this->exec($dirIn,$dirOut,$trabId);
+		} catch(Exception $e) {
+			$erro = new Erro;
+			$erro->trabalho_id = $trabId;
+			$erro->texto = $e->getMessage() . json_encode($e);
+			$erro->read = 0;
+			$erro->save();
+		}
+	}
+
+	private function exec($dirIn,$dirOut,$trabId){
 		$this->criaValidaDiretorios($dirIn,$dirOut,$trabId);
 		
 		$files = array_filter(scandir($this->dirIn),function($i) { 
