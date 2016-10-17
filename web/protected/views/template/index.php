@@ -30,6 +30,26 @@ $this->menu = [
 			]),[
 				'class'=>'uk-button uk-button-link'
 			]);?>
+			<div class="uk-button">Reprocessa: </div>
+			<?=CHtml::link(' 1',$this->createUrl('/template/Reprocessar',[
+				'template'=>$t,
+				'tipo'=>1,
+			]),[
+				'class'=>'uk-button uk-button-link'
+			]);?>
+			<?=CHtml::link(' 2',$this->createUrl('/template/Reprocessar',[
+				'template'=>$t,
+				'tipo'=>2,
+			]),[
+				'class'=>'uk-button uk-button-link'
+			]);?>
+			<?=CHtml::link(' 4',$this->createUrl('/template/Reprocessar',[
+				'template'=>$t,
+				'tipo'=>4,
+			]),[
+				'class'=>'uk-button uk-button-link'
+			]);?>
+			<div class="uk-button"> | </div>
 			<?=CHtml::link('<i class="uk-icon uk-icon-trash"></i>',$this->createUrl('/template/excluir',[
 				'template'=>$t,
 			]),[

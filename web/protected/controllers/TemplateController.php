@@ -1,6 +1,7 @@
 <?php
 include_once(Yii::getPathOfAlias('webroot') . '/../src/GeraTemplate.php');
-
+include_once(Yii::getPathOfAlias('webroot') . '/../src/GeraTemplateDuasReferencias.php');
+include_once(Yii::getPathOfAlias('webroot') . '/../src/GeraTemplateQuatroReferencias.php');
 class TemplateController extends BaseController {
 
 	public $strFuncoes=[];
@@ -89,6 +90,21 @@ class TemplateController extends BaseController {
 		]);
 
 	}	
+
+	public function actionReprocessar($template,$tipo=1)
+	{
+		$gerador = new GeraTemplate();
+		if($tipo == 2){
+			$gerador = new GeraTemplateDuasReferencias();
+		} elseif ($tipo == 4){
+			$gerador = new GeraTemplateQuatroReferencias();
+		}
+		$dir = Yii::getPathOfAlias('webroot') . '/../data/template/' . $template;
+		$img = $dir . '/base.jpg';
+		$config = include $dir . '/gerador.php';
+		$gerador->gerarTemplate($img,$config,300);
+		$this->redirect($this->createUrl('/template/index'));
+	}
 
 	public function actionExcluir($template)
 	{
