@@ -8,6 +8,7 @@ class ProcessaCommand extends CConsoleCommand {
 	public $dirIn;
 	public $dirOut;
 	public $trabalho;
+	private $resolucao = 300;
 
 	public $dirDoneFile; # Diretório onde arquivos de log serão salvos
 
@@ -53,7 +54,7 @@ class ProcessaCommand extends CConsoleCommand {
 				try {
 					$this->log('Processando ' . $f);
 					$image = new Image($template,$this->trabalho->taxaPreenchimento);
-					$image->exec($arquivo);
+					$image->exec($arquivo,$this->resolucao);
 					$image->output['arquivo'] = $arquivoDest; # TODO: é usado no debug?
 					$imageOutPut = $image->output;
 					$this->log('Processamento realizado ' . $f);

@@ -3,8 +3,10 @@ include_once(Yii::getPathOfAlias('webroot') . '/../../src/GeraTemplate.php');
 include_once(Yii::getPathOfAlias('webroot') . '/../../src/GeraTemplateDuasReferencias.php');
 include_once(Yii::getPathOfAlias('webroot') . '/../../src/GeraTemplateQuatroReferencias.php');
 
+
 class TemplateCommand extends CConsoleCommand {
 
+	private $resolucaoBase = 300;
 	/**
 	 * Usa como referência somente a âncora 1
 	 */
@@ -14,7 +16,7 @@ class TemplateCommand extends CConsoleCommand {
 			$img = $dir . '/base.jpg';
 			$config = require $dir . '/gerador.php';
 			$g = new GeraTemplate();
-			$g->gerarTemplate($img,$config,300);
+			$g->gerarTemplate($img,$config,$this->resolucaoBase);
 		} else {
 			echo "\tQual o nome do template?\n".
 				 "\tUse --nome=<nome> sendo <nome> um diretorio em /data/tempalte\n";
@@ -31,7 +33,7 @@ class TemplateCommand extends CConsoleCommand {
 			$config = include $dir . '/gerador.php';
 
 			$g = new GeraTemplateDuasReferencias();
-			$g->gerarTemplate($img,$config,300);
+			$g->gerarTemplate($img,$config,$this->resolucaoBase);
 		} else {
 			echo "\tQual o nome do template?\n".
 				 "\tUse --nome=<nome> sendo <nome> um diretorio em /data/tempalte\n";
@@ -50,7 +52,7 @@ class TemplateCommand extends CConsoleCommand {
 			$config = include $dir . '/gerador.php';
 
 			$g = new GeraTemplateQuatroReferencias();
-			$g->gerarTemplate($img,$config,300);
+			$g->gerarTemplate($img,$config,$this->resolucaoBase);
 		} else {
 			echo "\tQual o nome do template?\n".
 				 "\tUse --nome=<nome> sendo <nome> um diretorio em /data/tempalte\n";

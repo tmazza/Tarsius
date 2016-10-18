@@ -5,6 +5,7 @@ include_once(Yii::getPathOfAlias('webroot') . '/../src/GeraTemplateQuatroReferen
 class TemplateController extends BaseController {
 
 	public $strFuncoes=[];
+	private $resolucaoBase = 300;
 
 	protected function beforeAction($action){
 		return parent::beforeAction($action);
@@ -102,7 +103,7 @@ class TemplateController extends BaseController {
 		$dir = Yii::getPathOfAlias('webroot') . '/../data/template/' . $template;
 		$img = $dir . '/base.jpg';
 		$config = include $dir . '/gerador.php';
-		$gerador->gerarTemplate($img,$config,300);
+		$gerador->gerarTemplate($img,$config,$this->resolucaoBase);
 		$this->redirect($this->createUrl('/template/index'));
 	}
 
@@ -166,7 +167,7 @@ class TemplateController extends BaseController {
 		$img = $dir . '/base.jpg';
 		$config = include $dir . '/gerador.php';
 		$g = new GeraTemplate();
-		$g->gerarTemplate($img,$config,300);
+		$g->gerarTemplate($img,$config,$this->resolucaoBase);
 	}
 
 	/**
