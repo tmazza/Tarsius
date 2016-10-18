@@ -1,51 +1,129 @@
+-- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
 --
--- File generated with SQLiteStudio v3.1.0 on qui ago 18 14:10:14 2016
+-- Host: imagens-concursos.ufrgs.br    Database: tarsius
+-- ------------------------------------------------------
+-- Server version	5.5.51
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
 --
--- Text encoding used: System
+-- Table structure for table `distribuido`
 --
-PRAGMA foreign_keys = off;
-BEGIN TRANSACTION;
 
--- Table: distribuido
-CREATE TABLE distribuido (
-    id               INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome             VARCHAR,
-    status           INTEGER DEFAULT (0),
-    trabalho_id      INTEGER REFERENCES trabalho (id),
-    tempDir          VARCHAR,
-    dataDistribuicao INT,
-    dataFechamento   INT,
-    output           TEXT,
-    exportado        BOOLEAN DEFAULT (0) 
-);
+DROP TABLE IF EXISTS `distribuido`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `distribuido` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(40) DEFAULT NULL,
+  `status` int(11) DEFAULT '0',
+  `trabalho_id` int(11) DEFAULT NULL,
+  `tempDir` varchar(40) DEFAULT NULL,
+  `dataDistribuicao` int(11) DEFAULT NULL,
+  `dataFechamento` int(11) DEFAULT NULL,
+  `output` text,
+  `exportado` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_distribuido_nome` (`nome`),
+  KEY `isx_distribuido_trabalho` (`trabalho_id`),
+  KEY `idx_distribuido_status` (`status`)
+) ENGINE=InnoDB AUTO_INCREMENT=426 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Table structure for table `erro`
+--
 
--- Table: processo
-CREATE TABLE processo (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    pid         INT,
-    status      INT,
-    trabalho_id INTEGER REFERENCES trabalho (id) ON DELETE CASCADE
-                                                 ON UPDATE CASCADE,
-    workDir     VARCHAR,
-    qtd         INTEGER,
-    dataInicio  INTEGER,
-    dataFim     INTEGER
-);
+DROP TABLE IF EXISTS `erro`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `erro` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `trabalho_id` int(11) DEFAULT NULL,
+  `texto` text,
+  `read` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Table structure for table `finalizado`
+--
 
--- Table: trabalho
-CREATE TABLE trabalho (
-    id                INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome              VARCHAR,
-    sourceDir         VARCHAR,
-    status            INTEGER DEFAULT (0),
-    pid               INTEGER,
-    tempoDistribuicao INTEGER DEFAULT (10),
-    template          TEXT,
-    taxaPreenchimento REAL    DEFAULT (0.3) 
-);
+DROP TABLE IF EXISTS `finalizado`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `finalizado` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(200) DEFAULT NULL,
+  `conteudo` text,
+  `trabalho_id` int(11) DEFAULT NULL,
+  `dataFechamento` int(11) DEFAULT NULL,
+  `exportado` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_finalizado_nome` (`nome`,`trabalho_id`),
+  KEY `idx_finalizado_trab_d` (`trabalho_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=266 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Table structure for table `processo`
+--
 
-COMMIT TRANSACTION;
-PRAGMA foreign_keys = on;
+DROP TABLE IF EXISTS `processo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `processo` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `pid` int(11) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `trabalho_id` int(11) DEFAULT NULL,
+  `workDir` text,
+  `qtd` int(11) DEFAULT NULL,
+  `dataInicio` int(11) DEFAULT NULL,
+  `dataFim` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `trabalho`
+--
+
+DROP TABLE IF EXISTS `trabalho`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `trabalho` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(45) DEFAULT NULL,
+  `sourceDir` text,
+  `status` int(11) DEFAULT '0',
+  `pid` int(11) DEFAULT NULL,
+  `tempoDistribuicao` int(11) DEFAULT '10',
+  `template` text,
+  `taxaPreenchimento` double DEFAULT '0.3',
+  `distribuindo` int(11) DEFAULT '0',
+  `export` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-10-18 14:00:41

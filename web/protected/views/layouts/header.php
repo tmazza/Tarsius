@@ -1,6 +1,6 @@
 <nav class="uk-navbar uk-margin-large-bottom">
     <div class="uk-container uk-container-center" style="padding-top:8px;">
-        <a class="uk-navbar-brand uk-hidden-small" href="#!" style="height:50px;">
+        <a class="uk-navbar-brand uk-hidden-small" href="<?=$this->createUrl('/');?>" style="height:50px;">
             <?=CHtml::image($this->wb . '/img/logo2.png','Logo Tarsius',[
                 'width'=>'140px'
             ]);?>
