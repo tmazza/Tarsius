@@ -18,7 +18,9 @@ $this->menu[] = ['Voltar',$this->createUrl('/trabalho/ver',[
 	?>
 	<li>
 		<hr>
-		<?=$nd->nome;?> 
+		<?=CHtml::link($nd->nome,$this->createUrl('/distribuido/ver',[
+			'id' => $nd->id,
+		]));?> 
 		| <?=CHtml::link("Aplicar máscara com tolerância",$this->createUrl('/Forca/index',[
 			'id'=>$nd->id,
 		]));?>

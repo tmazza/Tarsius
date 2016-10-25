@@ -1,7 +1,7 @@
 <?php
 bcscale(14);
 
-define('DEBUG',true);
+define('DEBUG',false);
 
 define('CORTE_PRETO', 150);
 define('TOLERANCIA_MATCH', 0.4); # eg: areabase  = 1000. busca triangulos de area entre 500 e 1500
@@ -46,6 +46,7 @@ class Image {
     public $coefB;
     
     public $minMatchAncora;
+    public $validaTemplate = true;
 
     public function __construct($template,$preenchimentoMinimo=0.3,$minMatchAncora=0.85) {
       $this->template = $template;
@@ -64,7 +65,7 @@ class Image {
     /**
      * Processa imagem
      */
-    public function exec($arquivo,$resolucao=300) {
+    public function exec($arquivo,$resolucao=200) {
       $this->timeAll = microtime(true);
       $this->inicializar($arquivo,$resolucao);
       $this->localizarAncoras();
@@ -163,7 +164,7 @@ class Image {
 
 
       # Valida template baseado no valor avaliado de alguma região.
-      if(isset($this->medidas['validaReconhecimento']) && $this->medidas['validaReconhecimento']){
+      if($this->validaTemplate && isset($this->medidas['validaReconhecimento']) && $this->medidas['validaReconhecimento']){
         list($regiao,$valorEsperado) = json_decode($this->medidas['validaReconhecimento'],true);
 
         if(isset($this->output['regioes'][$regiao])){
@@ -297,6 +298,7 @@ class Image {
         $this->template = $template;
 
         $templateFile = __DIR__.'/../data/template/' . $template . '/template.json';
+
         $str = file_get_contents($templateFile);
         $data = json_decode($str,true);
 

@@ -155,12 +155,14 @@ class AnalisarRegioes {
   }
 
   private function getPontoNormalizadoQuadruple($r,$d){
-    $cor = imagecolorallocate($this->debugImage, 255, 0, 0); # DEBUG
-    $cor2 = imagecolorallocate($this->debugImage, 0, 255, 0); # DEBUG
-    $cor3 = imagecolorallocate($this->debugImage, 0, 0, 255); # DEBUG
-    $cor4 = imagecolorallocate($this->debugImage, 255, 255, 0); # DEBUG
-    $cor5 = imagecolorallocate($this->debugImage, 0, 0, 0); # DEBUG
-    $cor6 = imagecolorallocate($this->debugImage, 255, 0, 255); # DEBUG
+    if(DEBUG){
+      $cor = imagecolorallocate($this->debugImage, 255, 0, 0); # DEBUG
+      $cor2 = imagecolorallocate($this->debugImage, 0, 255, 0); # DEBUG
+      $cor3 = imagecolorallocate($this->debugImage, 0, 0, 255); # DEBUG
+      $cor4 = imagecolorallocate($this->debugImage, 255, 255, 0); # DEBUG
+      $cor5 = imagecolorallocate($this->debugImage, 0, 0, 0); # DEBUG
+      $cor6 = imagecolorallocate($this->debugImage, 255, 0, 255); # DEBUG
+    }
 
     list($p1,$p3) = $r[1];
     list($p2,$p4) = $r[2];
@@ -175,10 +177,12 @@ class AnalisarRegioes {
     $p2 = [bcadd($p2[0],$ancora2[0]),bcadd($p2[1],$ancora2[1])];
     $p4 = [bcadd($p4[0],$ancora4[0]),bcadd($p4[1],$ancora4[1])];
 
-    imagefilledellipse($this->debugImage, $ancora1[0], $ancora1[1], 3, 3, $cor3); # DEBUG
-    imagefilledellipse($this->debugImage, $ancora3[0], $ancora3[1], 3, 3, $cor4); # DEBUG
-    imagefilledellipse($this->debugImage, $ancora2[0], $ancora2[1], 3, 3, $cor); # DEBUG
-    imagefilledellipse($this->debugImage, $ancora4[0], $ancora4[1], 3, 3, $cor2); # DEBUG
+    if(DEBUG){
+      imagefilledellipse($this->debugImage, $ancora1[0], $ancora1[1], 3, 3, $cor3); # DEBUG
+      imagefilledellipse($this->debugImage, $ancora3[0], $ancora3[1], 3, 3, $cor4); # DEBUG
+      imagefilledellipse($this->debugImage, $ancora2[0], $ancora2[1], 3, 3, $cor); # DEBUG
+      imagefilledellipse($this->debugImage, $ancora4[0], $ancora4[1], 3, 3, $cor2); # DEBUG
+    }
 
     $p1 = Helper::rotaciona($p1,$ancora1,$this->image->rot);
     $p3 = Helper::rotaciona($p3,$ancora3,$this->image->rot);
@@ -194,13 +198,17 @@ class AnalisarRegioes {
     $minY = min($p1[1],$p3[1]); $maxY = max($p1[1],$p3[1]);
     $px1 = (($maxX - $minX) / 2) + $minX;
     $py1 = (($maxY - $minY) / 2) + $minY;
-    imagefilledellipse($this->debugImage, $px1, $py1, 3, 3, $cor5); # DEBUG
+    if(DEBUG){
+      imagefilledellipse($this->debugImage, $px1, $py1, 3, 3, $cor5); # DEBUG
+    }
 
     $minX = min($p2[0],$p4[0]); $maxX = max($p2[0],$p4[0]);
     $minY = min($p2[1],$p4[1]); $maxY = max($p2[1],$p4[1]);
     $px2 = (($maxX - $minX) / 2) + $minX;
     $py2 = (($maxY - $minY) / 2) + $minY;
-    imagefilledellipse($this->debugImage, $px2, $py2, 3, 3, $cor6); # DEBUG
+    if(DEBUG){
+      imagefilledellipse($this->debugImage, $px2, $py2, 3, 3, $cor6); # DEBUG
+    }
 
     $pf1 = [$px1,$py1];
     $pf2 = [$px2,$py2];
@@ -208,7 +216,9 @@ class AnalisarRegioes {
     $minY = min($pf1[1],$pf2[1]); $maxY = max($pf1[1],$pf2[1]);
     $px = (($maxX - $minX) / 2) + $minX;
     $py = (($maxY - $minY) / 2) + $minY;
-    imagefilledellipse($this->debugImage, $px, $py, 3, 3, $cor); # DEBUG
+    if(DEBUG){
+      imagefilledellipse($this->debugImage, $px, $py, 3, 3, $cor); # DEBUG
+    }
 
     return [$px,$py];
   }

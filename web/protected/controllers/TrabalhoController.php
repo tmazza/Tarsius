@@ -142,12 +142,26 @@ class TrabalhoController extends BaseController {
 	}
 
 	public function actionUpdateVer($id){
+		$finalizadas = Finalizado::model()->findAll([
+	      'condition'=>"trabalho_id=$id AND exportado=0 AND conteudo IS NOT NULL",
+	      'limit'=>8,
+	    ]);
+	    foreach ($finalizadas as $f) {
+	       $conteudo = json_decode($f->conteudo,true);
+	       if(isset($conteudo['saidaFormatada'])){
+	        $this->export($id,$f,$conteudo['saidaFormatada'],basename($conteudo['arquivo']));
+	      }
+	    }
+
 		$erros = Erro::model()->findAll("trabalho_id = $id");
 		if(count($erros) > 0){
 			echo CHtml::link('Erros encontrados',$this->createUrl('/trabalho/verErros',[
 				'id' => (int) $id,
 			])) . '<br>';
 		}
+
+
+
 		$this->renderPartial('_ver',$this->getInfoTrabalho($id));
 	}
 

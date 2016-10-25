@@ -13,9 +13,9 @@ class OCR {
     $path = __DIR__ . '/../data/runtime/' . $tempFile . '.png';
 
     $output = $this->run($path);
-    if(!DEBUG){
+    // if(!DEBUG){
       unlink($path);
-    }
+    // }
 
     return preg_replace('/[^0-9]/','', $output);
   }

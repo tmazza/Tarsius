@@ -8,7 +8,7 @@ class ProcessaCommand extends CConsoleCommand {
 	public $dirIn;
 	public $dirOut;
 	public $trabalho;
-	private $resolucao = 300;
+	private $resolucao = 200;
 
 	public $dirDoneFile; # Diretório onde arquivos de log serão salvos
 
@@ -31,7 +31,7 @@ class ProcessaCommand extends CConsoleCommand {
 
 	private function exec($dirIn,$dirOut,$trabId){
 		$this->criaValidaDiretorios($dirIn,$dirOut,$trabId);
-		
+			
 		$files = array_filter(scandir($this->dirIn),function($i) { 
 		  return pathinfo($i, PATHINFO_EXTENSION) == 'jpg'; 
 		});

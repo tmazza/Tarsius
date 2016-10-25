@@ -22,7 +22,8 @@ class ReprocessaController extends BaseController {
 			$ok = true;
 			try {
 				$image = new Image($model->trabalho->template,$model->trabalho->taxaPreenchimento);
-				$image->execComAncoras($model->trabalho->sourceDir.'/'.$model->nome,$pontos);
+				$image->validaTemplate = false;
+				$image->execComAncoras($model->trabalho->sourceDir.'/'.$model->nome,$pontos,200);
 				$model->resultado->conteudo = json_encode($image->output);
 				$model->resultado->update(['conteudo']);
 			} catch (Exception $e) {
@@ -38,7 +39,7 @@ class ReprocessaController extends BaseController {
 			} else {
 				$this->redirect($this->createUrl('/reprocessa/ancora',[
 					'id'=>$model->id,
-					'msg'=>$msg . ' | com ' . $minMatch,
+					'msg'=>$msg . ' | com ',
 				]));
 			}
 		} else {
