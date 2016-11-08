@@ -14,7 +14,6 @@ class Buscador {
      * @param type $image
      * @param type $obj
      * @param type $ponto
-     * TODO: algoritmo para expansao do quadrado caso objeto não seja encontrado com area inicial.
      */
     public function find($image, $objProcurado, $ponto) {
         $areaDeBusca = $this->areaBuscaInicial; // tamanho da aresta do quadrado de busca com centro em $ponto
@@ -23,7 +22,7 @@ class Buscador {
 
         do {
             $match = $this->analisaQuadrado($image, $objProcurado, $ponto, $areaDeBusca);
-            # TODO: não refazer quadrados já análisados
+            # TODO: não refazer quadrados já análisados | somente expandir região
             $areaDeBusca *= (1 + EXPANSAO_BUSCA);
             $qtdExpansoes--;
         } while (!$match && $qtdExpansoes > 0);

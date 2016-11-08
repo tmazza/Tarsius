@@ -95,7 +95,8 @@ class Image {
     /**
      * Processa imagem recebendo a posição das âncporas
      */
-    public function execComAncoras($arquivo,$pontos,$resolucao=300) {
+    public function execComAncoras($arquivo,$pontos,$resolucao=false) {
+      $resolucao = $resolucao ? $resolucao : $this->resolucao;
       $this->inicializar($arquivo,$resolucao);
       $this->setAncoras($pontos);
       $this->analisarRegioes();
@@ -177,8 +178,7 @@ class Image {
           }
         } else {
           throw new Exception("Template não reconhecido, região não encontrada.", 1);
-        }
-        
+        }        
       }
 
       $saida = array_map(function($i) { return $i[0]; },$this->output['regioes']); 
