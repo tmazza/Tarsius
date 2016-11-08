@@ -23,7 +23,7 @@ class ReprocessaController extends BaseController {
 			try {
 				$image = new Image($model->trabalho->template,$model->trabalho->taxaPreenchimento);
 				$image->validaTemplate = false;
-				$image->execComAncoras($model->trabalho->sourceDir.'/'.$model->nome,$pontos,200);
+				$image->execComAncoras($model->trabalho->sourceDir.'/'.$model->nome,$pontos,300);
 				$model->resultado->conteudo = json_encode($image->output);
 				$model->resultado->update(['conteudo']);
 			} catch (Exception $e) {

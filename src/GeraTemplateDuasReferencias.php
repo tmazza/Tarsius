@@ -1,11 +1,13 @@
+
 <?php
 class GeraTemplateDuasReferencias extends GeraTemplate
 {
 
   public $refAncoras = 2;
-
-  public function gerarTemplate($arquivo,$config,$resolucao=300)
+  
+  public function gerarTemplate($arquivo,$config,$resolucao=false)
   {
+    $resolucao = $resolucao ? $resolucao : $this->resolucao;
     $this->init($arquivo,$resolucao);
     $regioes = [];
     foreach ($config['regioes'] as $cb) { # Configuracao Bloco

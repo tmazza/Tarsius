@@ -37,7 +37,7 @@ class Image {
     public $ancoras = array();
     public $rot = 0; // em radianos
     public $template;
-    public $resolucao = false; # Em dpi
+    public $resolucao = 300; # Em dpi
     public $formatoSaida = false;
 
     public $output = array();
@@ -65,7 +65,8 @@ class Image {
     /**
      * Processa imagem
      */
-    public function exec($arquivo,$resolucao=200) {
+    public function exec($arquivo,$resolucao=false) {
+      $resolucao = $resolucao ? $resolucao : $this->resolucao;
       $this->timeAll = microtime(true);
       $this->inicializar($arquivo,$resolucao);
       $this->localizarAncoras();

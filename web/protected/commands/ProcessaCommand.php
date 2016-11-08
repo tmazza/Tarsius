@@ -8,7 +8,7 @@ class ProcessaCommand extends CConsoleCommand {
 	public $dirIn;
 	public $dirOut;
 	public $trabalho;
-	private $resolucao = 200;
+	private $resolucao = 300;
 
 	public $dirDoneFile; # Diretório onde arquivos de log serão salvos
 

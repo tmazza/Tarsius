@@ -214,36 +214,36 @@ class TrabalhoController extends BaseController {
 		}
 
 	  private function export($id,$controleExportada,$valor,$NomeArquivo){
-	      try {
-			$trabalho = Trabalho::model()->findByPk((int) $id);
-			if(is_null($trabalho)){
-			  throw new Exception('', 1);
-			} else {
-				$export = json_decode($trabalho->export,true);
-				$export = array_map(function($i) use($valor) {
-					return $valor[$i];
-				},$export);
+	  //     try {
+			// $trabalho = Trabalho::model()->findByPk((int) $id);
+			// if(is_null($trabalho)){
+			//   throw new Exception('', 1);
+			// } else {
+			// 	$export = json_decode($trabalho->export,true);
+			// 	$export = array_map(function($i) use($valor) {
+			// 		return $valor[$i];
+			// 	},$export);
 
-				$model = new Leitura();
-				$model->NomeArquivo = substr($NomeArquivo, 0,-4);
-				$model->attributes = $export;
+			// 	$model = new Leitura();
+			// 	$model->NomeArquivo = substr($NomeArquivo, 0,-4);
+			// 	$model->attributes = $export;
 
-				if($model->validate()){
-				  if($model->save()){
-				    $controleExportada->exportado=1;
-				    $controleExportada->update(['exportado']);
-				  }
-				} else {
-				  throw new Exception(json_encode($model->getErrors()), 1);
-				}
-			}
-	      } catch(Exception $e){
-	        $erro = new Erro;
-	        $erro->trabalho_id = $id;
-	        $erro->texto = $e->getMessage() . ' | ' . json_encode($e);
-	        $erro->read = 0;
-	        $erro->save();
-	      }
+			// 	if($model->validate()){
+			// 	  if($model->save()){
+			// 	    $controleExportada->exportado=1;
+			// 	    $controleExportada->update(['exportado']);
+			// 	  }
+			// 	} else {
+			// 	  throw new Exception(json_encode($model->getErrors()), 1);
+			// 	}
+			// }
+	  //     } catch(Exception $e){
+	  //       $erro = new Erro;
+	  //       $erro->trabalho_id = $id;
+	  //       $erro->texto = $e->getMessage() . ' | ' . json_encode($e);
+	  //       $erro->read = 0;
+	  //       $erro->save();
+	  //     }
 	  }
 
 	  public function actionVerErros($id)

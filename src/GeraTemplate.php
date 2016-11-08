@@ -1,3 +1,4 @@
+
 <?php
 
 define('DEBUG',true);
@@ -6,8 +7,8 @@ define('CORTE_PRETO', 150);
 define('TOLERANCIA_MATCH', 0.4); # eg: areabase  = 1000. busca triangulos de area entre 500 e 1500
 define('EXPANSAO_BUSCA', 0.4); # taxa de aumento da área de busca
 define('QTD_EXPANSOES_BUSCA', 10);
-
 define('MATCH_ANCORA', 0.85);
+
 include_once __DIR__.'/Buscador.php';
 include_once __DIR__.'/BuscarAncoras.php';
 include_once __DIR__.'/Objeto.php';
@@ -36,8 +37,8 @@ class GeraTemplate {
   public $ancoraBase;
 
   public $escala;
-  public $resolucao;
-
+  protected $resolucao = 300;
+  
   public $qtdExpansoes;
   public $assAncoras;
 
@@ -60,7 +61,8 @@ class GeraTemplate {
    *                - casoFalse: string ou function valor retornado caso elipse não esteja preenchida
    *
    */
-  public function gerarTemplate($arquivo,$config,$resolucao=300){
+  public function gerarTemplate($arquivo,$config,$resolucao=false){
+    $resolucao = $resolucao ? $resolucao : $this->resolucao;
     $this->init($arquivo,$resolucao);
     $regioes = [];
     foreach ($config['regioes'] as $cb) { # Configuracao Bloco
