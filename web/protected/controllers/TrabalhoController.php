@@ -130,12 +130,18 @@ class TrabalhoController extends BaseController {
 		$trabalho->solicitaPausaProcessos();
 
 		// Aguarda até que todos os arquivos sejam devolvidos para sourceDir
-		while($trabalho->qtdProcessosAtivos() > 0)
+		while($trabalho->qtdProcessosAtivos() > 0){
 			sleep(1);
+		}
 
+		# apaga registros
 		Processo::model()->deleteAll("trabalho_id = {$trabalho->id}");
 		Distribuido::model()->deleteAll("trabalho_id = {$trabalho->id}");
 		Finalizado::model()->deleteAll("trabalho_id = {$trabalho->id}");
+
+		# apaga arquivos de imagens de resultado de imagem processada
+		$dir = Yii::getPathOfAlias('webroot') . '/../data/runtime/trab-' . $trabalho->id;
+		CFileHelper::removeDirectory($dir);
 
 		$this->redirect($this->createUrl('/trabalho/ver',['id'=>$trabalho->id]));
 
