@@ -74,7 +74,6 @@ class GeraTemplate {
         list($x1,$y1) = $cb['p1'];
         list($x2,$y2) = $cb['p2'];
 
-        echo $x1 . ' | ' . $y1 . ' | ' . $x2 . ' | ' . $y2 . "\n";
         $x1 = ($x1 - $this->ancoraBase[0])/$this->escala; # Converte para milimetros
         $y1 = ($y1 - $this->ancoraBase[1])/$this->escala; # Converte para milimetros
         $x2 = ($x2 - $this->ancoraBase[0])/$this->escala; # Converte para milimetros
@@ -101,11 +100,12 @@ class GeraTemplate {
    * da folha. 
    */
   protected function criaArquivoTemplate($config,$regioes,$baseDir){
+    list($horizontal,$vertical) = $this->getDistanciaAncoras();
     $content = [
       'raioTriangulo' => (14 * sqrt(2)) / 2, # diagonal / 2
       'ancora1' => [$this->ancoraBase[0]/$this->escala,$this->ancoraBase[1]/$this->escala],
-      'distAncHor' => 126,
-      'distAncVer' => 189,
+      'distAncHor' => $horizontal,
+      'distAncVer' => $vertical,
       'elpAltura' => 2.5,
       'elpLargura' => 4.36,
       'regioes' => $regioes,
@@ -118,6 +118,17 @@ class GeraTemplate {
     $h = fopen($file,'w+');
     fwrite($h, json_encode($content,JSON_PRETTY_PRINT));
     fclose($h);
+  }
+
+  private function getDistanciaAncoras()
+  {
+    $ancoras = $this->getAncoras();
+    $a1 = $ancoras[1]->getCentro();
+    $a2 = $ancoras[3]->getCentro();
+    $a4 = $ancoras[4]->getCentro();
+    $horizontal = bcdiv(bcsub($a2[0],$a1[1]), $this->escala);
+    $vertical   = bcdiv(bcsub($a4[1],$a1[1]), $this->escala);
+    return [(float)$horizontal,(float)$vertical];
   }
 
   /**
