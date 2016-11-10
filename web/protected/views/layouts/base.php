@@ -5,8 +5,10 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Tarsius</title>
-        <link rel="apple-touch-icon-precomposed" href="images/apple-touch-icon.png">
         <link rel="stylesheet" href="<?=$this->wb;?>/uikit/css/uikit.min.css">
+
+        <link rel="icon" type="image/png" sizes="16x16" href="<?=$this->wb?>/img/favicon.png?v1">
+
         <script src="<?=$this->wb;?>/uikit/js/uikit.min.js"></script>
     </head>
 
