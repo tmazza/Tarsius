@@ -66,7 +66,6 @@ class Image {
      * Processa imagem
      */
     public function exec($arquivo,$resolucao=false) {
-      $resolucao = $resolucao ? $resolucao : $this->resolucao;
       $this->timeAll = microtime(true);
       $this->inicializar($arquivo,$resolucao);
       $this->localizarAncoras();
@@ -96,7 +95,6 @@ class Image {
      * Processa imagem recebendo a posição das âncporas
      */
     public function execComAncoras($arquivo,$pontos,$resolucao=false) {
-      $resolucao = $resolucao ? $resolucao : $this->resolucao;
       $this->inicializar($arquivo,$resolucao);
       $this->setAncoras($pontos);
       $this->analisarRegioes();
@@ -118,16 +116,28 @@ class Image {
     * Busca imagem e converte para cinza
     */
     protected function inicializar($arquivo,$resolucao){
-      $this->resolucao = $resolucao;
-      $this->depoisDeDefinirResolucao();
-      if(DEBUG)
-        $time = microtime(true);
+      if(DEBUG) $time = microtime(true);
+
       $this->arquivo = $arquivo;
+      // $this->resolucao = $resolucao ? $resolucao : $this->getResolucao();
+      $this->resolucao = $this->getResolucao();
+      $this->depoisDeDefinirResolucao();
       $this->image = Helper::load($arquivo);
       if (!imagefilter($this->image, IMG_FILTER_GRAYSCALE))
         throw new Exception('Imagem não pode ser convertida para tons de cinza.', 500);
-      if(DEBUG)
-        $this->saveTime('_inicializar', $time);
+
+      if(DEBUG) $this->saveTime('_inicializar', $time);
+    }
+
+    private function getResolucao()
+    {
+      $a = fopen($this->arquivo,'r');
+      $string = fread($a,20);
+      fclose($a);
+      $data = bin2hex(substr($string,14,4));
+      $x = hexdec(substr($data,0,4));
+      $y = hexdec(substr($data,4,4));
+      return $x == $y ? $x : 300;      
     }
 
     /**
