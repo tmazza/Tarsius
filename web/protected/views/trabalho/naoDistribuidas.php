@@ -18,19 +18,44 @@ $this->menu[] = ['Voltar',$this->createUrl('/trabalho/ver',[
 	?>
 	<li>
 		<hr>
-		<?=CHtml::link($nd->nome,$this->createUrl('/distribuido/ver',[
-			'id' => $nd->id,
-		]));?> 
-		| <?=CHtml::link("Aplicar máscara com tolerância",$this->createUrl('/Forca/index',[
-			'id'=>$nd->id,
-		]));?>
-		| <?=CHtml::link("Informar âncoras manualmente",$this->createUrl('/reprocessa/ancora',['id'=>$nd->id,]));?>
-		<?php $linkImg = str_replace('repositorios', '..', $trabalho->sourceDir).'/'.$nd->nome; ?>
-		<?=CHtml::image($linkImg,'',[
-			'class'=>'zoom',
-			'data-zoom-imag'=>$linkImg,
-		]);?>
-
+		<ul>
+			<li>
+				<?=CHtml::link("Aplicar máscara com tolerância",$this->createUrl('/Forca/index',[
+					'id'=>$nd->id,
+				]));?>
+			</li>
+			<li>
+			<?=CHtml::link("Informar âncoras manualmente",$this->createUrl('/reprocessa/ancora',['id'=>$nd->id,]));?>
+			</li>
+		</ul>
+		<br>
+		<div class="uk-grid">
+			<div class="uk-width-1-2">
+				<?php $linkImg = str_replace('repositorios', '..', $trabalho->sourceDir).'/'.$nd->nome; ?>
+				<?=CHtml::image($linkImg,'',[
+					'class'=>'zoom',
+					'data-zoom-imag'=>$linkImg,
+					'style'=>'width:320px',
+				]);?>
+			</div>
+			<div class="uk-width-1-2">
+				<?php
+				try {
+					if(is_null($nd)){
+						throw new Exception("Registro finalizado ID:'$id' não encontrado.", 3);
+					} else {
+						$debugImage = DistribuidoController::getDebugImage($nd,1);
+						$this->renderPartial('/distribuido/ver',[
+							'model'=>$nd,
+							'debugImage'=>$debugImage,
+						]);
+					}
+				} catch(Exception $e){
+					echo $e->getMessage();
+				}
+				?>
+			</div>
+		</div>
 	</li>
 <?php endforeach; ?>
 </ul>

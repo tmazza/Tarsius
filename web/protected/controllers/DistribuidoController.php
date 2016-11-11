@@ -9,7 +9,7 @@ class DistribuidoController extends BaseController {
 			if(is_null($model)){
 				throw new Exception("Registro finalizado ID:'$id' não encontrado.", 3);
 			} else {
-				$debugImage = $this->getDebugImage($model,$renovar);
+				$debugImage = self::getDebugImage($model,$renovar);
 
 				$this->render('ver',[
 					'model'=>$model,
@@ -25,7 +25,7 @@ class DistribuidoController extends BaseController {
 
 	}
 
-	private function getDebugImage($dist,$renovar=false){		
+	public static function getDebugImage($dist,$renovar=false){		
 		$baseDir	 = __DIR__ . '/../../../data/runtime/trab-'.$dist->trabalho->id;
 		$file = $dist->nome;
 
