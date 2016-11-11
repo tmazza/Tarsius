@@ -3,19 +3,23 @@ class ComparaCommand extends CConsoleCommand {
 
 	public $trabalho;
 	public $concurso;
+	public $folha;
 
-	private function inicializar($trabalho,$concurso){
+	private function inicializar($trabalho,$concurso,$folha){
 		if(!$trabalho)
 			throw new Exception('Trabalho não informado. Use --trabalho=<trabalho_id>', 500);
 		$this->trabalho = $trabalho;
 		if(!$concurso)
 			throw new Exception('Concurso não informado. Use --concurso=<CodConcurso>', 500);
 		$this->concurso = $concurso;
+		if(!$folha)
+			throw new Exception('Folha não informada. Use --folha=<FolhaLeitura>', 500);
+		$this->folha = $folha;
 	}
 
-	public function actionIndex($trabalho=false,$concurso=false){
+	public function actionIndex($trabalho=false,$concurso=false,$folha=false){
 		try {
-			$this->inicializar($trabalho,$concurso);
+			$this->inicializar($trabalho,$concurso,$folha);
 			$this->processaResultados();		
 		} catch(Exception $e) {
 			echo $e->getMessage() . "\n";			
@@ -26,7 +30,7 @@ class ComparaCommand extends CConsoleCommand {
 		$data = Yii::app()->dbExport->createCommand()
 				->select('NomeArquivo,RespostasOriginais')
 				->from('dbo.LEITURA')
-				->where('Concurso = ' . $this->concurso)
+				->where('Concurso = ' . $this->concurso . ' AND FolhaLeitura=' . $this->folha)
 				->queryAll();
 		$iguais = $naoEncontradas = $respNaoDefinida = $diferencas = [];
 		$count = 0;
@@ -84,7 +88,7 @@ class ComparaCommand extends CConsoleCommand {
 
 		$dir = __DIR__ . '/../../../data/comparacoes/';
 		if(!is_dir($dir)) mkdir($dir);
-		$nomeArquivo = "comparacao_trab_{$this->trabalho}_conc_{$this->concurso}.html";
+		$nomeArquivo = "comparacao_trab_{$this->trabalho}_conc_{$this->concurso}_folha_{$this->folha}.html";
 		$h = fopen($dir.$nomeArquivo,'w+');
 		fwrite($h,$template);
 		fclose($h);

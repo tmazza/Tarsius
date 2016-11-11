@@ -60,7 +60,7 @@
 							$model = $d['model'];	
 							echo CHtml::link($f,
 								Yii::app()->params['urlBase']
-								. '/concurso/tarsius2/web/index.php/distribuido/ver/id/'
+								. '/concurso/tarsius/web/index.php/distribuido/ver/id/'
 								. $model->id,[
 								'target'=>'_blank',
 							]);
