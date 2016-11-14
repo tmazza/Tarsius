@@ -26,6 +26,7 @@ class DistribuidoController extends BaseController {
 	}
 
 	public static function getDebugImage($dist,$renovar=false){		
+		include_once __DIR__ . '/../../../src/Helper.php';
 		$baseDir	 = __DIR__ . '/../../../data/runtime/trab-'.$dist->trabalho->id;
 		$file = $dist->nome;
 
