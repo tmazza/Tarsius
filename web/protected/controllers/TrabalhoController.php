@@ -48,10 +48,11 @@ class TrabalhoController extends BaseController {
 		]);
 	}
 
-	public function actionNaoDistribuidas($id){
+	public function actionNaoDistribuidas($id,$pageSize=8){
 		Yii::app()->clientScript->registerScriptFile($this->wb.'/jquery.elevatezoom.min.js');
 		$model = Trabalho::model()->findByPk((int)$id);
-		$naoDistribuidas = Distribuido::model()->findAll([
+
+ 		$criteria=new CDbCriteria([
 			'alias' => 'd',
 			'with' => [
 				'resultado' => [
@@ -61,12 +62,20 @@ class TrabalhoController extends BaseController {
 			],
 			//'join'=>'JOIN finalizado f ON f.trabalho_id = d.trabalho_id AND f.nome = f.nome',
 			'condition'=>"d.trabalho_id={$model->id}",
-			'limit'=>20,
+			// 'limit'=>30,
 		]);
+ 		
+    	$count=Distribuido::model()->count($criteria);
+    	$pages=new CPagination($count);
+
+    	$pages->pageSize=$pageSize;
+    	$pages->applyLimit($criteria);
+	    $models=Distribuido::model()->findAll($criteria);
 
 		$this->render('naoDistribuidas',[
 			'trabalho'=>$model,
-			'naoDistribuidas'=>$naoDistribuidas,
+			'naoDistribuidas'=>$models,
+			'pages'=>$pages,
 		]);
 	}
 
@@ -190,7 +199,7 @@ class TrabalhoController extends BaseController {
 	  public function actionExportaResultado($id){
 	    $finalizadas = Finalizado::model()->findAll([
 	      'condition'=>"trabalho_id=$id AND exportado=0 AND conteudo IS NOT NULL",
-	      'limit'=>1024,
+	      'limit'=>2048,
 	    ]);
 	    foreach ($finalizadas as $f) {
 	       $conteudo = json_decode($f->conteudo,true);

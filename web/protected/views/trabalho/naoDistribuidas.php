@@ -11,6 +11,30 @@ $this->menu[] = ['Voltar',$this->createUrl('/trabalho/ver',[
 	]))?>
 	&raquo; Não exportadas
 </h3>
+
+<div class="uk-text-right">
+	Quantidade de imagens por página:
+	<?php
+	$urlBase = function($pageSize) use($trabalho) { 
+		return $this->createUrl('/trabalho/naoDistribuidas',[
+			'id'=>$trabalho->id,
+			'pageSize'=>$pageSize,
+		]);
+	}; 
+	echo CHtml::dropDownList('pageSize',(int)@$_GET['pageSize'],[
+		$urlBase(8) => 8,
+		$urlBase(16) => 16,
+		$urlBase(32) => 32,
+		$urlBase(64) => 64,
+		$urlBase(128) => 128,
+		$urlBase(256) => 256,
+		$urlBase(512) => 512,
+	],[
+		'onchange' => "window.location.href=this.options[this.selectedIndex].value",
+	]);?>
+</div>
+
+
 <ul>
 <?php foreach($naoDistribuidas as $nd): ?>
 	<?php
@@ -59,6 +83,9 @@ $this->menu[] = ['Voltar',$this->createUrl('/trabalho/ver',[
 	</li>
 <?php endforeach; ?>
 </ul>
+<?php $this->widget('CLinkPager', array(
+    'pages' => $pages,
+)) ?>
 <script type="text/javascript">
 $(".zoom").elevateZoom({
   zoomType: "lens",
