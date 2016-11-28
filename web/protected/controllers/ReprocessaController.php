@@ -47,4 +47,22 @@ class ReprocessaController extends BaseController {
 		}
 	}
 
+	public function actionRotacionar($id,$angulo=90)
+	{
+		$angulos = [90,180,270];
+		if(in_array($angulo, $angulos)){
+			$model = Distribuido::model()->findByPk((int)$id);
+			$fileName = $model->trabalho->sourceDir.'/'.$model->nome;
+			HImg::rotate($fileName,$angulo);
+		}
+
+		$linkImg = str_replace('repositorios', '..', $model->trabalho->sourceDir).'/'.$model->nome . '?'.microtime(true);
+		echo CHtml::image($linkImg,'',[
+			'class'=>'zoom',
+			'data-zoom-imag'=>$linkImg,
+			'style'=>'width:320px',
+		]);
+
+	}
+
 }

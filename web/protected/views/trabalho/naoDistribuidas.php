@@ -55,12 +55,43 @@ $this->menu[] = ['Voltar',$this->createUrl('/trabalho/ver',[
 					]));?>
 				</li>
 				<li>
-				<?=CHtml::link("Informar âncoras manualmente",$this->createUrl('/reprocessa/ancora',['id'=>$nd->id,]));?>
+					<?=CHtml::link("Informar âncoras manualmente",$this->createUrl('/reprocessa/ancora',['id'=>$nd->id,]));?>
 				</li>
+				<li>
+					Rotacionar: 
+					<?=CHtml::ajaxLink("&#8634;",$this->createUrl('/reprocessa/rotacionar',[
+						'id'=>$nd->id,
+						'angulo'=>270,
+					]),[
+						'update' => '#img-' . $nd->id,
+					],[
+						'class' => 'uk-button uk-button-link',
+						'style' => 'font-size: 20px',
+					]);?> 
+					<?=CHtml::ajaxLink("&#8645;",$this->createUrl('/reprocessa/rotacionar',[
+						'id'=>$nd->id,
+						'angulo'=>180,
+					]),[
+						'update' => '#img-' . $nd->id,
+					],[
+						'class' => 'uk-button uk-button-link',
+						'style' => 'font-size: 20px',
+					]);?>
+					<?=CHtml::ajaxLink("&#8635;",$this->createUrl('/reprocessa/rotacionar',[
+						'id'=>$nd->id,
+						'angulo'=>90,
+					]),[
+						'update' => '#img-' . $nd->id,
+					],[
+						'class' => 'uk-button uk-button-link',
+						'style' => 'font-size: 20px',
+					]);?>
+				</li>
+
 			</ul>
 			<br>
 			<div class="uk-grid">
-				<div class="uk-width-1-2">
+				<div class="uk-width-1-2" id='img-<?=$nd->id?>'>
 					<?php $linkImg = str_replace('repositorios', '..', $trabalho->sourceDir).'/'.$nd->nome; ?>
 					<?=CHtml::image($linkImg,'',[
 						'class'=>'zoom',
