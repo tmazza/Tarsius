@@ -46,21 +46,18 @@ class ForcaController extends BaseController {
 
 	private function processar($id,$minMatch,$validaTemplate=true){
 		$model = Distribuido::model()->findByPk((int)$id);
+		$model->status = Distribuido::StatusReprocessamento;
+		$ok = $model->update(['status']);
 
-		$ok = true;
-		try {
-			$image = new Image($model->trabalho->template,$model->trabalho->taxaPreenchimento,$minMatch);
-			$image->validaTemplate = $validaTemplate;
-			$image->exec($model->trabalho->sourceDir.'/'.$model->nome);
-			$model->resultado->conteudo = json_encode($image->output);
-			$model->resultado->update(['conteudo']);
-			$msg = 'ok';			
-		} catch (Exception $e) {
-			$ok = false;
-			$msg = $e->getMessage();
-		}	
+		$validaTemplate = (int) $validaTemplate;
+        $cmd = 'hhvm ' . Yii::getPathOfAlias('application') .'/tarsius processa reprocessa';
+	    $cmd .= " --id={$id}";
+        $cmd .= " --minMatch={$minMatch}";
+        $cmd .= " --validaTemplate={$validaTemplate}";
 
-		return [$ok,$model,$msg];
+        $pid = exec($cmd . ' > /dev/null 2>&1 & echo $!; ');
+
+		return [$ok,$model,$pid];
 	}
 
 }

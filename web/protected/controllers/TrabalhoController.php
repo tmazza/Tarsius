@@ -61,7 +61,7 @@ class TrabalhoController extends BaseController {
 				],
 			],
 			//'join'=>'JOIN finalizado f ON f.trabalho_id = d.trabalho_id AND f.nome = f.nome',
-			'condition'=>"d.trabalho_id={$model->id}",
+			'condition'=>"d.trabalho_id={$model->id} AND status !=  " . Distribuido::StatusReprocessamento,
 			'order'=>'d.id DESC',
 			// 'limit'=>30,
 		]);
