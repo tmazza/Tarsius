@@ -27,6 +27,7 @@ class ComparaCommand extends CConsoleCommand {
 	}
 
 	private function processaResultados(){
+		ini_set('memory_limit', '4095M');
 		$data = Yii::app()->dbExport->createCommand()
 				->select('NomeArquivo,RespostasOriginais')
 				->from('dbo.LEITURA')
@@ -35,7 +36,9 @@ class ComparaCommand extends CConsoleCommand {
 		$iguais = $naoEncontradas = $respNaoDefinida = $diferencas = [];
 		$count = 0;
 		echo "\n";
-		foreach ($data as $r) {
+
+		while(count($data) > 0){
+			$r = array_shift($data);			
 			$nome = $r['NomeArquivo'];
 			$resp = trim($r['RespostasOriginais']);
 			$distribuido = Distribuido::model()->find([
