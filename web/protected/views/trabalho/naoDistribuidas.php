@@ -34,59 +34,92 @@ $this->menu[] = ['Voltar',$this->createUrl('/trabalho/ver',[
 	]);?>
 </div>
 
+<button onclick="$('.checkbox').prop('checked', 'checked');">Check All</button>
 
+<?=CHtml::beginForm('','POST',[
+	'id'=>'emMassa',
+]);?>
 <ul>
-<?php foreach($naoDistribuidas as $nd): ?>
-	<?php
-	$output = json_decode($nd->resultado->conteudo);
-	?>
-	<li>
-		<hr>
-		<ul>
-			<li>
-				<?=CHtml::link("Aplicar máscara com tolerância",$this->createUrl('/Forca/index',[
-					'id'=>$nd->id,
-				]));?>
-			</li>
-			<li>
-			<?=CHtml::link("Informar âncoras manualmente",$this->createUrl('/reprocessa/ancora',['id'=>$nd->id,]));?>
-			</li>
-		</ul>
-		<br>
-		<div class="uk-grid">
-			<div class="uk-width-1-2">
-				<?php $linkImg = str_replace('repositorios', '..', $trabalho->sourceDir).'/'.$nd->nome; ?>
-				<?=CHtml::image($linkImg,'',[
-					'class'=>'zoom',
-					'data-zoom-imag'=>$linkImg,
-					'style'=>'width:320px',
-				]);?>
-			</div>
-			<div class="uk-width-1-2">
-				<?php
-				try {
-					if(is_null($nd)){
-						throw new Exception("Registro finalizado ID:'$id' não encontrado.", 3);
-					} else {
-						$debugImage = DistribuidoController::getDebugImage($nd,1);
-						$this->renderPartial('/distribuido/ver',[
-							'model'=>$nd,
-							'debugImage'=>$debugImage,
-						]);
+	<?php foreach($naoDistribuidas as $nd): ?>
+		<?php
+		$output = json_decode($nd->resultado->conteudo);
+		?>
+		<li>
+			<hr>
+			<input class="checkbox" type="checkbox" name="folha[]" value="<?=$nd->id;?>" />
+			<br><br>
+			<ul>
+				<li>
+					<?=CHtml::link("Aplicar máscara com tolerância",$this->createUrl('/Forca/index',[
+						'id'=>$nd->id,
+					]));?>
+				</li>
+				<li>
+				<?=CHtml::link("Informar âncoras manualmente",$this->createUrl('/reprocessa/ancora',['id'=>$nd->id,]));?>
+				</li>
+			</ul>
+			<br>
+			<div class="uk-grid">
+				<div class="uk-width-1-2">
+					<?php $linkImg = str_replace('repositorios', '..', $trabalho->sourceDir).'/'.$nd->nome; ?>
+					<?=CHtml::image($linkImg,'',[
+						'class'=>'zoom',
+						'data-zoom-imag'=>$linkImg,
+						'style'=>'width:320px',
+					]);?>
+				</div>
+				<div class="uk-width-1-2">
+					<?php
+					try {
+						if(is_null($nd)){
+							throw new Exception("Registro finalizado ID:'$id' não encontrado.", 3);
+						} else {
+							$debugImage = DistribuidoController::getDebugImage($nd,1);
+							$this->renderPartial('/distribuido/ver',[
+								'model'=>$nd,
+								'debugImage'=>$debugImage,
+							]);
+						}
+					} catch(Exception $e){
+						echo $e->getMessage();
 					}
-				} catch(Exception $e){
-					echo $e->getMessage();
-				}
-				?>
+					?>
+				</div>
 			</div>
-		</div>
-	</li>
-<?php endforeach; ?>
+		</li>
+	<?php endforeach; ?>
 </ul>
-<?php $this->widget('CLinkPager', array(
+
+Min match
+<input type="text" name="minMatch" value="0.75" /> 
+<br>
+<label for='checkbox-validartemplate'>
+	<input type="checkbox" name="validaTemplate" id='checkbox-validartemplate' checked="" />
+	Validar template
+</label>
+<br>
+
+<?=CHtml::endForm();?>
+<button onclick="aplicaEmMassa('<?=$this->createUrl('/forca/EmMassa');?>')">Aplicar</button>
+
+<br>
+<br>
+<hr>
+<?php
+$this->widget('CLinkPager', array(
     'pages' => $pages,
-)) ?>
+));
+?>
+
 <script type="text/javascript">
+
+function aplicaEmMassa(url)
+{
+	$('#emMassa').attr('action',url);
+	$('#emMassa').submit();
+
+}
+
 $(".zoom").elevateZoom({
   zoomType: "lens",
   lensShape : "round",

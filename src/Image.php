@@ -3,7 +3,7 @@ bcscale(14);
 
 define('DEBUG',false);
 
-define('CORTE_PRETO', 150);
+define('CORTE_PRETO', 128);
 define('TOLERANCIA_MATCH', 0.4); # eg: areabase  = 1000. busca triangulos de area entre 500 e 1500
 define('EXPANSAO_BUSCA', 0.4); # taxa de aumento da área de busca
 define('QTD_EXPANSOES_BUSCA', 5);

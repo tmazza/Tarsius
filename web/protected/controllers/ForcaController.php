@@ -28,12 +28,13 @@ class ForcaController extends BaseController {
 	{
 		set_time_limit(0);
 		$minMatch = (float) $_POST['minMatch'];
+		$validaTemplate = isset($_POST['validaTemplate']) ? (bool) $_POST['validaTemplate'] : false;
 		$folhas = $_POST['folha'];
 		# TODO: passar parâmetro para desconsiderar número do template
 
 		$resultados = [];
 		foreach ($folhas as $id) {
-			$resultados[$id] = $this->processar($id,$minMatch);
+			$resultados[$id] = $this->processar($id,$minMatch,$validaTemplate);
 
 		}
 
