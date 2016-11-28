@@ -30,12 +30,12 @@ class ForcaController extends BaseController {
 		$minMatch = (float) $_POST['minMatch'];
 		$validaTemplate = isset($_POST['validaTemplate']) ? (bool) $_POST['validaTemplate'] : false;
 		$folhas = $_POST['folha'];
-		# TODO: passar parâmetro para desconsiderar número do template
 
-		$resultados = [];
-		foreach ($folhas as $id) {
-			$resultados[$id] = $this->processar($id,$minMatch,$validaTemplate);
 
+		$chuncks = array_chunk($folhas, ceil(count($folhas)/16));	
+
+		foreach ($chuncks as $ids) {
+			$this->processar($ids,$minMatch,$validaTemplate);
 		}
 
 		$this->redirect(Yii::app()->request->urlReferrer);
@@ -44,18 +44,25 @@ class ForcaController extends BaseController {
 		// ]);
 	}
 
-	private function processar($id,$minMatch,$validaTemplate=true){
-		$model = Distribuido::model()->findByPk((int)$id);
-		$model->status = Distribuido::StatusReprocessamento;
-		$ok = $model->update(['status']);
+	private function processar($ids,$minMatch,$validaTemplate=true)
+	{
+		if(!is_array($ids)){
+			$ids = [$ids];
+		}
+		foreach ($ids as $id) {
+			$model = Distribuido::model()->findByPk((int)$id);
+			$model->status = Distribuido::StatusReprocessamento;
+			$ok = $model->update(['status']);
+		}
 
+		$ids = implode(' ', $ids);
 		$validaTemplate = (int) $validaTemplate;
-        $cmd = 'hhvm ' . Yii::getPathOfAlias('application') .'/tarsius processa reprocessa';
-	    $cmd .= " --id={$id}";
-        $cmd .= " --minMatch={$minMatch}";
-        $cmd .= " --validaTemplate={$validaTemplate}";
+	    $cmd = 'hhvm ' . Yii::getPathOfAlias('application') .'/tarsius processa reprocessa';
+	    $cmd .= " {$ids}";
+	    $cmd .= " --minMatch={$minMatch}";
+	    $cmd .= " --validaTemplate={$validaTemplate}";
 
-        $pid = exec($cmd . ' > /dev/null 2>&1 & echo $!; ');
+	    $pid = exec($cmd . ' > /dev/null 2>&1 & echo $!; ');
 
 		return [$ok,$model,$pid];
 	}

@@ -39,11 +39,13 @@ $this->menu = [
 <?php endif; ?>
 
 <!-- <img id='main' src="<?=$debugImage;?>" style="width:100%;" /> -->
-<img id="zoom_01" src="<?=$debugImage;?>" data-zoom-image="<?=$debugImage;?>"/>
+
+<?php $zoomId = 'zoom_'.$model->id;?>
+<img id="<?=$zoomId?>" src="<?=$debugImage;?>" data-zoom-image="<?=$debugImage;?>"/>
 
 
 <script type="text/javascript">
-$("#zoom_01").elevateZoom({
+$("#<?=$zoomId?>").elevateZoom({
   zoomType: "lens",
   lensShape : "round",
   lensSize: 200,

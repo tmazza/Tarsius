@@ -99,29 +99,31 @@ class ProcessaCommand extends CConsoleCommand {
 	/**
 	 * @param $model int id na table Distribuido
 	 */
-	public function actionReprocessa($id,$minMatch=0.8,$validaTemplate=true)
+	public function actionReprocessa($args=[],$minMatch=0.8,$validaTemplate=true)
 	{
-		$model = Distribuido::model()->findByPk($id,"status = " . Distribuido::StatusReprocessamento);
-		
-		if(is_null($model)){
-			echo "Arquivo para reprocessamento não encontrado. ID: '{$id}'\n";
-		} else {
-			$ok = true;
-			try {
-				$image = new Image($model->trabalho->template,$model->trabalho->taxaPreenchimento,$minMatch);
-				$image->validaTemplate = $validaTemplate;
-				$image->exec($model->trabalho->sourceDir.'/'.$model->nome);
-				$msg = $image->output;			
-			} catch (Exception $e) {
-				$ok = false;
-				$msg = $e->getMessage();
+		foreach ($args as $id) {
+			$model = Distribuido::model()->findByPk($id,"status = " . Distribuido::StatusReprocessamento);
+			
+			if(is_null($model)){
+				echo "Arquivo para reprocessamento não encontrado. ID: '{$id}'\n";
+			} else {
+				$ok = true;
+				try {
+					$image = new Image($model->trabalho->template,$model->trabalho->taxaPreenchimento,$minMatch);
+					$image->validaTemplate = $validaTemplate;
+					$image->exec($model->trabalho->sourceDir.'/'.$model->nome);
+					$msg = $image->output;			
+				} catch (Exception $e) {
+					$ok = false;
+					$msg = $e->getMessage();
+				}
+
+				$model->resultado->conteudo = json_encode($msg);
+				$model->resultado->update(['conteudo']);
+
+				$model->status = Distribuido::StatusAguardando;
+				$model->update(['status']);
 			}
-
-			$model->resultado->conteudo = json_encode($msg);
-			$model->resultado->update(['conteudo']);
-
-			$model->status = Distribuido::StatusAguardando;
-			$model->update(['status']);
 		}
 	}
 
