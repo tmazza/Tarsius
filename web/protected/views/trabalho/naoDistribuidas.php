@@ -92,7 +92,7 @@ $this->menu[] = ['Voltar',$this->createUrl('/trabalho/ver',[
 			<br>
 			<div class="uk-grid">
 				<div class="uk-width-1-2" id='img-<?=$nd->id?>'>
-					<?php $linkImg = str_replace('repositorios', '..', $trabalho->sourceDir).'/'.$nd->nome; ?>
+					<?php $linkImg = $trabalho->urlImagens.'/'.$nd->nome; ?>
 					<?=CHtml::image($linkImg,'',[
 						'class'=>'zoom',
 						'data-zoom-imag'=>$linkImg,

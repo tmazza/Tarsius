@@ -86,7 +86,7 @@ class ComparaCommand extends CConsoleCommand {
 			'respNaoDefinida'=>$respNaoDefinida,
 			'trabalho'=>$this->trabalho,
 			'concurso'=>$this->concurso,
-			'url'=>str_replace('/repositorios/',Yii::app()->params['urlBase'],$model->sourceDir).'/',
+			'url'=>$model->urlImagens.'/',
 		]);
 
 		$dir = __DIR__ . '/../../../data/comparacoes/';

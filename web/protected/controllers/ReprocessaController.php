@@ -13,7 +13,7 @@ class ReprocessaController extends BaseController {
 
 		$this->render('ancora',[
 			'model'=>$model,
-			'urlImage'=> str_replace('/repositorios','',$model->trabalho->sourceDir).'/'.$model->nome,
+			'urlImage'=> $model->urlImagens.'/'.$model->nome,
 		]);
 	}
 
@@ -56,7 +56,7 @@ class ReprocessaController extends BaseController {
 			HImg::rotate($fileName,$angulo);
 		}
 
-		$linkImg = str_replace('repositorios', '..', $model->trabalho->sourceDir).'/'.$model->nome . '?'.microtime(true);
+		$linkImg = $model->trabalho->urlImagens.'/'.$model->nome . '?'.microtime(true);
 		echo CHtml::image($linkImg,'',[
 			'class'=>'zoom',
 			'data-zoom-imag'=>$linkImg,
