@@ -23,7 +23,7 @@ class ProcessaCommand extends CConsoleCommand {
 			# TODO: devolver imagens e mudar status do processo
 			$erro = new Erro;
 			$erro->trabalho_id = $trabId;
-			$erro->texto = $e->getMessage() . json_encode($e);
+			$erro->texto = CHtml::tag('h3',$e->getMessage()) . '<hr>' . $e->__toString();
 			$erro->read = 0;
 			$erro->save();
 		}

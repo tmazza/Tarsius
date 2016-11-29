@@ -30,7 +30,7 @@ class DistribuiCommand extends CConsoleCommand
       Yii::log('Iniciando distribuição T:' . $trabId,'trace','tarsius.distribui');
 
       try{
-
+        $old = umask(0); 
         $this->setTrabalho($trabId);  
 
         # Diretório de trabalho
@@ -41,6 +41,7 @@ class DistribuiCommand extends CConsoleCommand
 
         $this->dirReady = $this->dirExec . '/ready';
         if (!is_dir($this->dirReady)) mkdir($this->dirReady,0777);
+        umask($old); 
 
         $this->loop();
         $this->trabalho->status = 0;
@@ -48,7 +49,12 @@ class DistribuiCommand extends CConsoleCommand
 
 
       } catch(Exception $e) {
-        Yii::log($e->getMessage(),'trace','tarsius.distribui');
+
+        $erro = new Erro;
+        $erro->trabalho_id = $trabId;
+        $erro->texto = $e->__toString();
+        $erro->read = 0;
+        $erro->save();
 
       }
     } else {
@@ -89,7 +95,9 @@ class DistribuiCommand extends CConsoleCommand
           foreach ($blocos as $i => $bloco) {
             $dirHash = hash('crc32', microtime(true) . rand(0, 999999)); # workdir do processo
             $dirDest = $this->dirExec . '/' . $dirHash . '/';
-            mkdir($dirDest); # temporario enquanto busca imagens de sourceDir
+            $old = umask(0); 
+            mkdir($dirDest,0777); # diretório temporario enquanto busca imagens de sourceDir
+            umask($old);
             foreach ($bloco as $file) {
               if (rename($this->trabalho->sourceDir . '/' . $file, $dirDest . $file)){
                 $this->setJaDistribuido($file,$dirHash);
