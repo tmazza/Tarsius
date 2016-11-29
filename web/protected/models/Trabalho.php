@@ -18,6 +18,7 @@
 class Trabalho extends CActiveRecord
 {
 
+	const statusParado = 0;
 	const statusExecutando = 1;
 	const statusFinalizado = 2;
 	const statusDeveParar = 3;
