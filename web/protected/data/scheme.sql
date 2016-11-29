@@ -35,8 +35,9 @@ CREATE TABLE `distribuido` (
   PRIMARY KEY (`id`),
   KEY `idx_distribuido_nome` (`nome`),
   KEY `isx_distribuido_trabalho` (`trabalho_id`),
-  KEY `idx_distribuido_status` (`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=426 DEFAULT CHARSET=latin1;
+  KEY `idx_distribuido_status` (`status`),
+  KEY `idx_dist_all` (`status`,`nome`,`id`,`exportado`)
+) ENGINE=InnoDB AUTO_INCREMENT=192556 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -52,7 +53,7 @@ CREATE TABLE `erro` (
   `texto` text,
   `read` int(11) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -71,8 +72,9 @@ CREATE TABLE `finalizado` (
   `exportado` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_finalizado_nome` (`nome`,`trabalho_id`),
-  KEY `idx_finalizado_trab_d` (`trabalho_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=266 DEFAULT CHARSET=latin1;
+  KEY `idx_finalizado_trab_d` (`trabalho_id`),
+  KEY `all` (`id`,`nome`,`trabalho_id`,`dataFechamento`)
+) ENGINE=InnoDB AUTO_INCREMENT=174236 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -92,7 +94,7 @@ CREATE TABLE `processo` (
   `dataInicio` int(11) DEFAULT NULL,
   `dataFim` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2472 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -113,8 +115,9 @@ CREATE TABLE `trabalho` (
   `taxaPreenchimento` double DEFAULT '0.3',
   `distribuindo` int(11) DEFAULT '0',
   `export` text,
+  `urlImagens` text,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -126,4 +129,4 @@ CREATE TABLE `trabalho` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-10-18 14:00:41
+-- Dump completed on 2016-11-29 15:36:55
