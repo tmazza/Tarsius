@@ -40,7 +40,7 @@ class Trabalho extends CActiveRecord
 			array('nome, sourceDir, tempoDistribuicao', 'required'),
 			array('status, pid, tempoDistribuicao', 'numerical', 'integerOnly'=>true),
 			array('status','default','setOnEmpty'=>true,'value'=>0),
-			array('nome, sourceDir, template, taxaPreenchimento, export', 'safe'),
+			array('nome, sourceDir, template, taxaPreenchimento, export, urlImagens', 'safe'),
 			array('id, nome, sourceDir, status, pid, tempoDistribuicao', 'safe', 'on'=>'search'),
 		);
 	}

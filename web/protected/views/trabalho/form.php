@@ -32,6 +32,14 @@ $this->menu = [
 		    <?php echo $form->error($model,'sourceDir'); ?>
 	    </div>
 	</div>
+	
+	<div class="uk-form-row">
+	    <?php echo $form->labelEx($model,'urlImagens',['class'=>'uk-form-label']); ?>
+	    <div class="uk-form-controls">
+		    <?php echo $form->textField($model,'urlImagens',['class'=>'uk-width-1-1']); ?>
+		    <?php echo $form->error($model,'urlImagens'); ?>
+	    </div>
+	</div>
 
 	<div class="uk-form-row">
 	    <?php echo $form->labelEx($model,'tempoDistribuicao',['class'=>'uk-form-label']); ?>
