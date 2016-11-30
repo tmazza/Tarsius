@@ -127,7 +127,10 @@ class ProcessaCommand extends CConsoleCommand {
 		}
 	}
 
-	public function actionFile($arquivo,$template){
+	public function actionFile($arquivo=false,$template=false){
+		if(!($arquivo || $template)){
+			die("Informe o trabalho e o template em uso. \n\n\t--template=<ID-TRABALHO>\n\t--arquivo=<ID-ARQUIVO>\n\n");
+		}
 		$image = new Image($template,0.3);
 		$image->exec($arquivo);
 		print_r($image->output);
