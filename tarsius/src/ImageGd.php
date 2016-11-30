@@ -9,7 +9,10 @@ use Tarsius\Image;
 
 class ImageGd extends Image
 {
-
+    /**
+     * @throws Exception Caso o arquivo não exista ou a extensão seja inválida
+     *      ou o processo não tenha permissão de leitura no arquivo.
+     */
     public function load(): Image
     {
         $extension = pathinfo($this->name,PATHINFO_EXTENSION);

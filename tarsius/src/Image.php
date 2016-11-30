@@ -15,17 +15,12 @@ abstract class Image
     /**
      * Armazena nome da imagem e carrega arquivo de imagem para memória.
      *
-     * @var string $imageName Caminho completo para a imagem que será carregada
-     *
-     * @throws Exception Caso o arquivo não exista ou a extensão seja inválida
-     *      ou o processo não tenha permissão de leitura no arquivo.
-     * 
-     * @return void 
+     * @return Image 
      */
     abstract public function load(): Image;
 
     /**
-     * Armazeno nome do arquivo de imagem.
+     * Armazena nome do arquivo de imagem.
      *
      * @var string $name Caminho completo para a imagem a ser carregada
      */

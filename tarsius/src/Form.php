@@ -25,7 +25,7 @@ class Form
     private $mask;
 
     /**
-     * Procesa a imagem $imageName utilizando a máscara $maskName.
+     * Carrega imagem e máscara que devem ser utilizadas.
      * 
      * @param string $imageName Nome da imagem a ser processada.
      * @param string $maskName  Nome da máscara que deve ser aplicada na imagem.
@@ -34,7 +34,26 @@ class Form
     {
         $this->image = ImageFactory::create($imageName, ImageFactory::GD);
         $this->image->load();
-        $this->mask = new Mask();
+        $this->mask = new Mask($maskName);
+        $this->mask->load();
+    }
+
+    /**
+     * Procesa a imagem $imageName utilizando a máscara $maskName.
+     *
+     */
+    public function evaluate()
+    {
+        $this->image->localizarAncoras();        
+    }
+
+    /**
+     * Busca âncoras na imagem. Inicia busca no ponto esperado da âncora definido
+     * na máscara em uso.
+     */
+    public function localizarAncoras()
+    {
+
     }
 
 }
