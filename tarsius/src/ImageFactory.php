@@ -16,16 +16,17 @@ class ImageFactory
     /**
      * Cria objeto será usado para manipular a imagem.
      *
-     * @param string $type Tipo de manipulador de imagem que de ser usado.
+     * @param string $imageName Caminho completo para a imagem que deve ser carregada.
+     * @param string $type      Tipo de manipulador de imagem que de ser usado.
      *
      * @throws Exception Caso o tipo informado não seja válido.
      *
      * @return Image Retorna o objeto criado.
      */
-    public static function create(string $type): Image
+    public static function create(string $imageName, string $type): Image
     {
         if ($type === self::GD) {
-            return new ImageGd();
+            return new ImageGd($imageName);
         }
 
         throw new \Exception("Tipo de manipulador de imagem inválido.");

@@ -16,8 +16,9 @@ class ImageFactoryTest extends TestCase
 
     public function testCreate()
     {
+        $imageName = __DIR__  . '/images/formTest1.jpg';
         # tipo gd
-        $obj = ImageFactory::create(ImageFactory::GD);
+        $obj = ImageFactory::create($imageName, ImageFactory::GD);
         $this->assertInstanceOf('Tarsius\ImageGd', $obj);
     }
 }

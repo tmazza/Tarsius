@@ -32,8 +32,8 @@ class Form
      */
     public function __construct(string $imageName, string $maskName)
     {
-        $this->image = ImageFactory::create(ImageFactory::GD);
-        $this->image->load($imageName);
+        $this->image = ImageFactory::create($imageName, ImageFactory::GD);
+        $this->image->load();
         $this->mask = new Mask();
     }
 

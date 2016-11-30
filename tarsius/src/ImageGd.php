@@ -9,31 +9,23 @@ use Tarsius\Image;
 
 class ImageGd extends Image
 {
-    /**
-     * Abre e carrega arquivo de imagem para memória.
-     *
-     * @var string $imageName Caminho completo para a imagem que será carregada
-     *
-     * @throws Exception Caso o arquivo não exista ou a extensão seja inválida
-     *      ou o processo não tenha permissão de leitura no arquivo.
-     * 
-     * @return void 
-     */
-    public function load(string $imageName)
+
+    public function load(): Image
     {
-        $extension = pathinfo($imageName,PATHINFO_EXTENSION);
+        $extension = pathinfo($this->name,PATHINFO_EXTENSION);
         if ($extension !== 'jpg') {
             throw new \Exception("Imagem deve ser jpg.");
         }
-        if (is_readable($imageName)) {
-            $image = @imagecreatefromjpeg($imageName);
+        if (is_readable($this->name)) {
+            $image = @imagecreatefromjpeg($this->name);
             if (!$image) {
-                throw new \Exception("Erro desconhecido ao carregar imagem '{$imageName}'.");
+                throw new \Exception("Erro desconhecido ao carregar imagem '{$this->name}'.");
             }
-        } elseif (file_exists($imageName)) {
-            throw new \Exception("Sem permissão de leitura na imagem '{$imageName}'.");
+        } elseif (file_exists($this->name)) {
+            throw new \Exception("Sem permissão de leitura na imagem '{$this->name}'.");
         } else {
-            throw new \Exception("Imagem '{$imageName}' não encontrada ou não existe.");
+            throw new \Exception("Imagem '{$this->name}' não encontrada ou não existe.");
         }
+        return $this;
     }
 }
