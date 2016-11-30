@@ -19,8 +19,5 @@ class ImageFactoryTest extends TestCase
         # tipo gd
         $obj = ImageFactory::create(ImageFactory::GD);
         $this->assertInstanceOf('Tarsius\ImageGd', $obj);
-        # tipo imagemagick
-        $obj = ImageFactory::create(ImageFactory::IMAGE_MAGICK);
-        $this->assertInstanceOf('Tarsius\ImageMagick', $obj);
     }
 }

@@ -22,17 +22,13 @@ class ImageFactory
      *
      * @return Image Retorna o objeto criado.
      */
-    public static function create(string $type): IImage
+    public static function create(string $type): Image
     {
-        switch ($type) {
-            case self::GD:
-                return new ImageGd();
-            case self::IMAGE_MAGICK: 
-                return new ImageMagick();
-            default:
-                throw new Exception("Tipo de manipulador de imagem inválido.", 1);
-                break;
+        if ($type === self::GD) {
+            return new ImageGd();
         }
+
+        throw new \Exception("Tipo de manipulador de imagem inválido.");
     }
 
 }
