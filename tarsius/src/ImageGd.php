@@ -20,8 +20,8 @@ class ImageGd extends Image
             throw new \Exception("Imagem deve ser jpg.");
         }
         if (is_readable($this->name)) {
-            $image = @imagecreatefromjpeg($this->name);
-            if (!$image) {
+            $this->image = @imagecreatefromjpeg($this->name);
+            if (is_null($this->image)) {
                 throw new \Exception("Erro desconhecido ao carregar imagem '{$this->name}'.");
             }
         } elseif (file_exists($this->name)) {
@@ -30,5 +30,25 @@ class ImageGd extends Image
             throw new \Exception("Imagem '{$this->name}' não encontrada ou não existe.");
         }
         return $this;
+    }
+
+    /**
+     * @todo o que fazer quando pixel não pode ser avaliado?
+     */
+    public function isBlack(int $x, int $y): bool
+    {
+        $rgb = imagecolorat($this->image, $x, $y);
+        if (is_numeric($rgb)) {
+            $rgb = [
+                ($rgb >> 16) & 0xFF,
+                ($rgb >>  8) & 0xFF,
+                ($rgb >>  0) & 0xFF,
+            ];
+        } else {
+            $rgb = [255, 255, 255];
+        }
+
+        list($r, $g, $b) = $rgb;
+        return ceil(0.299*$r) + ceil(0.587*$g) + ceil(0.114*$b) < Image::THRESHOLD;
     }
 }

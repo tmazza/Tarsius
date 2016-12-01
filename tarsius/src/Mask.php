@@ -12,6 +12,7 @@ class Mask
 {
     const FORMAT_OUTPUT = 'formatoSaida';
     const REGIONS = 'regioes';
+    const START_POINT = 'ancora1';
 
     /**
      * @var static string $anchorsDir Caminho para diretório contendo as imagens das âncoras.
@@ -27,6 +28,14 @@ class Mask
      */
     private $type;
     /**
+     * @var int[] Ponto central da primiera âncora da máscara.
+     */
+    private $startPoint;
+    /**
+     * @var mixed[] $regions @todo documentar
+     */
+    private $regions;
+    /**
      * @var string $formatOutput @todo documentar
      */
     private $formatOutput = false;
@@ -34,10 +43,6 @@ class Mask
      * @var Image[] $anchors @todo documentar
      */
     private $anchors = [];    
-    /**
-     * @var mixed[] $regions @todo documentar
-     */
-    private $regions;
 
     /**
      * Armazena nome do arquivo de máscara em uso.
@@ -54,6 +59,8 @@ class Mask
 
     /**
      * Abre e interpreta arquivo JSON com as definições do template.
+     *
+     * @throws Exeception Quando START_POINT não é informado.
      */
     public function load(): Mask
     {
@@ -65,12 +72,18 @@ class Mask
             $str = file_get_contents($this->name);
             $data = json_decode($str,true);
 
-            if (isset($data[self::FORMAT_OUTPUT])) {
-                $this->formatOutput = json_decode($data[self::FORMAT_OUTPUT],true);
+            if (isset($data[self::START_POINT])) {
+                $this->startPoint = $data[self::START_POINT];
+            } else {
+                throw new Exception("Localização de primeira âncora deve ser informada. Use " . self::START_POINT);
             }
-            
+
             if (isset($data[self::REGIONS])) {
                 $this->regions = $data[self::REGIONS];
+            }
+
+            if (isset($data[self::FORMAT_OUTPUT])) {
+                $this->formatOutput = json_decode($data[self::FORMAT_OUTPUT],true);
             }
 
             /**
@@ -88,5 +101,22 @@ class Mask
             throw new \Exception("Arquivo '{$this->name}' não encontrado ou não existe.");
         }
         return $this;
+    }
+
+    /**
+     * Retorna valor de @var $startPoint
+     */
+    public function getStartPoint()
+    {
+        return $this->startPoint;        
+    }
+
+    /**
+     * Retorna a assinatura da primeira ancora. 
+     * @return array @todo confirmar formato da busca
+     */
+    public function getSignatureAnchor1()
+    {
+        return $this->anchors[1]->getSignature();
     }
 }

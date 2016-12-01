@@ -7,10 +7,29 @@ namespace Tarsius;
 
 abstract class Image 
 {
+    /**
+     * Resolução utilizada caso não seja possível ler as informações da imagem.
+     */
     const DEFAULT_RESOLUTION = 300;
+    /**
+     * Corte entre pixel pretos e brancos. 
+     * 
+     * @todo usar limiar dinâmico
+     */ 
+    const THRESHOLD = 128;
 
+    /**
+     * @var string $name Nome completo do arquivo sendo manipulado.
+     */
     public $name;
-    private $image;
+    /**
+     * @var resource $image Manipulador da imamgem
+     */
+    protected $image;
+    /**
+     * @var int $resolution Resolução extraída dos meta dados da imagem.
+     */
+    private $resolution = false;
 
     /**
      * Armazena nome da imagem e carrega arquivo de imagem para memória.
@@ -18,6 +37,11 @@ abstract class Image
      * @return Image 
      */
     abstract public function load(): Image;
+
+    /**
+     * Define se ponto da imagem é preto ou branco.
+     */
+    abstract public function isBlack(int $x, int $y): bool;
 
     /**
      * Armazena nome do arquivo de imagem.
@@ -38,17 +62,57 @@ abstract class Image
      *
      * @link http://stackoverflow.com/a/12988682 referência
      */
-    public function getResolucao(): int
+    public function getResolution(): int
     {
-      $handle = fopen($this->name,'r');
-      $string = fread($handle,20);
-      fclose($handle);
+        if (!$this->resolution) {
+            $handle = fopen($this->name,'r');
+            $string = fread($handle,20);
+            fclose($handle);
 
-      $data = bin2hex(substr($string,14,4));
-      $x = hexdec(substr($data,0,4));
-      $y = hexdec(substr($data,4,4));
-      
-      return $x == $y ? $x : self::DEFAULT_RESOLUTION;      
+            $data = bin2hex(substr($string,14,4));
+            $x = hexdec(substr($data,0,4));
+            $y = hexdec(substr($data,4,4));
+
+            $this->resolution = $x == $y ? $x : self::DEFAULT_RESOLUTION;      
+        }
+        return $this->resolution;
+    }
+
+    /**
+    * Extrai lista de pontos pretos contidos dentro da região definida por $p1 e $p2 
+    * (considerado como ponto preto).
+    *
+    * @param int[] $p1 Ponto superior esquerdo da região que deve ser avaliada.
+    * @param int[] $p2 Ponto inferior direito da região que deve ser avaliada.
+    *
+    * @todo não reprocessar regiões já analisadas. Salvar pontos no estado do objeto
+    *       para não precisar acessar os dados da imagem e extrair a informação novamente.
+    *
+    * @return array conjunto de pontos pretos indexados pelo eixo x e y na imagem.
+    */
+    public function getPointsBetween($p1, $p2) {
+        list($x0, $y0) = $p1;
+        list($x1, $y1) = $p2;
+        $pontos = array();
+        $x0 = $x0 >= 0 ? $x0 : 0; // Não ultrapassa limites da imagem
+        $y0 = $y0 >= 0 ? $y0 : 0; // Não ultrapassa limites da imagem
+
+        for ($j = $y0; $j < $y1; $j++) {
+            for ($i = $x0; $i < $x1; $i++) {
+                if ($this->isBlack($i, $j)) {
+                    $pontos[$i][$j] = true;
+                }
+            }
+        }
+        return $pontos;
+    }
+
+    /**
+     * @todo retornar a assinatura da imagem?região
+     */
+    public function getSignature()
+    {
+        return [];
     }
 
 }
