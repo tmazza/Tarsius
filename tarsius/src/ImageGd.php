@@ -34,6 +34,8 @@ class ImageGd extends Image
 
     /**
      * @todo o que fazer quando pixel não pode ser avaliado?
+     * @todo tornar busca das cores do pixel mais eficiente
+     * @link http://stackoverflow.com/questions/13791207/better-way-to-get-map-of-all-pixels-of-an-image-with-gd Avaliar
      */
     public function isBlack(int $x, int $y): bool
     {
@@ -49,6 +51,6 @@ class ImageGd extends Image
         }
 
         list($r, $g, $b) = $rgb;
-        return ceil(0.299*$r) + ceil(0.587*$g) + ceil(0.114*$b) < Image::THRESHOLD;
+        return (ceil(0.299*$r) + ceil(0.587*$g) + ceil(0.114*$b)) < Image::THRESHOLD;
     }
 }

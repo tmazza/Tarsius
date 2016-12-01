@@ -53,8 +53,7 @@ class ImageGdTest extends TestCase
         $obj = new ImageGd($this->imageName2);
         $obj->load();
 
-        $p1 = [10,10];
-        $p2 = [20,20];
+        $p1 = [10,10]; $p2 = [20,20]; # quadrado do centro
 
         $pontos = $obj->getPointsBetween($p1, $p2);
 
@@ -62,6 +61,24 @@ class ImageGdTest extends TestCase
         foreach ($pontos as $p) {
             $this->assertEquals(count($p), 10);
         }
+        
+    }
+
+    public function testGetObjectsBetween()
+    {
+        $obj = new ImageGd($this->imageName2);
+        $obj->load();
+
+        $p1 = [0,0]; $p2 = [30,30]; # toda a imagem
+
+        $objetos = $obj->getObjectsBetween($p1, $p2, 10, 1000);
+        echo '||' . count($objetos) . '||';
+
+        # todo
+        // $this->assertEquals(count($pontos), 10);
+        // foreach ($pontos as $p) {
+        //     $this->assertEquals(count($p), 10);
+        // }
         
     }
 

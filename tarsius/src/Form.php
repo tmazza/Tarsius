@@ -66,7 +66,7 @@ class Form
         $startPoint = $this->applyResolutionTo($this->mask->getStartPoint());
         $anchorSignature = $this->mask->getSignatureAnchor1();
         // $this->image->find($anchorSignature, $startPoint);
-        print_r($anchorSignature);
+        //print_r($anchorSignature);
     }
 
     /**

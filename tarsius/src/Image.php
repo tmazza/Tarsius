@@ -5,6 +5,8 @@
 
 namespace Tarsius;
 
+use Tarsius\ConnectedComponent;
+
 abstract class Image 
 {
     /**
@@ -79,18 +81,19 @@ abstract class Image
     }
 
     /**
-    * Extrai lista de pontos pretos contidos dentro da região definida por $p1 e $p2 
-    * (considerado como ponto preto).
-    *
-    * @param int[] $p1 Ponto superior esquerdo da região que deve ser avaliada.
-    * @param int[] $p2 Ponto inferior direito da região que deve ser avaliada.
-    *
-    * @todo não reprocessar regiões já analisadas. Salvar pontos no estado do objeto
-    *       para não precisar acessar os dados da imagem e extrair a informação novamente.
-    *
-    * @return array conjunto de pontos pretos indexados pelo eixo x e y na imagem.
-    */
-    public function getPointsBetween($p1, $p2) {
+     * Extrai lista de pontos pretos contidos dentro da região definida por $p1 e $p2 
+     * (considerado como ponto preto).
+     *
+     * @param int[] $p1 Ponto superior esquerdo da região que deve ser avaliada.
+     * @param int[] $p2 Ponto inferior direito da região que deve ser avaliada.
+     *
+     * @todo não reprocessar regiões já analisadas. Salvar pontos no estado do objeto
+     *       para não precisar extrair da imagem a informação novamente.
+     *
+     * @return array conjunto de pontos pretos indexados pelo eixo x e y na imagem.
+     */
+    public function getPointsBetween(array $p1, array $p2): array
+    {
         list($x0, $y0) = $p1;
         list($x1, $y1) = $p2;
         $pontos = array();
@@ -105,6 +108,28 @@ abstract class Image
             }
         }
         return $pontos;
+    }
+
+    /**
+     * Extrai conjunto de objetos contidos na região delimitada por $p1 e $p2 e
+     * que possuam area entre $minArea e $maxArea.
+     *
+     * @param int[] $p1 Ponto superior esquerdo da região que deve ser avaliada.
+     * @param int[] $p2 Ponto inferior direito da região que deve ser avaliada.
+     * @param int $minArea Área mínima para considerar objeto
+     * @param int $maxArea Área máxima para considerar objeto
+     *
+     * @return Object[] conjunto de objetos encontrados
+     */
+    public function getObjectsBetween(array $p1, array $p2, int $minArea, int $maxArea): array
+    {
+        $pontos = $this->getPointsBetween($p1, $p2);
+
+        $connectedComponents = new ConnectedComponent();
+        $connectedComponents->setMinArea($minArea);
+        $connectedComponents->setMaxArea($maxArea);
+
+        return $connectedComponents->getObjects($pontos);
     }
 
     /**
