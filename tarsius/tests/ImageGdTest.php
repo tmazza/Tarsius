@@ -71,14 +71,9 @@ class ImageGdTest extends TestCase
 
         $p1 = [0,0]; $p2 = [30,30]; # toda a imagem
 
-        $objetos = $obj->getObjectsBetween($p1, $p2, 10, 1000);
-        echo '||' . count($objetos) . '||';
+        $objetos = $obj->getObjectsBetween($p1, $p2, 10, 100);
 
-        # todo
-        // $this->assertEquals(count($pontos), 10);
-        // foreach ($pontos as $p) {
-        //     $this->assertEquals(count($p), 10);
-        // }
+        $this->assertEquals(count($objetos), 11);
         
     }
 
