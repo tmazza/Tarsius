@@ -7,6 +7,9 @@ namespace Tarsius;
 
 use Tarsius\ConnectedComponent;
 
+/**
+ * Contém informações e métodos para manipular a imagem sendo processada.
+ */
 abstract class Image 
 {
     /**
@@ -23,7 +26,7 @@ abstract class Image
     /**
      * @var string $name Nome completo do arquivo sendo manipulado.
      */
-    public $name;
+    protected $name;
     /**
      * @var resource $image Manipulador da imamgem
      */
@@ -31,7 +34,15 @@ abstract class Image
     /**
      * @var int $resolution Resolução extraída dos meta dados da imagem.
      */
-    private $resolution = false;
+    protected $resolution = false;
+    /**
+     * @var int $width Largura da imagem
+     */
+    protected $width = false;
+    /**
+     * @var int $height Largura da imagem
+     */
+    protected $height = false;
 
     /**
      * Armazena nome da imagem e carrega arquivo de imagem para memória.
@@ -44,6 +55,19 @@ abstract class Image
      * Define se ponto da imagem é preto ou branco.
      */
     abstract public function isBlack(int $x, int $y): bool;
+
+    /**
+     * Retorna a largura da imagem
+     * 
+     * @return int Largura da da imagem
+     */
+    abstract public function getWidth(): int;
+    /**
+     * Retorna a altura da imagem
+     * 
+     * @return int Altura da da imagem
+     */
+    abstract public function getHeight(): int;
 
     /**
      * Armazena nome do arquivo de imagem.
@@ -97,8 +121,8 @@ abstract class Image
         list($x0, $y0) = $p1;
         list($x1, $y1) = $p2;
         $pontos = array();
-        $x0 = $x0 >= 0 ? $x0 : 0; // Não ultrapassa limites da imagem
-        $y0 = $y0 >= 0 ? $y0 : 0; // Não ultrapassa limites da imagem
+        $x0 = $x0 >= 0 ? $x0 : 0;
+        $y0 = $y0 >= 0 ? $y0 : 0;
 
         for ($j = $y0; $j < $y1; $j++) {
             for ($i = $x0; $i < $x1; $i++) {
@@ -131,6 +155,22 @@ abstract class Image
 
         return $connectedComponents->getObjects($pontos);
     }
+
+    /**
+     * Busca todos os objetos da imagem com área enter $minArea e $maxArea
+     *
+     * @param int $minArea Área mínima que o objeto deve ter 
+     * @param int $minArea Área máxima que o objeto deve ter
+     *
+     * @return array lista de objetos encontrados
+     */
+    public function getAllObjects(int $minArea, int $maxArea)
+    {
+        $p1 = [0, 0];
+        $p2 = [$this->getWidth(), $this->getHeight()];
+        return $this->getObjectsBetween($p1, $p2, $minArea, $maxArea);
+    }
+
 
 
 }

@@ -64,7 +64,20 @@ class Form
 
         # Busca primeira âncora
         $startPoint = $this->applyResolutionTo($this->mask->getStartPoint());
-        $anchorSignature = $this->mask->getSignatureAnchor1();
+        $signaturaAnchor1 = $this->mask->getSignatureAnchor1();
+        $signaturaAnchor2 = $this->mask->getSignatureAnchor2();
+        $signaturaAnchor3 = $this->mask->getSignatureAnchor3();
+        $signaturaAnchor4 = $this->mask->getSignatureAnchor4();
+
+        Signature::print($signaturaAnchor1);
+        Signature::print($signaturaAnchor2);
+        Signature::print($signaturaAnchor3);
+        Signature::print($signaturaAnchor4);
+        echo ' ------ ' . Signature::compare($signaturaAnchor1,$signaturaAnchor2) . "\n";
+        echo ' ------ ' . Signature::compare($signaturaAnchor2,$signaturaAnchor3) . "\n";
+        echo ' ------ ' . Signature::compare($signaturaAnchor3,$signaturaAnchor4) . "\n";
+        echo ' ------ ' . Signature::compare($signaturaAnchor4,$signaturaAnchor1) . "\n";
+
         // $this->image->find($anchorSignature, $startPoint);
         //print_r($anchorSignature);
     }

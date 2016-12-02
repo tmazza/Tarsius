@@ -21,13 +21,17 @@ class Signature
 	 * @var static $l Raio do objeto. Maior distância entre o centro do objeto
 	 * e uma de suas bordas.
 	 */
-	private $l; // Raio do objeto
+	private static $l; // Raio do objeto
 	/**
 	 * @var static $n Quantidade de circulos internos
+	 *
+	 * @todo deveria variar de acordo com o tamanho ou formato do objeto
 	 */
-	private static $n = 18; // 
+	private static $n = 18;
 	/**
 	 * @var static $n Quantidade de cortes radiais
+	 *
+	 * @todo deveria variar de acordo com o tamanho ou formato do objeto
 	 */
 	private static $m = 180;
 
@@ -35,15 +39,15 @@ class Signature
 	 * Gera representação em coordenadas polares do objeto
 	 * @param Object $object
 	 *
-	 * @return bool[][] Matrix com pontos e situação
+	 * @return bool[][] Matrix com assinatura da imagem
 	 */
-	public static function generate($object)
+	public static function generate(Object $object)
 	{
 		list($xc, $yc) = $object->getCenter();
 		$points = $object->getPoints();
-		$this->l = $object->getRadius();
+		self::$l = $object->getRadius();
 
-		$ps = array();
+		$ps = [];
 		foreach ($points as $p) {
 			$ps[$p[0] . '-' . $p[1]] = $p[0] . '-' . $p[1];
 		}
@@ -52,58 +56,56 @@ class Signature
 		$matrix = array();
 		for ($i = 0; $i < self::$n; $i++) {
 			for ($j = 0; $j < self::$m; $j++) {
-				$r = floor(($i * $this->l) / (self::$n - 1));
+				$r = floor(($i * self::$l) / (self::$n - 1));
 				$ang = $j * (360 / self::$m);
 				$x = ceil($r * cos($ang)) + $xc;
 				$y = ceil($r * sin($ang)) + $yc;
 
 				$matrix[$i][$j] = isset($ps[$x . '-' . $y]);
-				if (isset($ps[$x . '-' . $y])) {
-					$points[$x][$y] = true;
-				}
 			}
 		}
-
-//		Helper::pintaPontos(imagecreatetruecolor(2000, 2000), $pontos, 'OBJ' . microtime(true), [255, 255, 255]);
-//		Helper::printMatizBinaria(self::$n, self::$m, $matrix);
 
 		return $matrix;
 	}
 
 	/**
 	 * Compara duas representações em coordenadas polares do objeto.
-	 * @param type $ass1
-	 * @param type $ass2
-	 * @param type $ang
-	 * @return type
+	 *
+	 * @param array[][] $signature1 Matrix no formato de retorno de generate()
+	 * @param array[][] $signature2 Matrix no formato de retorno de generate()
+	 * @param type $angle Ângulo de rotação ser considerado na comparação
+	 *
+	 * @return float Taxa de semelhanças entre duas assinaturas
 	 */
-	public static function comparaFormas($ass1, $ass2, $ang = 0) {
+	public static function compare(array $signature1, array $signature2, int $angle = 0)
+	{
 		$s = 0;
 		for ($i = 0; $i < self::$n; $i++) {
 			for ($j = 0; $j < self::$m; $j++) {
-				$jRot = (($j + $ang) % self::$m);
-				$s += ($ass1[$i][$jRot] xor $ass2[$i][$j]) ? 1 : 0;
+				$jRot = (($j + $angle) % self::$m);
+				$s += ($signature1[$i][$jRot] xor $signature2[$i][$j]) ? 1 : 0;
 			}
 		}
 		return 1 - ($s / ((self::$m / 2) * self::$n));
 	}
 
 	/**
-	 * Visualiza representação em coordenadas polares do objeto.
-	 * @param type $matrix
+	 * Print representação em coordenadas polares do objeto.
+	 *
+	 * @todo possibilitar geração de uma iamgem com o formato do objeto
+	 * e somente os pontos que foram considerados
+	 *
 	 */
-	public static function ver($matrix) {
-		echo '<pre>';
+	public static function print(array $matrix)
+	{
+		echo "\n";
 		foreach ($matrix as $linha => $colunas) {
 			foreach ($colunas as $coluna => $bin) {
-				if ($matrix[$linha][$coluna]) {
-					echo '0';
-				} else {
-					echo '-';
-				}
+				echo $matrix[$linha][$coluna] ? '|' : '-';
 			}
-			echo '<br>';
+			echo "\n";
 		}
+		echo "\n";
 	}
 
 }

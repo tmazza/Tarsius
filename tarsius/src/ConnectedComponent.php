@@ -69,8 +69,6 @@ class ConnectedComponent
     public function getObjects(array $points)
     {
 
-        #$image = imagecreatefromjpeg(__DIR__ . '/');
-
         list($finalLabels, $t_l) = $this->applyLabels($points);
         $this->groupObjects($finalLabels, $t_l);
         $this->applyAreaFilters();
