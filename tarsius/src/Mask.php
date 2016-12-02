@@ -117,6 +117,7 @@ class Mask
      */
     public function getSignatureAnchor1()
     {
-        return $this->anchors[1]->getSignature();
+        echo 'TODO:!!!';
+        // return $this->anchors[1]->getSignature();
     }
 }

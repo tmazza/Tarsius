@@ -27,6 +27,11 @@ class Object
      * @var int $maiorRaio Maior raio entre o centro de massa e as extremidades do objeto.
      */
     private $maiorRaio = false;
+    /**
+     * @var int[][] $signature Assniatura do objeto conforme implementado em Signature
+     */
+    private $signature = false;
+
 
     /**
      * Adiciona par ($x, $y) para conjunto de pontos do objeto
@@ -91,7 +96,7 @@ class Object
      *
      * @return type
      */
-    public function getMaiorRaio()
+    public function getRadius()
     {
         if (!$this->maiorRaio) {
             $dists = array();
@@ -106,5 +111,18 @@ class Object
         }
         return $this->maiorRaio;
     }
+
+    /**
+     * @todo retornar a assinatura da imagem
+     */
+    public function getSignature()
+    {
+        if (!$this->signature) {
+            $this->signature = Signature::generate($this);
+        }
+
+        return $this->signature;
+    }
+
 
 }

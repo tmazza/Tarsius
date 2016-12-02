@@ -73,6 +73,9 @@ class ImageGdTest extends TestCase
 
         $objetos = $obj->getObjectsBetween($p1, $p2, 10, 100);
 
+        echo count($objetos);
+        exit;
+
         $this->assertEquals(count($objetos), 11);
         
     }

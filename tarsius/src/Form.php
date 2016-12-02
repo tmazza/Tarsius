@@ -53,13 +53,13 @@ class Form
 
     /**
      * Busca âncoras na imagem. Inicia busca no ponto esperado da âncora definido
-     * na máscara em uso.
-     * A numeração das âncoras é considerada em sentido horário começando pelo canto 
-     * superior esquerdo. São necessárias 4 âncoras e essas devem formar um retângulo.
+     * na máscara em uso  A numeração das âncoras é considerada em sentido horário 
+     * começando pelo canto superior esquerdo. São necessárias 4 âncoras e essas 
+     * devem formar um retângulo.
      */
     public function localizarAncoras()
     {
-        # Primeira escala considerada é baseda na resolução extraída dos meta dados da imagem
+        # Primeira escala considerada é baseada na resolução extraída dos meta dados da imagem
         $this->setScale($this->image->getResolution());
 
         # Busca primeira âncora

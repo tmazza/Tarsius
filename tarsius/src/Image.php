@@ -132,12 +132,5 @@ abstract class Image
         return $connectedComponents->getObjects($pontos);
     }
 
-    /**
-     * @todo retornar a assinatura da imagem?região
-     */
-    public function getSignature()
-    {
-        return [];
-    }
 
 }
