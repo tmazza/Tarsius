@@ -6,82 +6,100 @@
 namespace Tarsius;
 
 /**
- * @todo refatorar toda a classe!!!
+ * Mantem pontos e propriedades de uma objeto da imagem.
  */
 class Object
 {
 
-    private $area = null;
-    private $centro = null;
-    private $maiorRaio = null;
-    private $pontos;
+    /**
+     * @var int[][] Conjunto de pontos do objeto.
+     */
+    private $points;
+    /**
+     * @var int $area Área do objeto.
+     */
+    private $area = false;
+    /**
+     * @var int[][] $centro Ponto de centro de massa do objeto.
+     */
+    private $centro = false;
+    /**
+     * @var int $maiorRaio Maior raio entre o centro de massa e as extremidades do objeto.
+     */
+    private $maiorRaio = false;
 
     /**
      * Adiciona par ($x, $y) para conjunto de pontos do objeto
-     * @param type $x
-     * @param type $y
+     *
+     * @todo fazer cálcula da área enquanto pontos são adicionados
+     *
+     * @param int $x Coordenada x do ponto
+     * @param int $y Coordenada y do ponto
      */
-    public function addPonto($x, $y) {
-        $this->pontos[] = array($x, $y);
+    public function addPoint($x, $y)
+    {
+        $this->points[] = [$x, $y];
     }
 
     /**
      * Retorna conjunto de pontos do objeto
-     * @return type
+     *
+     * @return int[][] Conjunto de pontos da imagem
      */
-    public function getPontos() {
-        return $this->pontos;
+    public function getPoints(): array
+    {
+        return $this->points;
     }
 
     /**
-     * Retorna área (Qtd. de pontos).
-     * @return type
+     * Soma quantidade de pontos do objeto da imagem.
+     *
+     * @return int área do objeto
      */
-    public function getArea() {
-        if (is_null($this->area)) {
-            $this->area = count($this->pontos);
+    public function getArea(): int
+    {
+        if (!$this->area) {
+            $this->area = count($this->points);
         }
         return $this->area;
     }
 
     /**
-     * Calcula o centro de massa/gravidade.
-     * @param type $obj
-     * @return type
+     * Calcula o centro de massa/gravidade do objeto.
+     *
+     * @return int[][] Centro de massa do objeto
      */
-    public function getCentro() {
-        if (!isset($this->centro)) {
+    public function getCenter(): array
+    {
+        if (!$this->centro) {
+            $area = $this->getArea();
             $somaX = $somaY = 0;
-            foreach ($this->pontos as $p) {
+            foreach ($this->points as $p) {
                 $somaX += $p[0];
                 $somaY += $p[1];
             }
-            $this->centro = [ceil($somaX / $this->area), ceil($somaY / $this->area)];
+            $this->centro = [ceil($somaX / $area), ceil($somaY / $area)];
         }
         return $this->centro;
     }
 
     /**
-     * Sobreescreve posição da âncora
-     */
-    public function setCentro($ponto){
-        $this->centro = $ponto;
-    }
-
-    /**
      * Calcula o maior raio.
-     * TODO: otimizar. Sendo usado algoritmo ingênuo. 
      * A partir do centro calcula a distancia entre todos os pontos do   * objeto, a maior distância é selecionada.
-     * @param type $obj
+     *
+     * @todo reduzir complexida do algoritmo.
+     *
      * @return type
      */
-    public function getMaiorRaio() {
-        if (is_null($this->maiorRaio)) {
+    public function getMaiorRaio()
+    {
+        if (!$this->maiorRaio) {
             $dists = array();
-            $centro = $this->getCentro();
-            foreach ($this->getPontos() as $p) {
-                $dist = sqrt(pow($centro[0] - $p[0], 2) + pow($centro[1] - $p[1], 2));
-                $dists[$p[0] . '-' . $p[1]] = $dist;
+            list($xc, $yc) = $this->getCenter();
+            foreach ($this->getPoints() as $p) {
+                list($x, $y) = $p;
+                $dist = sqrt(pow($xc - $x, 2) + pow($yc - $y, 2));
+                $dists[$x . '-' . $y] = $dist;
             }
             arsort($dists);
             $this->maiorRaio = array_shift($dists);

@@ -83,11 +83,11 @@ class ConnectedComponent
      * A Linear-time two-scan labbeling algorithn ADAPTADO
      * @link http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=4379810 Lifeng He, Yuyan Chao and Kenji Suzuki
      *
-     * @param int[][] $pontos Pontos de foreground(pretos) quer serão processados.
+     * @param int[][] $points Pontos de foreground(pretos) quer serão processados.
      *
-     * @return int[][] Lista de pontos com o valor do label associado.
+     * @return int[][] Lista de points com o valor do label associado.
      */
-    private function applyLabels($pontos)
+    private function applyLabels($points)
     {
         $labelCount = 1;
         $e_l = $t_l = array();
@@ -95,7 +95,7 @@ class ConnectedComponent
         $finalLabels = [];
 
         # aplica label para cada ponto
-        foreach ($pontos as $x => $linha) {
+        foreach ($points as $x => $linha) {
             foreach ($linha as $y => $p) {
 
                 $posiveis = $this->getLabelsOfMask($x, $y, $finalLabels);
@@ -197,10 +197,9 @@ class ConnectedComponent
                 if (!isset($this->objects[$label])) {
                     $this->objects[$label] = new Object();
                 }
-                $this->objects[$label]->addPonto($x, $y);
+                $this->objects[$label]->addPoint($x, $y);
             }
         }
-        print_r(array_unique(array_keys($this->objects)));
     }
 
 
