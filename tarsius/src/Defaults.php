@@ -39,5 +39,5 @@ class Defaults
      *      11.81 pixel por milímetro, com $searchArea igual 10 a primeira área de busca
      *      seria um quadrado de 10*11.81 pixel de lado.
      */
-    static public $searchArea = 10;
+    static public $searchArea = 15;
 }

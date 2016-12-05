@@ -7,6 +7,7 @@ namespace Tarsius;
 
 use Tarsius\ImageFactory;
 use Tarsius\Mask;
+use Tarsius\Math;
 
 class Form
 {
@@ -68,6 +69,17 @@ class Form
         $this->setScaleDirect(bcdiv($observed,$expected,14));
         # TODO: analisar regiões
         # TODO: organizar saída
+
+
+        // #DEGUB!
+        // $a3 = $this->anchors[Mask::ANCHOR_BOTTOM_RIGHT]->getCenter();
+        // $a2 = $this->anchors[Mask::ANCHOR_TOP_RIGHT]->getCenter();
+        // $copy = $this->image->getAnCopy();
+        // $this->image->drawRectangle($copy, $a1, $a3);
+        // $this->image->drawRectangle($copy, $a2, $a4);
+        // $this->image->save($copy, 'ancoras');
+
+
     }
 
     /**

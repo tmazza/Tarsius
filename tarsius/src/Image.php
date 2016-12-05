@@ -7,12 +7,15 @@ namespace Tarsius;
 
 use Tarsius\ConnectedComponent;
 use Tarsius\Defaults;
+use Tarsius\ImageDebug;
 
 /**
  * Contém informações e métodos para manipular a imagem sendo processada.
  */
 abstract class Image 
 {
+    use ImageDebug;
+
     /**
      * Resolução utilizada caso não seja possível ler as informações da imagem.
      */
@@ -25,6 +28,10 @@ abstract class Image
      */ 
     const THRESHOLD = 128;
 
+    /**
+     * @var static string $anchorsDir Caminho para diretório contendo as imagens das âncoras.
+     */
+    protected static $debugDir = __DIR__ . DIRECTORY_SEPARATOR . 'debug' . DIRECTORY_SEPARATOR;
     /**
      * @var string $name Nome completo do arquivo sendo manipulado.
      */
@@ -122,18 +129,18 @@ abstract class Image
     {
         list($x0, $y0) = $p1;
         list($x1, $y1) = $p2;
-        $pontos = array();
+        $points = array();
         $x0 = $x0 >= 0 ? $x0 : 0;
         $y0 = $y0 >= 0 ? $y0 : 0;
 
         for ($j = $y0; $j < $y1; $j++) {
             for ($i = $x0; $i < $x1; $i++) {
                 if ($this->isBlack($i, $j)) {
-                    $pontos[$i][$j] = true;
+                    $points[$i][$j] = true;
                 }
             }
         }
-        return $pontos;
+        return $points;
     }
 
     /**
@@ -149,13 +156,18 @@ abstract class Image
      */
     public function getObjectsBetween(array $p1, array $p2, int $minArea, int $maxArea): array
     {
-        $pontos = $this->getPointsBetween($p1, $p2);
+        $points = $this->getPointsBetween($p1, $p2);
 
         $connectedComponents = new ConnectedComponent();
         $connectedComponents->setMinArea($minArea);
         $connectedComponents->setMaxArea($maxArea);
 
-        return $connectedComponents->getObjects($pontos);
+
+        $objs = $connectedComponents->getObjects($points);
+        $copy = $this->getCopy();
+        $this->drawObjects($copy, $objs);
+        $this->save($copy, 'objs');
+        return $objs;
     }
 
     /**
