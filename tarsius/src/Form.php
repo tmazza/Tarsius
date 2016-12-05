@@ -56,7 +56,18 @@ class Form
      */
     public function evaluate()
     {
+        # Primeira escala considerada é baseada na resolução extraída dos meta dados da imagem
+        $this->setScale($this->image->getResolution());
+        # Localiza as 4 âncoras da máscara        
         $this->localizarAncoras();
+        # Atualiza informação de escala considerando distâncias esperadas e avaliadas entre as âncoras
+        $a1 = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getCenter();
+        $a4 = $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->getCenter();
+        $observed = $this->distance($a1,$a4);
+        $expected = $this->mask->getVerticalDistance();
+        $this->setScaleDirect(bcdiv($observed,$expected,14));
+
+
     }
 
     /**
@@ -69,24 +80,22 @@ class Form
      */
     public function localizarAncoras()
     {
-        # Primeira escala considerada é baseada na resolução extraída dos meta dados da imagem
-        $this->setScale($this->image->getResolution());
-
-        # Busca primeira âncora
+        # Encontra âncoras do topo da folha
         $this->getAnchor(Mask::ANCHOR_TOP_LEFT);
         $this->getAnchor(Mask::ANCHOR_TOP_RIGHT);
-        # todo: atualizar rotação
+        
+        # Define rotação considerando primeira distância conhecida
+        $p1 = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getCenter();
+        $p2 = $this->anchors[Mask::ANCHOR_TOP_RIGHT]->getCenter();
+        $this->setRotation($p1, $p2);
 
+        # Encontra âncoras na base da folha
         $this->getAnchor(Mask::ANCHOR_BOTTOM_RIGHT);
         $this->getAnchor(Mask::ANCHOR_BOTTOM_LEFT);
-        # todo: atualizar rotação
 
-        print_r($this->anchors[1]->getCenter());
-        print_r($this->anchors[2]->getCenter());
-        print_r($this->anchors[3]->getCenter());
-        print_r($this->anchors[4]->getCenter());
-        echo "\n\n";
-        exit;
+        # Redefine rotação considerando âncoras com maior distância
+        $p2 = $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->getCenter();
+        $this->updateRotation($p1, $p2, true);
     }
 
     /**
@@ -113,6 +122,31 @@ class Form
     private function setScale(int $resolution)
     {
         $this->scale = bcdiv($resolution, 25.4);
+    }
+
+    /**
+     * Define escala considerando valor igual a quantidade de pixel por milímetro.
+     */
+    private function setScaleDirect(float $scale)
+    {
+        $this->scale = $scale;
+    }
+
+    /**
+     * Atualiza valor de rotação da imagem considerando ângulo entre dois pontos
+     */
+    private function setRotation($p1, $p2, $reverse = false)
+    {
+        $this->rotation = atan($this->lineGradient($p1, $p2, $reverse));
+    }
+
+    /**
+     * Atualiza valor de rotação da imagem considerando ângulo entre dois pontos
+     * fazendo uma média simples com o valor já existente
+     */
+    private function updateRotation($p1, $p2, $reverse = false)
+    {
+        $this->rotation = ($this->rotation + atan($this->lineGradient($p1, $p2, $reverse))) / 2;
     }
 
     /**
