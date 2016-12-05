@@ -6,7 +6,7 @@
 namespace Tarsius;
 
 use Tarsius\ConnectedComponent;
-use Tarsius\Finder;
+use Tarsius\Defaults;
 
 /**
  * Contém informações e métodos para manipular a imagem sendo processada.
@@ -180,20 +180,21 @@ abstract class Image
      * @todo passagem de parâmetros de configuração.
      *
      * @param bool[][] &$objectSignature Assinatura do objeto a ser procurado
-     * @param int[] $centralPoint Ponto central da região de busca
+     * @param int[] &$centralPoint Ponto central da região de busca
+     * @param float $scale Escala em uso pelo formulário. (Pode ser diferente da definida nos meta-dados da imagem) 
+     * @param array $config Condiguração área mínima e máxima do objeto e do valor
+     *      mínimo para considerar duas regiões iguais
      */
-    public function findObject(array &$objectSignature, array $centralPoint)
+    public function findObject(array &$objectSignature, array &$centralPoint, float $scale, array $config = [])
     {
-        $minArea        = 500;   // @todo passar parâmetros de configuração!
-        $maxArea        = 3000;  // @todo passar parâmetros de configuração!
-        $searchArea     = 100;   // @todo passar parâmetros de configuração!
-        $minMatch       = 0.8;   // @todo passar parâmetros de configuração!
-        
-        $maxExpansions  = 4;     // @todo passar parâmetros de configuração!
-        $expasionRate   = 0.5;   // @todo passar parâmetros de configuração!
+        $minArea        = $config['minArea']        ?? Defaults::$minArea;
+        $maxArea        = $config['maxArea']        ?? Defaults::$maxArea;
+        $minMatch       = $config['minMatch']       ?? Defaults::$minMatchObject;
+        $searchArea     = ($config['searchArea']    ?? Defaults::$searchArea) * $scale;
+        $maxExpansions  = $config['maxExpansions']  ?? Defaults::$maxExpansions;
+        $expasionRate   = $config['expasionRate']   ?? Defaults::$expasionRate;
         
         $match = false;
-
         do {
 
             list($p1, $p2) = $this->getPointsOfRegion($centralPoint, $searchArea);

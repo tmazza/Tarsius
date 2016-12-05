@@ -5,7 +5,7 @@
 
 namespace Tarsius;
 
-trait Helper
+trait Math
 {
 
     /**

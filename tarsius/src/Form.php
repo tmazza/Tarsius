@@ -10,7 +10,7 @@ use Tarsius\Mask;
 
 class Form
 {
-    use Helper;    
+    use Math;    
     /**
      * @var Image objeto da imagem sendo processado
      */
@@ -66,8 +66,8 @@ class Form
         $observed = $this->distance($a1,$a4);
         $expected = $this->mask->getVerticalDistance();
         $this->setScaleDirect(bcdiv($observed,$expected,14));
-
-
+        # TODO: analisar regiões
+        # TODO: organizar saída
     }
 
     /**
@@ -158,7 +158,16 @@ class Form
     {
         $signature = $this->mask->getSignatureOfAnchor($anchor);
         $startPoint = $this->getExpectedPositionAnchor($anchor);
-        $this->anchors[$anchor] = $this->image->findObject($signature, $startPoint);
+
+        $config = [];
+        if (isset($this->anchors[Mask::ANCHOR_TOP_LEFT])) {
+            $area = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getArea();
+            $config['minArea'] = $area - ($area * 0.5);
+            $config['naxArea'] = $area + ($area * 0.5);
+            # TODO: configuração de minMatch!??
+        }
+
+        $this->anchors[$anchor] = $this->image->findObject($signature, $startPoint, $this->scale, $config);
         if ($this->anchors[$anchor] === false) {
             throw new Exception("Âncora {$anchor} não encontrada.");           
         }
