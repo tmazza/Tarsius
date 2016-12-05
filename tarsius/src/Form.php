@@ -10,6 +10,7 @@ use Tarsius\Mask;
 
 class Form
 {
+    use Helper;    
     /**
      * @var Image objeto da imagem sendo processado
      */
@@ -29,7 +30,7 @@ class Form
     /**
      * @var int $rotation Rotação da imagem
      */
-    private $rotation;
+    private $rotation = 0;
     /**
      * @var array $anchors Âncoras da imagem
      */
@@ -74,8 +75,11 @@ class Form
         # Busca primeira âncora
         $this->getAnchor(Mask::ANCHOR_TOP_LEFT);
         $this->getAnchor(Mask::ANCHOR_TOP_RIGHT);
+        # todo: atualizar rotação
+
         $this->getAnchor(Mask::ANCHOR_BOTTOM_RIGHT);
         $this->getAnchor(Mask::ANCHOR_BOTTOM_LEFT);
+        # todo: atualizar rotação
 
         print_r($this->anchors[1]->getCenter());
         print_r($this->anchors[2]->getCenter());
@@ -148,17 +152,18 @@ class Form
                     $posAnchor1[1],
                 ];
             case Mask::ANCHOR_BOTTOM_RIGHT: 
-                return [
-                    $posAnchor1[0] + $horizontalDistance, 
+                return $this->rotatePoint([
+                    $posAnchor1[0] + $horizontalDistance,
                     $posAnchor1[1] + $verticalDistance,
-                ]; 
+                ], $posAnchor1, $this->rotation); 
             case Mask::ANCHOR_BOTTOM_LEFT: 
-                return [
+                return $this->rotatePoint([
                     $posAnchor1[0], 
                     $posAnchor1[1] + $verticalDistance,
-                ];  
+                ], $posAnchor1, $this->rotation); 
             default:
                 throw new Exception("Operação inválida. Âncora {$anchor} desconhecida.");
         }
     }
+
 }
