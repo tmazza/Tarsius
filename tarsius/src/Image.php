@@ -6,6 +6,7 @@
 namespace Tarsius;
 
 use Tarsius\ConnectedComponent;
+use Tarsius\Finder;
 
 /**
  * Contém informações e métodos para manipular a imagem sendo processada.
@@ -20,6 +21,7 @@ abstract class Image
      * Corte entre pixel pretos e brancos. 
      * 
      * @todo usar limiar dinâmico
+     * @todo possibilitar configuração em tempo de execução
      */ 
     const THRESHOLD = 128;
 
@@ -171,6 +173,79 @@ abstract class Image
         return $this->getObjectsBetween($p1, $p2, $minArea, $maxArea);
     }
 
+    /**
+     * Busca objeto que contenha a assinatura objectSignature, iniciando
+     * a busca em uma região com centro em $centralPoint.
+     * A largura e a altura da região de busca é definida ...
+     * @todo passagem de parâmetros de configuração.
+     *
+     * @param bool[][] &$objectSignature Assinatura do objeto a ser procurado
+     * @param int[] $centralPoint Ponto central da região de busca
+     */
+    public function findObject(array &$objectSignature, array $centralPoint)
+    {
+        $minArea        = 500;   // @todo passar parâmetros de configuração!
+        $maxArea        = 3000;  // @todo passar parâmetros de configuração!
+        $searchArea     = 100;   // @todo passar parâmetros de configuração!
+        $minMatch       = 0.8;   // @todo passar parâmetros de configuração!
+        
+        $maxExpansions  = 4;     // @todo passar parâmetros de configuração!
+        $expasionRate   = 0.5;   // @todo passar parâmetros de configuração!
+        
+        $match = false;
 
+        do {
+
+            list($p1, $p2) = $this->getPointsOfRegion($centralPoint, $searchArea);
+            $objects = $this->getObjectsBetween($p1, $p2, $minArea, $maxArea);
+
+            foreach ($objects as $object) {
+                $similarity = Signature::compare(Signature::generate($object), $objectSignature);
+                if ($similarity >= $minMatch) {
+                    $match = $object;
+                }
+            }
+            $searchArea *= (1 + $expasionRate);
+            $maxExpansions--;
+
+        } while (!$match && $maxExpansions > 0);
+
+        return $match;
+    }
+
+    /**
+     * Retorna ponto superior esquerdo e inferior direito do quadrado com
+     * centro em $centralPoint, formando um quadrado de lago $sideLenght*2
+     * Não permite que as coordenadas passem os limites da imagem.
+     *
+     * @todo não permitir que x1 e y1 estejam fora da imagem. Exceção?
+     *
+     * @param int[] $centralPoint
+     * @param type $centralPoint
+     * @param type $y0
+     *
+     * @return array Par de pontos, sendo o primeiro o superior esquerdo
+     *      e o segundo o inferior direito
+     */
+    private function getPointsOfRegion($centralPoint, $sideLength) {
+        list($x0, $y0) = $centralPoint;
+        $x1 = $x0 + $sideLength;
+        $y1 = $y0 + $sideLength;
+        $x0 -= $sideLength;
+        $y0 -= $sideLength;
+        
+        if ($x0 < 0) { # se atingir o topo da imagem expande para baixo
+            $x1 += abs($x0); 
+            $x0 = 0;
+        }
+        if ($y0 < 0) { # se atingir a borda esquerda da imagem expande para direita
+            $y1 += abs($y0);
+            $y0 = 0;
+        }
+        return [
+            [$x0, $y0],
+            [$x1, $y1], # @todo antes precisa ser y-1, precisa ainda??
+        ];
+    }
 
 }

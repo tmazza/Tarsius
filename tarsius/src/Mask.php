@@ -10,9 +10,17 @@ namespace Tarsius;
  */
 class Mask
 {
+    # Numeração das âncoras
+    const ANCHOR_TOP_LEFT = 1;
+    const ANCHOR_TOP_RIGHT = 2;
+    const ANCHOR_BOTTOM_RIGHT = 3;
+    const ANCHOR_BOTTOM_LEFT = 4;
+    # Nome dos parâmetros no template
     const FORMAT_OUTPUT = 'formatoSaida';
     const REGIONS = 'regioes';
     const START_POINT = 'ancora1';
+    const DIST_ANC_HOR = 'distAncHor';
+    const DIST_ANC_VER = 'distAncVer';
 
     /**
      * @var static string $anchorsDir Caminho para diretório contendo as imagens das âncoras.
@@ -32,11 +40,19 @@ class Mask
      */
     private $startPoint;
     /**
-     * @var mixed[] $regions @todo documentar
+     * @var $distAncHor Distância vertical entre as âncoras
+     */
+    private $distAncHor;
+    /**
+     * @var $distAncVer Distância horizontal entre as âncoras
+     */
+    private $distAncVer;
+    /**
+     * @var mixed[] $regions @todo documentar. Link para forma de criação!
      */
     private $regions;
     /**
-     * @var string $formatOutput @todo documentar
+     * @var string $formatOutput @todo documentar. Link para forma de criação!
      */
     private $formatOutput = false;
     /**
@@ -60,7 +76,7 @@ class Mask
     /**
      * Abre e interpreta arquivo JSON com as definições do template.
      *
-     * @throws Exeception Quando START_POINT não é informado.
+     * @throws Exeception Quando START_POINT,DIST_ANC_HOR ou DIST_ANC_VER não for informado.
      */
     public function load(): Mask
     {
@@ -76,6 +92,18 @@ class Mask
                 $this->startPoint = $data[self::START_POINT];
             } else {
                 throw new Exception("Localização de primeira âncora deve ser informada. Use " . self::START_POINT);
+            }
+            
+            if (isset($data[self::DIST_ANC_HOR])) {
+                $this->distAncHor = $data[self::DIST_ANC_HOR];
+            } else {
+                throw new Exception("Distância vertical entre as âncoras. Use " . self::DIST_ANC_HOR);
+            }
+
+            if (isset($data[self::DIST_ANC_VER])) {
+                $this->distAncVer = $data[self::DIST_ANC_VER];
+            } else {
+                throw new Exception("Distância horizontal entre as âncoras. Use " . self::DIST_ANC_VER);
             }
 
             if (isset($data[self::REGIONS])) {
@@ -109,6 +137,22 @@ class Mask
     public function getStartPoint()
     {
         return $this->startPoint;        
+    }
+
+    /**
+     * Retorna valor de @var $distAncHor
+     */
+    public function getHorizontalDistance()
+    {
+        return $this->distAncHor;        
+    }
+
+    /**
+     * Retorna valor de @var $distAncVer
+     */
+    public function getVerticalDistance()
+    {
+        return $this->distAncVer;
     }
 
     /**

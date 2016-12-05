@@ -32,7 +32,6 @@ class Object
      */
     private $signature = false;
 
-
     /**
      * Adiciona par ($x, $y) para conjunto de pontos do objeto
      *
@@ -113,14 +112,13 @@ class Object
     }
 
     /**
-     * @todo retornar a assinatura da imagem
+     * Retornar a assinatura da imagem
      */
     public function getSignature()
     {
         if (!$this->signature) {
             $this->signature = Signature::generate($this);
         }
-
         return $this->signature;
     }
 

@@ -10,7 +10,6 @@ use Tarsius\Mask;
 
 class Form
 {
-
     /**
      * @var Image objeto da imagem sendo processado
      */
@@ -24,9 +23,17 @@ class Form
      */
     private $mask;
     /**
-     * Escala sendo utilizada para aplicação da máscara ao template.
+     * @var int $scale Escala sendo utilizada para aplicação da máscara ao template.
      */
     private $scale;
+    /**
+     * @var int $rotation Rotação da imagem
+     */
+    private $rotation;
+    /**
+     * @var array $anchors Âncoras da imagem
+     */
+    private $anchors = [];
 
     /**
      * Carrega imagem e máscara que devem ser utilizadas.
@@ -56,6 +63,8 @@ class Form
      * na máscara em uso  A numeração das âncoras é considerada em sentido horário 
      * começando pelo canto superior esquerdo. São necessárias 4 âncoras e essas 
      * devem formar um retângulo.
+     *
+     * @throws Exception Caso alguma das não seja encontrada
      */
     public function localizarAncoras()
     {
@@ -63,23 +72,17 @@ class Form
         $this->setScale($this->image->getResolution());
 
         # Busca primeira âncora
-        $startPoint = $this->applyResolutionTo($this->mask->getStartPoint());
-        $signaturaAnchor1 = $this->mask->getSignatureAnchor1();
-        $signaturaAnchor2 = $this->mask->getSignatureAnchor2();
-        $signaturaAnchor3 = $this->mask->getSignatureAnchor3();
-        $signaturaAnchor4 = $this->mask->getSignatureAnchor4();
+        $this->getAnchor(Mask::ANCHOR_TOP_LEFT);
+        $this->getAnchor(Mask::ANCHOR_TOP_RIGHT);
+        $this->getAnchor(Mask::ANCHOR_BOTTOM_RIGHT);
+        $this->getAnchor(Mask::ANCHOR_BOTTOM_LEFT);
 
-        Signature::print($signaturaAnchor1);
-        Signature::print($signaturaAnchor2);
-        Signature::print($signaturaAnchor3);
-        Signature::print($signaturaAnchor4);
-        echo ' ------ ' . Signature::compare($signaturaAnchor1,$signaturaAnchor2) . "\n";
-        echo ' ------ ' . Signature::compare($signaturaAnchor2,$signaturaAnchor3) . "\n";
-        echo ' ------ ' . Signature::compare($signaturaAnchor3,$signaturaAnchor4) . "\n";
-        echo ' ------ ' . Signature::compare($signaturaAnchor4,$signaturaAnchor1) . "\n";
-
-        // $this->image->find($anchorSignature, $startPoint);
-        //print_r($anchorSignature);
+        print_r($this->anchors[1]->getCenter());
+        print_r($this->anchors[2]->getCenter());
+        print_r($this->anchors[3]->getCenter());
+        print_r($this->anchors[4]->getCenter());
+        echo "\n\n";
+        exit;
     }
 
     /**
@@ -108,4 +111,54 @@ class Form
         $this->scale = bcdiv($resolution, 25.4);
     }
 
+    /**
+     * Busca uma âncora da imagem se baseando na posição espeada.
+     *
+     * @param int $anchor Âncora sendo procurada
+     */
+    private function getAnchor(int $anchor)
+    {
+        $signature = $this->mask->getSignatureOfAnchor($anchor);
+        $startPoint = $this->getExpectedPositionAnchor($anchor);
+        $this->anchors[$anchor] = $this->image->findObject($signature, $startPoint);
+        if ($this->anchors[$anchor] === false) {
+            throw new Exception("Âncora {$anchor} não encontrada.");           
+        }
+    }
+
+    /**
+     * Retorna posição esperada da âncora.
+     *
+     * @param int $anchor Âncora a ser avaliada
+     */ 
+    private function getExpectedPositionAnchor(int $anchor)
+    {
+        if($anchor !== Mask::ANCHOR_TOP_LEFT){
+            $posAnchor1 = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getCenter();
+        }
+        $horizontalDistance = $this->applyResolutionTo($this->mask->getHorizontalDistance());
+        $verticalDistance = $this->applyResolutionTo($this->mask->getVerticalDistance());
+
+        switch ($anchor) {
+            case Mask::ANCHOR_TOP_LEFT:
+                return $this->applyResolutionTo($this->mask->getStartPoint());
+            case Mask::ANCHOR_TOP_RIGHT: 
+                return [
+                    $posAnchor1[0] + $horizontalDistance, 
+                    $posAnchor1[1],
+                ];
+            case Mask::ANCHOR_BOTTOM_RIGHT: 
+                return [
+                    $posAnchor1[0] + $horizontalDistance, 
+                    $posAnchor1[1] + $verticalDistance,
+                ]; 
+            case Mask::ANCHOR_BOTTOM_LEFT: 
+                return [
+                    $posAnchor1[0], 
+                    $posAnchor1[1] + $verticalDistance,
+                ];  
+            default:
+                throw new Exception("Operação inválida. Âncora {$anchor} desconhecida.");
+        }
+    }
 }
