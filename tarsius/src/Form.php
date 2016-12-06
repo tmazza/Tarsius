@@ -73,8 +73,9 @@ class Form
         $this->setScaleDirect(bcdiv($observed,$expected,14));
         
         # avalia regiões da imagem
-        $result = $this->evaluateRegions();
-        print_r($result);
+        $analyser = new FormAnalyser($this->image, $this->mask, $this->anchors, $this->scale, $this->rotation);
+        $result = $analyser->evaluateRegions();
+        // print_r($result);
 
         # TODO: organizar saída
 
@@ -119,19 +120,6 @@ class Form
             $this->image->save($copy, 'anchor');
         }
 
-    }
-
-    /**
-     * Avalia resultado para cada região definida em $mask, de acordo com 
-     * o tipo da região e as condições de preenchimento definidas em Tarsius
-     *
-     * @return array Lista de regiões com ID da região como chave e o resultado
-     *      da interpretaçõao e informações relevantes como valor.
-     */
-    private function evaluateRegions()
-    {
-        $analyser = new FormAnalyser($this->image, $this->mask, $this->anchors, $this->scale, $this->rotation);
-        return $analyser->evaluateRegions();
     }
 
     /**

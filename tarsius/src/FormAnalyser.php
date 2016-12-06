@@ -18,30 +18,34 @@ class FormAnalyser
     const REGION_NUMERIC_OCR = 1;
 
     /**
-     * @var 
+     * @var Image $image Imagem a ser analisada
      */
     private $image;
     /**
-     * @var 
+     * @var Mask $mask Máscara que deve ser aplicada na imagem.
      */
     private $mask;
     /**
-     * @var 
+     * @var array $anchors Conjunto de âncoras encontradas
      */
     private $anchors;
     /**
-     * @var 
+     * @var float $scale Resolução observada na imagem
      */
     private $scale;
     /**
-     * @var 
+     * @var float $rotation Rotação observada na imagem
      */
     private $rotation;
 
     /**
      * Instancia formulário a ser manipulado
      *
-     * @param Form &$form Formulário sendo analisado.
+     * @param float &$image Imagem a ser analisada
+     * @param float &$mask Máscara que deve ser aplicada na imagem.
+     * @param float &$anchors Conjunto de âncoras encontradas
+     * @param float &$scale Resolução observada na imagem
+     * @param float &$rotation Rotação observada na imagem
      */
     public function __construct(&$image, &$mask, &$anchors, &$scale, &$rotation)
     {
@@ -54,6 +58,11 @@ class FormAnalyser
 
     /**
      * Analisa regiões definidas na máscara de acordo com o seu tipo.
+     * Avalia resultado para cada região definida em $mask, de acordo com 
+     * o tipo da região e as condições de preenchimento definidas em Tarsius
+     *
+     * @return array Lista de regiões com ID da região como chave e o resultado
+     *      da interpretaçõao e informações relevantes como valor.
      */
     public function evaluateRegions()
     {
