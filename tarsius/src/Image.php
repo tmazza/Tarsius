@@ -234,6 +234,22 @@ abstract class Image
     }
 
     /**
+     * Gera pontos que formam um quadrado com centro em $centralPoint e
+     * de aresta $sideLength
+     *     
+     * @param int[] $centralPoint
+     * @param type $centralPoint
+     * @param type $y0
+     *
+     * @return array Par de pontos, sendo o primeiro o superior esquerdo
+     *      e o segundo o inferior direito
+     */
+    public function getPointsOfRegion($centralPoint, $sideLength)
+    {
+        return $this->createRectangle($centralPoint, $sideLength, $sideLength);
+    }
+
+    /**
      * Retorna ponto superior esquerdo e inferior direito do quadrado com
      * centro em $centralPoint, formando um quadrado de lago $sideLenght*2
      * Não permite que as coordenadas passem os limites da imagem.
@@ -247,12 +263,13 @@ abstract class Image
      * @return array Par de pontos, sendo o primeiro o superior esquerdo
      *      e o segundo o inferior direito
      */
-    private function getPointsOfRegion($centralPoint, $sideLength) {
-        list($x0, $y0) = $centralPoint;
-        $x1 = $x0 + $sideLength;
-        $y1 = $y0 + $sideLength;
-        $x0 -= $sideLength;
-        $y0 -= $sideLength;
+    public function createRectangle($centralPoint, $width, $height)
+    {
+      list($x0, $y0) = $centralPoint;
+        $x1 = $x0 + $width;
+        $y1 = $y0 + $height;
+        $x0 -= $width;
+        $y0 -= $height;
 
         if ($x0 < 0) { # se atingir o topo da imagem expande para baixo
             $x1 += abs($x0); 
@@ -273,7 +290,7 @@ abstract class Image
         return [
             [$x0, $y0],
             [$x1, $y1], # @todo antes precisa ser y-1, precisa ainda??
-        ];
+        ];  
     }
 
 }

@@ -132,22 +132,24 @@ class Form
      */
     private function evaluteRegions()
     {
+        # DEBUG
+        $copy = Tarsius::$enableDebug ? $this->image->getCopy() : null;
+        
         $result = [];
         $regions = $this->mask->getRegions();
         foreach ($regions as $id => $region) {
             $type = $region[0];
-
             if ($type == self::REGION_ELLIPSE) {
-                $point = $this->getPointWithCorretion($this->applyResolutionTo($region));
-                echo $id . ' - ';
-                echo $type;
-                print_r($point);
-                echo  " | \n";
+                $result[$id] = $this->evaluateEllipse($region, $copy);                
             } else {
                 throw new \Exception("Tipo de região '{$type}' desconhecido.");
             }
         }
 
+        # DEBUG
+        if (Tarsius::$enableDebug) {
+            $this->image->save($copy, 'elipses');
+        }
         return $result;
     }
 
@@ -157,7 +159,7 @@ class Form
      * para cada ponto.
      *
      */
-    private function getPointWithCorretion(&$region)
+    private function getPointWithCorretion($region)
     {
         $refAncoras = $this->mask->getNumAnchors();
 
@@ -201,6 +203,76 @@ class Form
         $p24 = $this->getMidPoint($p2, $p4);
 
         return $this->getMidPoint($p13, $p24);
+    }
+
+    /**
+     * Interpreta a região de uma ellipse. Conta a quantidade de pontos contidos na elipse
+     * de centro em $center. 
+     *
+     * @param array $region A definição de cada índice de $region deve ser:
+     *      - 0: tipo da região (0 nesse caso)
+     *      - 1 e 2: ponto definindo a região (não utilizado aqui)
+     *      - 3: saída a ser retornada caso a região preenchida seja maior do que mínima
+     *      - 4: saída a ser retornada caso a região preenchida não seja maior do que mínima
+     *      - 5: (opcional) preenchimento mínimo. Caso não seja definido será 
+     *           utilizado o valor em minMatch
+     *      - 6: (opcional) Largura da elipse. Caso não seja definido será utilizado 
+     *           o valor da classe Tarsius
+     *      - 7: (opcional) Altura da elipse. Caso não seja definido será utilizado o valor 
+     *           da classe Tarsius
+     *
+     */
+    private function evaluateEllipse($region, &$copy)
+    {
+        $center = $this->getPointWithCorretion($this->applyResolutionTo($region));   
+        $minMatch = $region[5] ?? Tarsius::$minMatchEllipse;
+        $elpWidth = $this->applyResolutionTo($region[6] ?? $this->mask->getEllipseWidth());
+        $elpHeight = $this->applyResolutionTo($region[7] ?? $this->mask->getEllipseHeight());
+
+
+        list($p1, $p2) = $this->image->createRectangle($center, $elpWidth/1.95, $elpHeight/1.95);
+        $points = $this->image->getPointsBetween($p1, $p2);
+
+        # DEBUG
+        if (Tarsius::$enableDebug) {
+            $this->image->drawRectangle($copy, $p1, $p2);
+        
+            $observedArea = 0;
+            foreach ($points as $x => $columns) {
+              foreach ($columns as $y => $v) {
+                # verifica se um ponto esta dentro ou fora da elipse
+                # equação da elipse | ((x-x0)^2 / a^2) + ((y0-y) / b^2), valores de y crescem 'para baixo' na imagem
+                if((($x - $center[0])**2 / ($elpWidth/2)**2) + (($center[1]-$y)**2 / ($elpHeight/2)**2) <= 1){
+                    $observedArea++;
+                    $this->image->setPixel($copy, [$x, $y], [0,255,0]);
+                } else {
+                    $this->image->setPixel($copy, [$x, $y], [0,0,255]);
+                }
+              }
+            }   
+        } else {
+            $observedArea = 0;
+            foreach ($points as $x => $columns) {
+              foreach ($columns as $y => $v) {
+                # verifica se um ponto esta dentro ou fora da elipse
+                # equação da elipse | ((x-x0)^2 / a^2) + ((y0-y) / b^2), valores de y crescem 'para baixo' na imagem
+                if((($x - $center[0])**2 / ($elpWidth/2)**2) + (($center[1]-$y)**2 / ($elpHeight/2)**2) <= 1){
+                    $observedArea++;
+                }
+              }
+            }   
+        }
+
+        $expectedArea = pi() * ($elpWidth/2) * ($elpHeight/2);
+        $fillRate = $observedArea / $expectedArea;
+
+        return [
+          $fillRate >= $minMatch ? $region[3] : $region[4],
+          $fillRate,
+          $center[0], # TODO: mantido para manter compatibilidade, verficar necessidade
+          $center[1], # TODO: mantido para manter compatibilidade, verficar necessidade
+        ];
+
     }
 
     /**

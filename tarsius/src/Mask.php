@@ -22,6 +22,8 @@ class Mask
     const DIST_ANC_HOR = 'distAncHor';
     const DIST_ANC_VER = 'distAncVer';
     const NUM_ANCHORS = 'refAncoras';
+    const ELLIPSE_WIDTH = 'elpLargura';
+    const ELLIPSE_HEIGHT = 'elpAltura';
 
     /**
      * @var static string $anchorsDir Caminho para diretório contendo as imagens das âncoras.
@@ -64,7 +66,19 @@ class Mask
     /**
      * @var Image[] $anchors @todo documentar
      */
-    private $anchors = [];    
+    private $anchors = []; 
+    /**
+     * Alturada das elipses contidas na imagem
+     * @todo está medida deveria servir somente como valor default, a definição do tamanh
+     *      da elipse  dentro da região deve sobreescrever este valor.
+     */   
+    private $ellipseWidth;
+    /**
+     * Alturada das elipses contidas na imagem
+     * @todo está medida deveria servir somente como valor default, a definição do tamanh
+     *      da elipse  dentro da região deve sobreescrever este valor.
+     */
+    private $ellipseHeight;
 
     /**
      * Armazena nome do arquivo de máscara em uso.
@@ -124,6 +138,14 @@ class Mask
                 $this->numAnchors = $data[self::NUM_ANCHORS];
             }
 
+            if (isset($data[self::ELLIPSE_WIDTH])) {
+                $this->ellipseWidth = $data[self::ELLIPSE_WIDTH];
+            }
+
+            if (isset($data[self::ELLIPSE_HEIGHT])) {
+                $this->ellipseHeight = $data[self::ELLIPSE_HEIGHT];
+            }
+
             /**
              * @todo permitir definição de tipo e quantidade de âncoras
              */
@@ -179,6 +201,22 @@ class Mask
     public function getNumAnchors()
     {
         return $this->numAnchors;
+    }
+
+    /**
+     * Retorna a largura da elipse
+     */
+    public function getEllipseWidth()
+    {
+        return $this->ellipseWidth;
+    }
+
+    /**
+     * Retorna a altura da elipse
+     */
+    public function getEllipseHeight()
+    {
+        return $this->ellipseHeight;
     }
 
     /**

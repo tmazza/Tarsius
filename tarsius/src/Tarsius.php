@@ -50,5 +50,8 @@ class Tarsius
      *      seria um quadrado de 10*11.81 pixel de lado.
      */
     static public $searchArea = 10;
-
+    /**
+     * @var float $minMatchEllipse Valor mínimo para considerar uma elipse preenchida.
+     */
+    static public $minMatchEllipse = 0.3;
 }
