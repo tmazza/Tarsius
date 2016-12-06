@@ -161,15 +161,33 @@ class Form
      */
     private function getPointWithCorretion($region)
     {
-        $refAncoras = $this->mask->getNumAnchors();
-
-        if($refAncoras==2){
-            throw new \Exception("@todo considerar pontos que usam 2 âncoras como referência");
-            
-        } elseif($refAncoras==4){
+        if (4 == $this->mask->getNumAnchors()) {
             return $this->getQuadrupleReference($region);
         }
-        throw new \Exception("@todo considerar pontos que usam 1 âncoras como referência");
+        return $this->getSingleReference($region);
+    }
+
+    /**
+     * Define posição do ponto considerando sua âncora base.
+     */
+    private function getSingleReference($region)
+    {
+        $px = $region[1];
+        $py = $region[2];
+
+        # Define âncora base de acordo com o sinal das coordenadas dos pontos
+        $base = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getCenter();
+        if($px < 0 && $py > 0){
+          $base = $this->anchors[Mask::ANCHOR_TOP_RIGHT]->getCenter();
+        } elseif($px < 0 && $py < 0){
+          $base = $this->anchors[Mask::ANCHOR_BOTTOM_RIGHT]->getCenter();
+        } elseif($px > 0 && $py < 0){
+          $base = $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->getCenter();
+        }
+        # soma âncora base de cada ponto
+        $px += $base[0];
+        $py += $base[1];
+        return $this->rotatePoint([$px,$py], $base, $this->rotation);
     }
 
     /**
@@ -185,23 +203,19 @@ class Form
         $ancora3 = $this->anchors[Mask::ANCHOR_TOP_RIGHT]->getCenter();
         $ancora2 = $this->anchors[Mask::ANCHOR_BOTTOM_RIGHT]->getCenter();
         $ancora4 = $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->getCenter();
-
         # soma âncora base de cada ponto
         $p1 = [bcadd($p1[0], $ancora1[0], 14), bcadd($p1[1], $ancora1[1], 14)];
         $p3 = [bcadd($p3[0], $ancora3[0], 14), bcadd($p3[1], $ancora3[1], 14)];
         $p2 = [bcadd($p2[0], $ancora2[0], 14), bcadd($p2[1], $ancora2[1], 14)];
         $p4 = [bcadd($p4[0], $ancora4[0], 14), bcadd($p4[1], $ancora4[1], 14)];
-
         # normaliza pontos considerando rotação
         $p1 = $this->rotatePoint($p1, $ancora1, $this->rotation);
         $p3 = $this->rotatePoint($p3, $ancora3, $this->rotation);
         $p2 = $this->rotatePoint($p2, $ancora2, $this->rotation);
         $p4 = $this->rotatePoint($p4, $ancora4, $this->rotation);
-
         # calcula pontos médios entre pares de âncoras
         $p13 = $this->getMidPoint($p1, $p3);
         $p24 = $this->getMidPoint($p2, $p4);
-
         return $this->getMidPoint($p13, $p24);
     }
 
