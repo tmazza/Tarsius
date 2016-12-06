@@ -23,7 +23,7 @@ class ProcessaCommand extends CConsoleCommand {
 			# TODO: devolver imagens e mudar status do processo
 			$erro = new Erro;
 			$erro->trabalho_id = $trabId;
-			$erro->texto = $e->getMessage() . json_encode($e);
+			$erro->texto = CHtml::tag('h3',$e->getMessage()) . '<hr>' . $e->__toString();
 			$erro->read = 0;
 			$erro->save();
 		}
@@ -127,7 +127,10 @@ class ProcessaCommand extends CConsoleCommand {
 		}
 	}
 
-	public function actionFile($arquivo,$template){
+	public function actionFile($arquivo=false,$template=false){
+		if(!($arquivo || $template)){
+			die("Informe o trabalho e o template em uso. \n\n\t--template=<ID-TRABALHO>\n\t--arquivo=<ID-ARQUIVO>\n\n");
+		}
 		$image = new Image($template,0.3);
 		$image->exec($arquivo);
 		print_r($image->output);

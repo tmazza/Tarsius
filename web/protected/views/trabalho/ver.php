@@ -18,6 +18,23 @@ $this->menu[] = ['Ver processadas',$this->createUrl('/trabalho/finalizadas',[
 	'id'=>$trabalho->id,])];
 $this->menu[] = ['Não exportadas',$this->createUrl('/trabalho/naoDistribuidas',[
 	'id'=>$trabalho->id,])];
+
+if($trabalho->status == 2){
+
+	$this->menu[] = ['Forçar parada',$this->createUrl('/trabalho/forcaParada',[
+		'id'=>$trabalho->id,
+	]),[
+		'confirm' => "Forçando a parada o processo será marcado como finalizado, " 
+					. "mesmo sem haver confirmação de seu estado atual.\n\n" 
+					. "Caso o processo não tenha encerrado e uma nova distribição " 
+					. "seja iniciada o novo processo e o não encerrado podem ficar "
+					. "concorrendo pelas imagens.\n\n"
+					. "O código do processo atual é '{$trabalho->pid}'.\n\n"
+					. "Você tem certeza que este processo já foi encerrado?",
+	]];
+
+}
+
 ?>
 <h3>
 	<?=CHtml::link('Trabalhos',$this->createUrl('/trabalho/index'));?> 

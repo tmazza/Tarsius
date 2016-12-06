@@ -187,6 +187,15 @@ class TrabalhoController extends BaseController {
 		]);		
 	}
 
+	public function actionForcaParada($id)
+	{
+		$trabalho = Trabalho::model()->findByPk((int)$id);
+		$trabalho->status = Trabalho::statusParado;
+		$trabalho->distribuindo = 0;
+		$trabalho->update(['status','distribuindo']);
+		$this->redirect($this->createUrl('/trabalho/ver',['id'=>$trabalho->id]));
+	}
+
 	private function runDistribui($trabalho) {
 	    $commandPath = Yii::app()->getBasePath() . DIRECTORY_SEPARATOR . 'commands';
 	    $runner = new CConsoleCommandRunner();
