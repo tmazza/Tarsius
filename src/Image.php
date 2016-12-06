@@ -181,10 +181,9 @@ class Image {
 
         if(isset($this->output['regioes'][$regiao])){
           $valorAvaliado = $this->output['regioes'][$regiao][0];
-          $valorAvaliado = (int) substr($valorAvaliado, 1,-1);
-          $valorEsperado = (int) substr($valorEsperado, 1,-1);
-          if($valorAvaliado != $valorEsperado){
-            throw new Exception("Template não reconhecido, valor esperado '$valorEsperado' diferente do valor avaliado '$valorAvaliado'. ", 1);
+          $lcs = $this->LCS($valorEsperado, $valorAvaliado);
+          if($lcs < (strlen($valorEsperado)-3) ){
+            throw new Exception("Template não reconhecido, valor esperado '$valorEsperado' diferente do valor avaliado '$valorAvaliado'. LCS: '{$lcs}' ", 1);
           }
         } else {
           throw new Exception("Template não reconhecido, região não encontrada.", 1);
@@ -195,6 +194,28 @@ class Image {
       $saidaFormatada = $this->formatoSaida ? $this->formatarSaida($this->formatoSaida,$this->output['regioes']) : [];
       $this->output['saidaFormatada'] = array_merge($saida,$saidaFormatada);
     }
+
+
+    private function LCS($a, $b)
+    {
+      $C = [];
+      $m = strlen($a);
+      $n = strlen($b);
+
+      for($i=0;$i<=$m;$i++) { if(!isset($C[$i])) $C[$i] = []; $C[$i][0] = 0; }
+      for($i=0;$i<=$n;$i++) { $C[0][$i] = 0; }     
+      for($i=1;$i<=$m;$i++){
+        for($j=1;$j<=$n;$j++){
+          if($a[$i-1] == $b[$j-1]){
+            $C[$i][$j] = $C[$i-1][$j-1] + 1;
+          } else {
+            $C[$i][$j] = $C[$i-1][$j] > $C[$i][$j-1] ? $C[$i-1][$j] : $C[$i][$j-1];          
+          }
+        }
+      }
+      return $C[$m][$n];
+    }
+
 
     /**
      * Organiza saída da interpretação das regiões de acordo com o formato de saida.
@@ -256,6 +277,8 @@ class Image {
           if(isset($value['sort']) && $value['sort']) 
             usort($matchs,$value['sort']);
 
+          # TODO: usar função agrupadora para processar conjunto de registros
+          # eg: número do avaliador no canhoto
           $output[$key] = '';
           foreach ($matchs as $m) 
             $output[$key] .= $data[$m][0];

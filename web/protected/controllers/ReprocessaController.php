@@ -13,7 +13,7 @@ class ReprocessaController extends BaseController {
 
 		$this->render('ancora',[
 			'model'=>$model,
-			'urlImage'=> $model->urlImagens.'/'.$model->nome,
+			'urlImage'=> $model->trabalho->urlImagens.'/'.$model->nome,
 		]);
 	}
 
