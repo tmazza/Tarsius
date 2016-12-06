@@ -51,7 +51,7 @@ class ImageGd extends Image
         }
 
         list($r, $g, $b) = $rgb;
-        return (ceil(0.299*$r) + ceil(0.587*$g) + ceil(0.114*$b)) < Image::THRESHOLD;
+        return (ceil(0.299*$r) + ceil(0.587*$g) + ceil(0.114*$b)) < Tarsius::$threshold;
     }
 
     /**

@@ -21,14 +21,6 @@ abstract class Image
      */
     const DEFAULT_RESOLUTION = 300;
     /**
-     * Corte entre pixel pretos e brancos. 
-     * 
-     * @todo usar limiar dinâmico
-     * @todo possibilitar configuração em tempo de execução
-     */ 
-    const THRESHOLD = 128;
-
-    /**
      * @var static string $anchorsDir Caminho para diretório contendo as imagens das âncoras.
      */
     protected static $debugDir = __DIR__ . DIRECTORY_SEPARATOR . 'debug' . DIRECTORY_SEPARATOR;

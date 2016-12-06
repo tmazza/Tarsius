@@ -14,7 +14,14 @@ class Tarsius
      * @var bool $debugEnable Se deve gerar dados intermediários para visualização
      *      e análise dos resultados parciais obtidos durante o processamento
      */
-    static public $enableDebug = false;
+    static public $enableDebug = true;
+    /**
+     * Corte entre pixel pretos e brancos. 
+     * 
+     * @todo usar limiar dinâmico
+     * @todo possibilitar configuração em tempo de execução
+     */ 
+    static public $threshold = 128;
     /**
      * @var int $minArea Área mínima para considerar objeto durante carregamento e busca
      *      das âncoras

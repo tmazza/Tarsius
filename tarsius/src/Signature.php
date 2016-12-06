@@ -61,25 +61,25 @@ class Signature
 				$y = ceil($r * sin($ang)) + $yc;
 
 				$matrix[$i][$j] = isset($ps[$x . '-' . $y]);
-				if ($matrix[$i][$j]) {
-					$points[$x][$y] = true;
-				}
+				// if ($matrix[$i][$j]) {
+				// 	$points[$x][$y] = true;
+				// }
 			}
 		}
 
-        # DEBUG
-        if (Tarsius::$enableDebug) {
-        	$image = imagecreatetruecolor(1000, 1000);
-        	$rgb = [255, 0, 0];
-            foreach ($points as $x => $ys) {
-            	foreach ($ys as $y => $nop) {
-            		if ($nop) {
-		        		imagesetpixel($image, $x, $y, imagecolorallocate($image, $rgb[0], $rgb[1], $rgb[2]));
-            		}
-            	}      
-            }      
-            imagejpeg($image, __DIR__ . '/debug/' . microtime(true) . '_' . rand(0,100) . '_signature.jpg');
-        }
+        // # DEBUG
+        // if (Tarsius::$enableDebug) {
+        // 	$image = imagecreatetruecolor(1000, 1000);
+        // 	$rgb = [255, 0, 0];
+        //     foreach ($points as $x => $ys) {
+        //     	foreach ($ys as $y => $nop) {
+        //     		if ($nop) {
+		      //   		imagesetpixel($image, $x, $y, imagecolorallocate($image, $rgb[0], $rgb[1], $rgb[2]));
+        //     		}
+        //     	}      
+        //     }      
+        //     imagejpeg($image, __DIR__ . '/debug/' . microtime(true) . '_' . rand(0,100) . '_signature.jpg');
+        // }
 
 		return $matrix;
 	}
