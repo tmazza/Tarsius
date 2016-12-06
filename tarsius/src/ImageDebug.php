@@ -38,7 +38,7 @@ trait ImageDebug
      *
      * @return resource Imagem com desenho
      */
-    abstract public function drawRectangle($image, $p1, $p2);
+    abstract public function drawRectangle($image, $p1, $p2, $rgb = [255, 0, 0]);
     /**
      * Altera a cor do pixel $p1 para $rgb em $image
      *
@@ -84,9 +84,11 @@ trait ImageDebug
     {
         foreach ($objects as $obj) {
             $points = $obj->getPoints();
+
             $rgb = [rand(0, 255), rand(0, 255), rand(0, 255)];
-            $this->drawPoints($image, $points, $rgb);
+            foreach ($points as $p) {
+                $this->setPixel($image, $p, $rgb);
+            }
         }
     }
-
 }

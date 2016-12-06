@@ -167,13 +167,11 @@ class Mask
         if (!isset($this->anchors[$anchor])) {
             throw new \Exception("Âncora {$anchor} não definida no template.");
         }
-        /**
-         * @todo definir área mínima e área máxima dos objetos!!!!! Como? Onde?
-         */
-        $objects = $this->anchors[$anchor]->getAllObjects(200, 2000);
+        $objects = $this->anchors[$anchor]->getAllObjects(Tarsius::$minArea, Tarsius::$maxArea);
         if (count($objects) != 1) {
             throw new \Exception("Assinatura da Âncora {$anchor} não pode ser gerada.");
         }
+
         return $objects[0]->getSignature();
     }
 

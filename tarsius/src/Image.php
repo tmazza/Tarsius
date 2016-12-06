@@ -6,7 +6,7 @@
 namespace Tarsius;
 
 use Tarsius\ConnectedComponent;
-use Tarsius\Defaults;
+use Tarsius\Tarsius;
 use Tarsius\ImageDebug;
 
 /**
@@ -162,12 +162,19 @@ abstract class Image
         $connectedComponents->setMinArea($minArea);
         $connectedComponents->setMaxArea($maxArea);
 
+        # DEBUG
+        if (Tarsius::$enableDebug) {
+            # gera imagem bom objetos selecionados dentro da região 
+            # definida por $p1 e $p2 em destaque
+            $objs = $connectedComponents->getObjects($points);
+            $copy = $this->getCopy();
+            $this->drawRectangle($copy, $p1, $p2);
+            $this->drawObjects($copy, $objs);
+            $this->save($copy, 'objs');
+            return $objs;
+        }
 
-        $objs = $connectedComponents->getObjects($points);
-        $copy = $this->getCopy();
-        $this->drawObjects($copy, $objs);
-        $this->save($copy, 'objs');
-        return $objs;
+        return $connectedComponents->getObjects($points);
     }
 
     /**
@@ -199,13 +206,13 @@ abstract class Image
      */
     public function findObject(array &$objectSignature, array &$centralPoint, float $scale, array $config = [])
     {
-        $minArea        = $config['minArea']        ?? Defaults::$minArea;
-        $maxArea        = $config['maxArea']        ?? Defaults::$maxArea;
-        $minMatch       = $config['minMatch']       ?? Defaults::$minMatchObject;
-        $searchArea     = ($config['searchArea']    ?? Defaults::$searchArea) * $scale;
-        $maxExpansions  = $config['maxExpansions']  ?? Defaults::$maxExpansions;
-        $expasionRate   = $config['expasionRate']   ?? Defaults::$expasionRate;
-        
+        $minArea        = $config['minArea']        ?? Tarsius::$minArea;
+        $maxArea        = $config['maxArea']        ?? Tarsius::$maxArea;
+        $minMatch       = $config['minMatch']       ?? Tarsius::$minMatchObject;
+        $searchArea     = ($config['searchArea']    ?? Tarsius::$searchArea) * $scale;
+        $maxExpansions  = $config['maxExpansions']  ?? Tarsius::$maxExpansions;
+        $expasionRate   = $config['expasionRate']   ?? Tarsius::$expasionRate;
+
         $match = false;
         do {
 
@@ -246,7 +253,7 @@ abstract class Image
         $y1 = $y0 + $sideLength;
         $x0 -= $sideLength;
         $y0 -= $sideLength;
-        
+
         if ($x0 < 0) { # se atingir o topo da imagem expande para baixo
             $x1 += abs($x0); 
             $x0 = 0;
@@ -254,6 +261,14 @@ abstract class Image
         if ($y0 < 0) { # se atingir a borda esquerda da imagem expande para direita
             $y1 += abs($y0);
             $y0 = 0;
+        }
+        $width = $this->getWidth();
+        if ($x1 > $width) { # se atingir borda direita da imamgem ignora expansão
+            $x1 = $width;
+        }
+        $height = $this->getHeight();
+        if ($y1 > $height) { # se atingir borda direita da imamgem ignora expansão
+            $y1 = $height;
         }
         return [
             [$x0, $y0],

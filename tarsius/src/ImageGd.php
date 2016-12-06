@@ -81,7 +81,7 @@ class ImageGd extends Image
      */
     public function save($image, $name)
     {
-        imagepng($image, self::$debugDir  . microtime(true) . "_{$name}.png");
+        imagepng($image, self::$debugDir  . microtime(true) . "_" . rand(0,100) . "_{$name}.png");
     }
 
 
@@ -98,11 +98,12 @@ class ImageGd extends Image
     /** DEBUG only
      * Função definida em ImageDebug
      */ 
-    public function drawRectangle($image, $p1, $p2)
+    public function drawRectangle($image, $p1, $p2, $rgb = [255, 0, 0])
     {
         list($x1, $y1) = $p1;
         list($x2, $y2) = $p2;
-        imagerectangle($image, $x1, $y1, $x2, $y2, imagecolorallocate($image, 255, 0, 0));
+        list($r, $g, $b) = $rgb;
+        imagerectangle($image, $x1, $y1, $x2, $y2, imagecolorallocate($image, $r, $g, $b));
         return $image;
     }
 

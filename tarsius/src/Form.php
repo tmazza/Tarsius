@@ -59,14 +59,17 @@ class Form
     {
         # Primeira escala considerada é baseada na resolução extraída dos meta dados da imagem
         $this->setScale($this->image->getResolution());
+        
         # Localiza as 4 âncoras da máscara        
         $this->localizarAncoras();
+        
         # Atualiza informação de escala considerando distâncias esperadas e avaliadas entre as âncoras
         $a1 = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getCenter();
         $a4 = $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->getCenter();
         $observed = $this->distance($a1,$a4);
         $expected = $this->mask->getVerticalDistance();
         $this->setScaleDirect(bcdiv($observed,$expected,14));
+        
         # TODO: analisar regiões
         # TODO: organizar saída
 
@@ -106,8 +109,21 @@ class Form
         $this->getAnchor(Mask::ANCHOR_BOTTOM_LEFT);
 
         # Redefine rotação considerando âncoras com maior distância
-        $p2 = $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->getCenter();
-        $this->updateRotation($p1, $p2, true);
+        $p4 = $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->getCenter();
+        $this->updateRotation($p1, $p4, true);
+
+        # DEBUG
+        if (Tarsius::$enableDebug) {
+            $copy = $this->image->getCopy();
+            $a1 = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getCenter();
+            $a2 = $this->anchors[Mask::ANCHOR_TOP_RIGHT]->getCenter();
+            $a3 = $this->anchors[Mask::ANCHOR_BOTTOM_RIGHT]->getCenter();
+            $a4 = $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->getCenter();
+            $this->image->drawRectangle($copy, $a1, $a3, [0, 255, 0]);
+            $this->image->drawRectangle($copy, $a2, $a4, [0, 0, 255]);
+            $this->image->save($copy, 'anchor');
+        }
+
     }
 
     /**
@@ -133,7 +149,7 @@ class Form
      */
     private function setScale(int $resolution)
     {
-        $this->scale = bcdiv($resolution, 25.4);
+        $this->scale = bcdiv($resolution, 25.4, 14);
     }
 
     /**

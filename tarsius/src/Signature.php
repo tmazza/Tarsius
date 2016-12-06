@@ -25,15 +25,15 @@ class Signature
 	/**
 	 * @var static $n Quantidade de circulos internos
 	 *
-	 * @todo deveria variar de acordo com o tamanho ou formato do objeto
+	 * @todo deveria variar de acordo com o tamanho ou formato do objeto?!
 	 */
-	private static $n = 18;
+	private static $n = 16;
 	/**
 	 * @var static $n Quantidade de cortes radiais
 	 *
-	 * @todo deveria variar de acordo com o tamanho ou formato do objeto
+	 * @todo deveria variar de acordo com o tamanho ou formato do objeto?!
 	 */
-	private static $m = 180;
+	private static $m = 128;
 
 	/**
 	 * Gera representação em coordenadas polares do objeto
@@ -52,8 +52,7 @@ class Signature
 			$ps[$p[0] . '-' . $p[1]] = $p[0] . '-' . $p[1];
 		}
 
-		$points = array();
-		$matrix = array();
+		$points = $matrix = [];
 		for ($i = 0; $i < self::$n; $i++) {
 			for ($j = 0; $j < self::$m; $j++) {
 				$r = floor(($i * self::$l) / (self::$n - 1));
@@ -62,8 +61,25 @@ class Signature
 				$y = ceil($r * sin($ang)) + $yc;
 
 				$matrix[$i][$j] = isset($ps[$x . '-' . $y]);
+				if ($matrix[$i][$j]) {
+					$points[$x][$y] = true;
+				}
 			}
 		}
+
+        # DEBUG
+        if (Tarsius::$enableDebug) {
+        	$image = imagecreatetruecolor(1000, 1000);
+        	$rgb = [255, 0, 0];
+            foreach ($points as $x => $ys) {
+            	foreach ($ys as $y => $nop) {
+            		if ($nop) {
+		        		imagesetpixel($image, $x, $y, imagecolorallocate($image, $rgb[0], $rgb[1], $rgb[2]));
+            		}
+            	}      
+            }      
+            imagejpeg($image, __DIR__ . '/debug/' . microtime(true) . '_' . rand(0,100) . '_signature.jpg');
+        }
 
 		return $matrix;
 	}
@@ -90,6 +106,7 @@ class Signature
 	}
 
 	/**
+	 * # DEBUG
 	 * Print representação em coordenadas polares do objeto.
 	 *
 	 * @todo possibilitar geração de uma iamgem com o formato do objeto

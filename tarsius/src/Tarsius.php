@@ -5,21 +5,31 @@
 
 namespace Tarsius;
 
-class Defaults
+/**
+ * @todo possibilitar alteração dos valores default ao iniciar
+ */
+class Tarsius
 {
     /**
-     * @var int $minArea Área mínima para considerar objeto durante busca.
+     * @var bool $debugEnable Se deve gerar dados intermediários para visualização
+     *      e análise dos resultados parciais obtidos durante o processamento
      */
-    static public $minArea = 100;
+    static public $enableDebug = true;
     /**
-     * @var int $maxArea Área máxima para considerar objeto durante busca.
+     * @var int $minArea Área mínima para considerar objeto durante carregamento e busca
+     *      das âncoras
      */
-    static public $maxArea = 10000;
+    static public $minArea = 800;
+    /**
+     * @var int $maxArea Área máxima para considerar objeto durante carregamento e busca
+     *      das âncoras
+     */
+    static public $maxArea = 4000;
     /**
      * @var float $minMatchsObject Porcentagem mínima na comparação de dois objetos para 
      * considerá-los iguais.
      */ 
-    static public $minMatchObject = 0.8;
+    static public $minMatchObject = 0.85;
     /**
      * @var float $maxExpansions Quantidade máxima de expansões na busca de um objeto. Região
      *      de busca é expandida enquanto nenhum objeto com $minMatchsObject mínimo seja 
@@ -39,5 +49,5 @@ class Defaults
      *      11.81 pixel por milímetro, com $searchArea igual 10 a primeira área de busca
      *      seria um quadrado de 10*11.81 pixel de lado.
      */
-    static public $searchArea = 15;
+    static public $searchArea = 10;
 }
