@@ -21,6 +21,7 @@ class Mask
     const START_POINT = 'ancora1';
     const DIST_ANC_HOR = 'distAncHor';
     const DIST_ANC_VER = 'distAncVer';
+    const NUM_ANCHORS = 'refAncoras';
 
     /**
      * @var static string $anchorsDir Caminho para diretório contendo as imagens das âncoras.
@@ -51,6 +52,11 @@ class Mask
      * @var mixed[] $regions @todo documentar. Link para forma de criação!
      */
     private $regions;
+    /**
+     * @var int $numAnchors Quantidade de âncoras sendo utilizada para definir
+     *      um ponto no template
+     */
+    private $numAnchors = 1;
     /**
      * @var string $formatOutput @todo documentar. Link para forma de criação!
      */
@@ -114,6 +120,10 @@ class Mask
                 $this->formatOutput = json_decode($data[self::FORMAT_OUTPUT],true);
             }
 
+            if (isset($data[self::NUM_ANCHORS])) {
+                $this->numAnchors = $data[self::NUM_ANCHORS];
+            }
+
             /**
              * @todo permitir definição de tipo e quantidade de âncoras
              */
@@ -153,6 +163,22 @@ class Mask
     public function getVerticalDistance()
     {
         return $this->distAncVer;
+    }
+
+    /**
+     * Retorna as regiões da máscara
+     */
+    public function getRegions()
+    {
+        return $this->regions;
+    }
+
+    /**
+     * Retorna a quantidade de âncora utilizadas para definir um ponto
+     */
+    public function getNumAnchors()
+    {
+        return $this->numAnchors;
     }
 
     /**

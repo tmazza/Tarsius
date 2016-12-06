@@ -11,7 +11,11 @@ use Tarsius\Math;
 
 class Form
 {
-    use Math;    
+    use Math;
+
+    const REGION_ELLIPSE = 0;
+    const REGION_NUMERIC_OCR = 1;
+
     /**
      * @var Image objeto da imagem sendo processado
      */
@@ -61,27 +65,20 @@ class Form
         $this->setScale($this->image->getResolution());
         
         # Localiza as 4 âncoras da máscara        
-        $this->localizarAncoras();
+        $this->findAnchors();
         
-        # Atualiza informação de escala considerando distâncias esperadas e avaliadas entre as âncoras
+        # Atualiza informação de escala considerando distâncias esperada e avaliada entre as âncoras
         $a1 = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getCenter();
         $a4 = $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->getCenter();
         $observed = $this->distance($a1,$a4);
         $expected = $this->mask->getVerticalDistance();
         $this->setScaleDirect(bcdiv($observed,$expected,14));
         
-        # TODO: analisar regiões
+        # avalia regiões da imagem
+        $result = $this->evaluteRegions();
+        print_r($result);
+
         # TODO: organizar saída
-
-
-        // #DEGUB!
-        // $a3 = $this->anchors[Mask::ANCHOR_BOTTOM_RIGHT]->getCenter();
-        // $a2 = $this->anchors[Mask::ANCHOR_TOP_RIGHT]->getCenter();
-        // $copy = $this->image->getAnCopy();
-        // $this->image->drawRectangle($copy, $a1, $a3);
-        // $this->image->drawRectangle($copy, $a2, $a4);
-        // $this->image->save($copy, 'ancoras');
-
 
     }
 
@@ -93,7 +90,7 @@ class Form
      *
      * @throws Exception Caso alguma das não seja encontrada
      */
-    public function localizarAncoras()
+    private function findAnchors()
     {
         # Encontra âncoras do topo da folha
         $this->getAnchor(Mask::ANCHOR_TOP_LEFT);
@@ -124,6 +121,86 @@ class Form
             $this->image->save($copy, 'anchor');
         }
 
+    }
+
+    /**
+     * Avalia resultado para cada região definida em $mask, de acordo com 
+     * o tipo da região e as condições de preenchimento definidas em Tarsius
+     *
+     * @return array Lista de regiões com ID da região como chave e o resultado
+     *      da interpretaçõao e informações relevantes como valor.
+     */
+    private function evaluteRegions()
+    {
+        $result = [];
+        $regions = $this->mask->getRegions();
+        foreach ($regions as $id => $region) {
+            $type = $region[0];
+
+            if ($type == self::REGION_ELLIPSE) {
+                $point = $this->getPointWithCorretion($this->applyResolutionTo($region));
+                echo $id . ' - ';
+                echo $type;
+                print_r($point);
+                echo  " | \n";
+            } else {
+                throw new \Exception("Tipo de região '{$type}' desconhecido.");
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Retorna o ponto da região sendo analisada considerando a forma 
+     * como o template foi gerado, usando 1, 2 ou as 4 âncoras como referência
+     * para cada ponto.
+     *
+     */
+    private function getPointWithCorretion(&$region)
+    {
+        $refAncoras = $this->mask->getNumAnchors();
+
+        if($refAncoras==2){
+            throw new \Exception("@todo considerar pontos que usam 2 âncoras como referência");
+            
+        } elseif($refAncoras==4){
+            return $this->getQuadrupleReference($region);
+        }
+        throw new \Exception("@todo considerar pontos que usam 1 âncoras como referência");
+    }
+
+    /**
+     * Defini posição do ponto usando as quatros âncoras como referência.
+     * Utiliza os pares de ancoras 1-3 e 2-4 para reduzir efeitos não planares.
+     */
+    private function getQuadrupleReference(&$region)
+    {
+        list($p1,$p3) = $region[1];
+        list($p2,$p4) = $region[2];
+
+        $ancora1 = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getCenter();
+        $ancora3 = $this->anchors[Mask::ANCHOR_TOP_RIGHT]->getCenter();
+        $ancora2 = $this->anchors[Mask::ANCHOR_BOTTOM_RIGHT]->getCenter();
+        $ancora4 = $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->getCenter();
+
+        # soma âncora base de cada ponto
+        $p1 = [bcadd($p1[0], $ancora1[0], 14), bcadd($p1[1], $ancora1[1], 14)];
+        $p3 = [bcadd($p3[0], $ancora3[0], 14), bcadd($p3[1], $ancora3[1], 14)];
+        $p2 = [bcadd($p2[0], $ancora2[0], 14), bcadd($p2[1], $ancora2[1], 14)];
+        $p4 = [bcadd($p4[0], $ancora4[0], 14), bcadd($p4[1], $ancora4[1], 14)];
+
+        # normaliza pontos considerando rotação
+        $p1 = $this->rotatePoint($p1, $ancora1, $this->rotation);
+        $p3 = $this->rotatePoint($p3, $ancora3, $this->rotation);
+        $p2 = $this->rotatePoint($p2, $ancora2, $this->rotation);
+        $p4 = $this->rotatePoint($p4, $ancora4, $this->rotation);
+
+        # calcula pontos médios entre pares de âncoras
+        $p13 = $this->getMidPoint($p1, $p3);
+        $p24 = $this->getMidPoint($p2, $p4);
+
+        return $this->getMidPoint($p13, $p24);
     }
 
     /**
@@ -185,7 +262,7 @@ class Form
     private function getAnchor(int $anchor)
     {
         $signature = $this->mask->getSignatureOfAnchor($anchor);
-        $startPoint = $this->getExpectedPositionAnchor($anchor);
+        $startPoint = $this->getExpectedAnchorPosition($anchor);
 
         $config = [];
         if (isset($this->anchors[Mask::ANCHOR_TOP_LEFT])) {
@@ -206,7 +283,7 @@ class Form
      *
      * @param int $anchor Âncora a ser avaliada
      */ 
-    private function getExpectedPositionAnchor(int $anchor)
+    private function getExpectedAnchorPosition(int $anchor)
     {
         if($anchor !== Mask::ANCHOR_TOP_LEFT){
             $posAnchor1 = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getCenter();

@@ -14,7 +14,7 @@ class Tarsius
      * @var bool $debugEnable Se deve gerar dados intermediários para visualização
      *      e análise dos resultados parciais obtidos durante o processamento
      */
-    static public $enableDebug = true;
+    static public $enableDebug = false;
     /**
      * @var int $minArea Área mínima para considerar objeto durante carregamento e busca
      *      das âncoras
@@ -50,4 +50,5 @@ class Tarsius
      *      seria um quadrado de 10*11.81 pixel de lado.
      */
     static public $searchArea = 10;
+
 }
