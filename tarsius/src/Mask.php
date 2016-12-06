@@ -111,7 +111,7 @@ class Mask
             if (isset($data[self::START_POINT])) {
                 $this->startPoint = $data[self::START_POINT];
             } else {
-                throw new Exception("Localização de primeira âncora deve ser informada. Use " . self::START_POINT);
+                throw new Exception("Localização da primeira âncora deve ser informada. Use " . self::START_POINT);
             }
             
             if (isset($data[self::DIST_ANC_HOR])) {

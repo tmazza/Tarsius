@@ -9,6 +9,25 @@ trait Math
 {
 
     /**
+     * Converte milímetros para pixel, considerando a resolução da imagem.
+     * @param mixed $data int ou array
+     * @param float $scale escala ser aplicada
+     *
+     * @return valor(es) em pixel.  
+     */
+    public function applyResolution($data, $scale)
+    {
+        if (is_array($data)) {
+            foreach ($data as $k => $v) {
+                $data[$k] = $this->applyResolution($v, $scale);
+            }
+        } else {
+            $data = bcmul($data,$scale,14);
+        }
+        return $data;
+    }
+
+    /**
      * Rotaciona pixel de acordo com do angulo de rotação $ang
      *
      * @param array $ponto Ponto a ser rotacionado
