@@ -76,6 +76,17 @@ class ImageGd extends Image
         return $this->height;
     }
 
+    /**
+     * Cria cópia de pedaço da imagem
+     */
+    public function cropAndCreate($fileName, $p1, $p2)
+    {
+        $temp = imagecreatetruecolor($p2[0]-$p1[0], $p2[1]-$p1[1]);
+        imagecopy($temp, $this->image, 0, 0, $p1[0], $p1[1], $p2[0], $p2[1]);
+        imagejpeg($temp, $fileName);
+        imagedestroy($temp);
+    }
+
     /** DEBUG only
      * Função definida em ImageDebug
      */

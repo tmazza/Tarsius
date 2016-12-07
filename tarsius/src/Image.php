@@ -69,6 +69,14 @@ abstract class Image
      * @return int Altura da da imagem
      */
     abstract public function getHeight(): int;
+    /**
+     * Cria arquivo com recorte da imagem
+     * 
+     * @param string $fileName Nome completo do arquivo que será gerado.
+     * @param array $p1 Ponto superior esquerdo da região
+     * @param array $p2 Ponto inferior direito da região
+     */
+    abstract public function cropAndCreate($fileName, $p1, $p2);
 
     /**
      * Armazena nome do arquivo de imagem.
