@@ -41,11 +41,11 @@ class FormAnalyser
     /**
      * Instancia formulário a ser manipulado
      *
-     * @param float &$image Imagem a ser analisada
-     * @param float &$mask Máscara que deve ser aplicada na imagem.
-     * @param float &$anchors Conjunto de âncoras encontradas
-     * @param float &$scale Resolução observada na imagem
-     * @param float &$rotation Rotação observada na imagem
+     * @param float &$image
+     * @param float &$mask
+     * @param float &$anchors
+     * @param float &$scale
+     * @param float &$rotation
      */
     public function __construct(&$image, &$mask, &$anchors, &$scale, &$rotation)
     {

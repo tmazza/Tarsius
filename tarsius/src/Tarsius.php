@@ -6,7 +6,7 @@
 namespace Tarsius;
 
 /**
- * @todo possibilitar alteração dos valores default ao iniciar
+ * Configuração dos parâmetros usados para processamento
  */
 class Tarsius
 {
@@ -14,7 +14,7 @@ class Tarsius
      * @var bool $debugEnable Se deve gerar dados intermediários para visualização
      *      e análise dos resultados parciais obtidos durante o processamento
      */
-    static public $enableDebug = true;
+    static public $enableDebug = false;
     /**
      * Corte entre pixel pretos e brancos. 
      * 
@@ -61,4 +61,19 @@ class Tarsius
      * @var float $minMatchEllipse Valor mínimo para considerar uma elipse preenchida.
      */
     static public $minMatchEllipse = 0.3;
+
+
+    /**
+     * Altera valores default dos parâmetros
+     */
+    public static function config(array $config)
+    {
+        $class = new \ReflectionClass(__CLASS__);
+        $parameters = $class->getStaticProperties();
+
+        foreach (array_keys($parameters) as $param) {
+            self::${$param} = $config[$param] ?? self::${$param};
+        }
+    }
+
 }
