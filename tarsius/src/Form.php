@@ -176,15 +176,14 @@ class Form
         $signature = $this->mask->getSignatureOfAnchor($anchor);
         $startPoint = $this->getExpectedAnchorPosition($anchor);
 
-        $config = [];
+        $minArea = $maxArea = false;
         if (isset($this->anchors[Mask::ANCHOR_TOP_LEFT])) {
             $area = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getArea();
-            $config['minArea'] = $area - ($area * 0.5);
-            $config['naxArea'] = $area + ($area * 0.5);
-            # TODO: configuração de minMatch!??
+            $minArea = $area - ($area * 0.5);
+            $maxArea = $area + ($area * 0.5);
         }
 
-        $this->anchors[$anchor] = $this->image->findObject($signature, $startPoint, $this->scale, $config);
+        $this->anchors[$anchor] = $this->image->findObject($signature, $startPoint, $this->scale, $minArea, $maxArea);
         if ($this->anchors[$anchor] === false) {
             throw new Exception("Âncora {$anchor} não encontrada.");           
         }

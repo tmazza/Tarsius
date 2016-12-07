@@ -193,17 +193,19 @@ abstract class Image
      * @param bool[][] &$objectSignature Assinatura do objeto a ser procurado
      * @param int[] &$centralPoint Ponto central da região de busca
      * @param float $scale Escala em uso pelo formulário. (Pode ser diferente da definida nos meta-dados da imagem) 
-     * @param array $config Condiguração área mínima e máxima do objeto e do valor
-     *      mínimo para considerar duas regiões iguais
+     * @param mixed $config int|bool Área mínima para considerar objeto
+     * @param mixed $config int|bool Área máxima para considerar objeto
+     *
      */
-    public function findObject(array &$objectSignature, array &$centralPoint, float $scale, array $config = [])
+    public function findObject(array &$objectSignature, array &$centralPoint, float $scale, $minArea = false, $maxArea = false)
     {
-        $minArea        = $config['minArea']        ?? Tarsius::$minArea;
-        $maxArea        = $config['maxArea']        ?? Tarsius::$maxArea;
-        $minMatch       = $config['minMatch']       ?? Tarsius::$minMatchObject;
-        $searchArea     = ($config['searchArea']    ?? Tarsius::$searchArea) * $scale;
-        $maxExpansions  = $config['maxExpansions']  ?? Tarsius::$maxExpansions;
-        $expasionRate   = $config['expasionRate']   ?? Tarsius::$expasionRate;
+        $minArea = $minArea ?? Tarsius::$minArea;
+        $maxArea = $maxArea ?? Tarsius::$maxArea;
+      
+        $minMatch = Tarsius::$minMatchObject;
+        $searchArea = Tarsius::$searchArea * $scale;
+        $maxExpansions = Tarsius::$maxExpansions;
+        $expasionRate = Tarsius::$expasionRate;
 
         $match = false;
         do {
