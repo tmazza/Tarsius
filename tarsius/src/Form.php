@@ -70,12 +70,19 @@ class Form
         $a4 = $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->getCenter();
         $observed = $this->distance($a1,$a4);
         $expected = $this->mask->getVerticalDistance();
-        $this->setScaleDirect(bcdiv($observed,$expected,14));
+        $this->setScaleDirect(bcdiv($observed, $expected, 14));
         
-        # avalia regiões da imagem
+        # Avalia regiões da imagem
         $analyser = new FormAnalyser($this->image, $this->mask, $this->anchors, $this->scale, $this->rotation);
-        $result = $analyser->evaluateRegions();
-        // print_r($result);
+        $detailedResult = $analyser->evaluateRegions();
+
+        # Monta resultado com as regiões avaliadas e agrupamentos definidos no $outputFormat da máscara
+        $regionResult = array_map(function($i) { return $i[0]; }, $detailedResult); 
+        $extraResult = $this->formatOutput($regionResult);
+        $aaa = array_merge($regionResult,$extraResult);
+        
+
+        print_r($aaa);
 
         # TODO: organizar saída
 
@@ -223,6 +230,61 @@ class Form
             default:
                 throw new Exception("Operação inválida. Âncora {$anchor} desconhecida.");
         }
+    }
+
+    /**
+     * Organiza saída da interpretação das regiões de acordo com o formato de saida.
+     *
+     * @param array regionResult dicionário com chave sendo o ID de uma região e chave o valor 
+     * interpretado nessa região. Exemplo:
+     * [
+     *    'e-02' => 'B',
+     *    'e-01' => 'A',
+     *    'e-03' => 'C',
+     *    'eAusente' => 'SIM',
+     * ]
+     *  
+     * @return array dicionario com as chaves sendo iguais as definidas em {@param formatoSaida}
+     * e valor o resultado do processamento, conforme explicado acima. Por exemplo, usando
+     * os valores exemplificados acime de {@param formatoSaida} e {@param data} a saída seria:
+     * [
+     *  'ausente' => 'SIM',
+     *  'respostas' => 'ABC',
+     * ]
+     *
+     * Note que a string 'respostas' está em ordem devido a regra de ordenamento definida.
+     * Caso não houvesse, a saída seria 'BAC'.
+     *
+     */
+    protected function formatOutput(&$regionResult){
+      $output = [];
+      $regionsId = array_keys($regionResult);
+
+      foreach ($this->mask->getOutputFormat() as $key => $value) {
+        if (is_string($value)) { # Renomeia saída
+          $output[$key] = $regionResult[$value];
+        } else {
+
+          $matchs = array_filter($regionsId, function($i) use($value){
+            return preg_match($value['match'],$i) == 1;
+          });
+
+          # @todo permitir uso de uma função que manipule a lista de
+          # valores em $match
+
+          if (isset($value['sort']) && $value['sort']) {
+            usort($matchs,$value['sort']);
+          }
+
+          $output[$key] = '';
+          foreach ($matchs as $regionId){
+            $output[$key] .= $regionResult[$regionId];
+          }
+
+
+        }
+      }
+      return $output;
     }
 
 }

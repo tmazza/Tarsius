@@ -15,6 +15,7 @@ class Mask
     const ANCHOR_TOP_RIGHT = 2;
     const ANCHOR_BOTTOM_RIGHT = 3;
     const ANCHOR_BOTTOM_LEFT = 4;
+    
     # Nome dos parâmetros no template
     const FORMAT_OUTPUT = 'formatoSaida';
     const REGIONS = 'regioes';
@@ -24,6 +25,7 @@ class Mask
     const NUM_ANCHORS = 'refAncoras';
     const ELLIPSE_WIDTH = 'elpLargura';
     const ELLIPSE_HEIGHT = 'elpAltura';
+    const OUTPUT_FORMAT = 'formatoSaida';
 
     /**
      * @var static string $anchorsDir Caminho para diretório contendo as imagens das âncoras.
@@ -79,6 +81,31 @@ class Mask
      *      da elipse  dentro da região deve sobreescrever este valor.
      */
     private $ellipseHeight;
+    /**
+     * @var array $outputFormat deve ser um dicionário tendo como chave o nome
+     * esperado pra saída (qualquer nome) e como valor ou uma string ou 
+     * um array. Caso seja string, deve ser igual ao ID de alguma região
+     * do template. Caso seja array, deve obrigatoriamente conter um
+     * índice de chave 'match' o qual possui a expressão regular que será
+     * usada como filtro para os ID's das regiões. Somente ID's que passarem
+     * na comparação com 'match' serão incluídos na saída. O resultado das
+     * diversas regiões que tiverem match serão concatenados, opcionalmente
+     * é informar uma função de ordenação usando o índice 'sort'. Abaixo um
+     * exemplo de formato de arquivo válido:
+     * [
+     *   'ausente' => 'eAusente', // Serve somente como alias
+     *   'respostas' => [         // Concatena todos os resultadas de regiões com
+     *    'match' => '/^e-/',     // ID que passe no condição definida em match
+     *     'sort' => function($a,$b){
+     *       return $a > $b;          
+     *     },
+     *   ],
+     * ];
+     * O formato acima terá como saída duas linhas (ausente e respostas). A primeira
+     * linha tem o valor interpretado pela região de ID 'eAusente' a segunda linha 
+     * terá o resultado concatenado de todas as regiões que tenham ID que comece com 'e-'.
+     */
+    private $outputFormat = [];
 
     /**
      * Armazena nome do arquivo de máscara em uso.
@@ -131,7 +158,7 @@ class Mask
             }
 
             if (isset($data[self::FORMAT_OUTPUT])) {
-                $this->formatOutput = json_decode($data[self::FORMAT_OUTPUT],true);
+                $this->formatOutput = json_decode($data[self::FORMAT_OUTPUT], true);
             }
 
             if (isset($data[self::NUM_ANCHORS])) {
@@ -145,6 +172,10 @@ class Mask
             if (isset($data[self::ELLIPSE_HEIGHT])) {
                 $this->ellipseHeight = $data[self::ELLIPSE_HEIGHT];
             }
+
+            if (isset($data[self::OUTPUT_FORMAT])) {
+                $this->outputFormat = json_decode($data[self::OUTPUT_FORMAT], true);
+            }            
 
             /**
              * @todo permitir definição de tipo e quantidade de âncoras
@@ -164,7 +195,7 @@ class Mask
     }
 
     /**
-     * Retorna valor de @var $startPoint
+     * @return valor de @var $startPoint
      */
     public function getStartPoint()
     {
@@ -172,7 +203,7 @@ class Mask
     }
 
     /**
-     * Retorna valor de @var $distAncHor
+     * @return valor de @var $distAncHor
      */
     public function getHorizontalDistance()
     {
@@ -180,7 +211,7 @@ class Mask
     }
 
     /**
-     * Retorna valor de @var $distAncVer
+     * @return valor de @var $distAncVer
      */
     public function getVerticalDistance()
     {
@@ -188,7 +219,7 @@ class Mask
     }
 
     /**
-     * Retorna as regiões da máscara
+     * @return as regiões da máscara
      */
     public function getRegions()
     {
@@ -196,7 +227,7 @@ class Mask
     }
 
     /**
-     * Retorna a quantidade de âncora utilizadas para definir um ponto
+     * @return a quantidade de âncora utilizadas para definir um ponto
      */
     public function getNumAnchors()
     {
@@ -204,7 +235,7 @@ class Mask
     }
 
     /**
-     * Retorna a largura da elipse
+     * @return a largura da elipse
      */
     public function getEllipseWidth()
     {
@@ -212,11 +243,19 @@ class Mask
     }
 
     /**
-     * Retorna a altura da elipse
+     * @return a altura da elipse
      */
     public function getEllipseHeight()
     {
         return $this->ellipseHeight;
+    }
+
+    /**
+     * @return o padrão de formatação de saída
+     */
+    public function getOutputFormat()
+    {
+        return $this->outputFormat;
     }
 
     /**
