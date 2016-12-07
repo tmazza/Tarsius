@@ -15,6 +15,14 @@ class Form
     use Math;
 
     /**
+     * @var string $imageName
+     */
+    private $imageName;
+    /**
+     * @var string $maskName
+     */
+    private $maskName;
+    /**
      * @var Image objeto da imagem sendo processado
      */
     private $image;
@@ -47,9 +55,11 @@ class Form
      */
     public function __construct(string $imageName, string $maskName)
     {
-        $this->image = ImageFactory::create($imageName, ImageFactory::GD);
+        $this->imageName = $imageName;
+        $this->maskName = $maskName;
+        $this->image = ImageFactory::create($this->imageName, ImageFactory::GD);
         $this->image->load();
-        $this->mask = new Mask($maskName);
+        $this->mask = new Mask($this->maskName);
         $this->mask->load();
     }
 
@@ -76,17 +86,13 @@ class Form
         $analyser = new FormAnalyser($this->image, $this->mask, $this->anchors, $this->scale, $this->rotation);
         $detailedResult = $analyser->evaluateRegions();
 
+        # @todo validar número do template
+
         # Monta resultado com as regiões avaliadas e agrupamentos definidos no $outputFormat da máscara
-        $regionResult = array_map(function($i) { return $i[0]; }, $detailedResult); 
-        $extraResult = $this->formatOutput($regionResult);
-        $aaa = array_merge($regionResult,$extraResult);
-        
-
-        print_r($aaa);
-
-        # TODO: organizar saída
+        return $this->completeResults($detailedResult);
 
     }
+
 
     /**
      * Busca âncoras na imagem. Inicia busca no ponto esperado da âncora definido
@@ -230,6 +236,36 @@ class Form
             default:
                 throw new Exception("Operação inválida. Âncora {$anchor} desconhecida.");
         }
+    }
+
+
+    /**
+     * Monta lista com todos as informações do processamento e resultados otidos.
+     * 
+     * @param array &$detailedResult Lista de resultados obtidos da regiões da máscara
+     *
+     * @return array Lista informações das parâmetros usados durante o processamento, dos
+     *      resultados brutos obtidos e dos resultados formatadas. 
+     */
+    private function completeResults(&$detailedResult)
+    {
+
+        $regionResult = array_map(function($i) { return $i[0]; }, $detailedResult); 
+        $extraResult = $this->formatOutput($regionResult);
+        $compiledResult = array_merge($regionResult,$extraResult);
+
+        # Configuração utilizada
+        $class = new \ReflectionClass('Tarsius\Tarsius');
+        $configuration = $class->getStaticProperties();
+
+        return [
+            'imageName' => $this->imageName,
+            'maskName' => $this->maskName,
+            'configuration' => $configuration,
+            'detailedResult' => $detailedResult,
+            'compiledResult' => $compiledResult,
+        ];
+
     }
 
     /**
