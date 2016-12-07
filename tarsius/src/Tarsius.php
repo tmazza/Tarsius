@@ -14,7 +14,7 @@ class Tarsius
      * @var bool $debugEnable Se deve gerar dados intermediários para visualização
      *      e análise dos resultados parciais obtidos durante o processamento
      */
-    static public $enableDebug = true;
+    static public $enableDebug = false;
     /**
      * @var string $runtimeDir Diretório para manipulação de arquivos gerados e acessados
      *      pelo processo.
@@ -29,14 +29,22 @@ class Tarsius
     static public $threshold = 128;
     /**
      * @var int $minArea Área mínima para considerar objeto durante carregamento e busca
-     *      das âncoras
+     *      das âncoras. Após encontrar a primeira âncora o valor da área desta será usado
+     *      como referência de área máxima tendo uma tolerância de $areaTolerance
      */
     static public $minArea = 800;
     /**
      * @var int $maxArea Área máxima para considerar objeto durante carregamento e busca
-     *      das âncoras
+     *      das âncoras. Após encontrar a primeira âncora o valor da área desta será usado
+     *      como referência de área máxima tendo uma tolerância de $areaTolerance
      */
     static public $maxArea = 4000;
+    /**
+     * @var float $areaTolerance Tolerância na busca das âncoras, usado após encontrar a primeira
+     *      âncora. Por exemplo, caso a área da âncora encontrada seja de 1000 pixel e $areaTolerance
+     *      seja 0.4 o valor de $minArea e $maxArea serão, respectivamente, 600 e 1400.
+     */
+    static public $areaTolerance = 0.4;
     /**
      * @var float $minMatchsObject Porcentagem mínima na comparação de dois objetos para 
      * considerá-los iguais.

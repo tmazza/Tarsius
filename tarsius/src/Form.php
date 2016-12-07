@@ -192,8 +192,8 @@ class Form
         $minArea = $maxArea = false;
         if (isset($this->anchors[Mask::ANCHOR_TOP_LEFT])) {
             $area = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getArea();
-            $minArea = $area - ($area * 0.5);
-            $maxArea = $area + ($area * 0.5);
+            $minArea = $area - ($area * Tarsius::$areaTolerance);
+            $maxArea = $area + ($area * Tarsius::$areaTolerance);
         }
 
         $this->anchors[$anchor] = $this->image->findObject($signature, $startPoint, $this->scale, $minArea, $maxArea);
@@ -262,8 +262,10 @@ class Form
             'imageName' => $this->imageName,
             'maskName' => $this->maskName,
             'configuration' => $configuration,
-            'detailedResult' => $detailedResult,
-            'compiledResult' => $compiledResult,
+            'scale' => bcmul($this->scale, 25.4, 14),
+            'rotation' => $this->rotation,
+            'regionsResult' => $detailedResult,
+            'result' => $compiledResult,
         ];
 
     }
