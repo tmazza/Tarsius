@@ -31,16 +31,16 @@ class Mask
     /**
      * @var static string $anchorsDir Caminho para diretório contendo as imagens das âncoras.
      */
-    private static $anchorsDir = __DIR__ . DIRECTORY_SEPARATOR . 'static' . DIRECTORY_SEPARATOR;
+    protected static $anchorsDir = __DIR__ . DIRECTORY_SEPARATOR . 'static' . DIRECTORY_SEPARATOR;
     /**
      * @var string $name Caminho completo para a máscara a ser carregada
      */
-    private $name;
+    protected $name;
     /**
      * @var string $type Tipo de manipulador de imagem que de ser usado. 
      *      Tipos possíveis definidos em ImageFactoty.
      */
-    private $type;
+    protected $type;
     /**
      * @var int[] Ponto central da primiera âncora da máscara.
      */
@@ -190,14 +190,7 @@ class Mask
                 }
             }            
 
-            /**
-             * @todo permitir definição de tipo e quantidade de âncoras
-             */
-            for ($i = 1; $i < 5; $i++) {
-                $imageName = self::$anchorsDir . "ancora{$i}.jpg"; 
-                $this->anchors[$i] = ImageFactory::create($imageName, $this->type);
-                $this->anchors[$i]->load();
-            }
+            $this->loadAnchors();
 
         } elseif (file_exists($this->name)) {
             throw new \Exception("Sem permissão de leitura no arquivo '{$this->name}'.");
@@ -205,6 +198,19 @@ class Mask
             throw new \Exception("Arquivo '{$this->name}' não encontrado ou não existe.");
         }
         return $this;
+    }
+
+    /**
+     * Carrega âncoras da máscaera
+     * @todo permitir definição de tipo e quantidade de âncoras
+     */
+    protected function loadAnchors()
+    {
+        for ($i = 1; $i < 5; $i++) {
+            $imageName = self::$anchorsDir . "ancora{$i}.jpg"; 
+            $this->anchors[$i] = ImageFactory::create($imageName, $this->type);
+            $this->anchors[$i]->load();
+        }
     }
 
     /**
