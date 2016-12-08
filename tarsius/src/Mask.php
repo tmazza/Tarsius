@@ -29,9 +29,9 @@ class Mask
     const VALIDATE_MASK = 'validaReconhecimento';
 
     /**
-     * @var static string $anchorsDir Caminho para diretório contendo as imagens das âncoras.
+     * @var static string $staticDir Caminho para diretório contendo as imagens das âncoras.
      */
-    protected static $anchorsDir = __DIR__ . DIRECTORY_SEPARATOR . 'static' . DIRECTORY_SEPARATOR;
+    protected static $staticDir = __DIR__ . DIRECTORY_SEPARATOR . 'static' . DIRECTORY_SEPARATOR;
     /**
      * @var string $name Caminho completo para a máscara a ser carregada
      */
@@ -207,7 +207,7 @@ class Mask
     protected function loadAnchors()
     {
         for ($i = 1; $i < 5; $i++) {
-            $imageName = self::$anchorsDir . "ancora{$i}.jpg"; 
+            $imageName = self::$staticDir . "ancora{$i}.jpg"; 
             $this->anchors[$i] = ImageFactory::create($imageName, $this->type);
             $this->anchors[$i]->load();
         }

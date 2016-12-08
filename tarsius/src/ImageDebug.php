@@ -12,15 +12,22 @@ namespace Tarsius;
 trait ImageDebug
 {
     /**
-     * Grava uma imagem no diretório de DEBUG definido em $debugDir. 
+     * Grava uma imagem no diretório de DEBUG definido em Tarsius::$debugDir. 
      * Todas as implementações da função concatenam como prefixo do 
-     * nome da imagem o timestamp atual. O diretória Tarsius::$debugDir
-     * deve ser criado caso não exista.
+     * nome da imagem o timestamp atual. 
      *
      * @param resource $image Imagem que deve ser gravada
-     * @param string $name Nome que deve ser atribuído ao arquivo
+     * @param string $name Nome que deve ser atribuído ao arquivo que será salvo
+     *      em Tarsius::$debugDir
      */
     abstract public function save($image, $name);
+    /**
+     * Grava uma imagem no diretório de definido por $path
+     *
+     * @param resource $image Imagem que deve ser gravada
+     * @param string $name Nome completao para imagem a ser criada
+     */
+    abstract public function saveIn($image, $path);
     /**
      * Retorna uma cópia de $image
      *
@@ -48,6 +55,19 @@ trait ImageDebug
      * @param array $rgb Cor em formato RGV a ser utilizada.
      */    
     abstract public function setPixel(&$image, $p1, $rgb = [255, 0, 0]);
+    /**
+     * Escreve $text na imagem, na posição $startPoint com ângulo $angle, font 
+     * do tipo $fontFamily e tamanho $fontSize e cor $rgb.
+     *
+     * @param resource &$image Imagem a ser manipulada.
+     * @param string $text 
+     * @param float $fontFamily 
+     * @param float $fontSize 
+     * @param array $startPoint Coordenadas x,y do ponto 
+     * @param float $angle 
+     * @param array $rgb
+     */
+    abstract public function writeText(&$image,$text,$startPoint,$fontFamily,$fontSize,$angle,$rgb=[255, 0, 0]);
 
     /**
      * Retorna uma cópia da imagem em $image

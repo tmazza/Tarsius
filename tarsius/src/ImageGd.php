@@ -101,6 +101,13 @@ class ImageGd extends Image
         imagepng($image, Tarsius::$debugDir . DIRECTORY_SEPARATOR . $filename);
     }
 
+    /** DEBUG only
+     * Função definida em ImageDebug
+     */
+    public function saveIn($image, $path)
+    {
+        imagepng($image, $path);
+    }
 
     /** DEBUG only
      * Função definida em ImageDebug
@@ -131,5 +138,16 @@ class ImageGd extends Image
     {
         list($x, $y) = $p1;
         imagesetpixel($image, $x, $y, imagecolorallocate($image, $rgb[0], $rgb[1], $rgb[2]));
+    }
+
+    /** DEBUG only
+     * Escreve texto $text na imagem
+     */
+    public function writeText(&$image, $text, $startPoint, $fontFamily = false, $fontSize = 15, $angle = 0.0, $rgb = [255, 0, 0])
+    {
+        list($x, $y) = $startPoint;
+        list($r, $g, $b) = $rgb;
+        $color = imagecolorallocate($image, $r, $g, $b);
+        imagettftext($image, $fontSize, $angle, $x, $y, $color, $fontFamily, $text);
     }
 }
