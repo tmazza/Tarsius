@@ -74,7 +74,11 @@ class Tarsius
      * @var float $minMatchEllipse Valor mínimo para considerar uma elipse preenchida.
      */
     static public $minMatchEllipse = 0.3;
-
+    /**
+     * @var int $templateValidationTolerance Quantidade de diferenças aceitas durante 
+     *      comparação de validador de template. Mask.validateMask
+     */
+    static public $templateValidationTolerance = 3;
 
     /**
      * Altera valores default dos parâmetros

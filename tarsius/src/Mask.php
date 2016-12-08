@@ -26,6 +26,7 @@ class Mask
     const ELLIPSE_WIDTH = 'elpLargura';
     const ELLIPSE_HEIGHT = 'elpAltura';
     const OUTPUT_FORMAT = 'formatoSaida';
+    const VALIDATE_MASK = 'validaReconhecimento';
 
     /**
      * @var static string $anchorsDir Caminho para diretório contendo as imagens das âncoras.
@@ -106,6 +107,11 @@ class Mask
      * terá o resultado concatenado de todas as regiões que tenham ID que comece com 'e-'.
      */
     private $outputFormat = [];
+    /**
+     * @var array $validateMask Definição da região e do valor a ser usado para validar
+     * aplicação do template.
+     */
+    private $validateMask = false;
 
     /**
      * Armazena nome do arquivo de máscara em uso.
@@ -175,6 +181,13 @@ class Mask
 
             if (isset($data[self::OUTPUT_FORMAT])) {
                 $this->outputFormat = json_decode($data[self::OUTPUT_FORMAT], true);
+            }            
+
+            if (isset($data[self::VALIDATE_MASK])) {
+                $this->validateMask = $data[self::VALIDATE_MASK];
+                if (!is_array($this->validateMask)) {
+                    $this->validateMask = false;
+                }
             }            
 
             /**
@@ -256,6 +269,14 @@ class Mask
     public function getOutputFormat()
     {
         return $this->outputFormat;
+    }
+
+    /**
+     * @return o padrão de validação para aplicação do template.
+     */
+    public function getValidateMask()
+    {
+        return $this->validateMask;
     }
 
     /**

@@ -86,7 +86,8 @@ class Form
         $analyser = new FormAnalyser($this->image, $this->mask, $this->anchors, $this->scale, $this->rotation);
         $detailedResult = $analyser->evaluateRegions();
 
-        # @todo validar número do template
+        # Valida aplicação do template
+        $this->validateMask($detailedResult);
 
         # Monta resultado com as regiões avaliadas e agrupamentos definidos no $outputFormat da máscara
         return $this->completeResults($detailedResult);
@@ -238,6 +239,63 @@ class Form
         }
     }
 
+    /**
+     * Caso a aplicação da validação da máscara esteja definida o valor interpretado 
+     * na região especificada será comparado como valor esperado. Se a diferença entre
+     * os dois valores for maior do que Tarsius::$templateValidationTolerance uma execeção
+     * será lançada. O valor da região e o valor esperado devem ser uma string, a comparaçaõ
+     * será feita usando Longest Common Subsequence. 
+     *
+     * @param array $detailedResult Lista com valores avaliados em cada região
+     *
+     * @throws Exception Caso a quantidade de diferenças seja maior do que 
+     *      Tarsius::$templateValidationTolerance
+     */
+    private function validateMask(&$detailedResult)
+    {
+        if ($this->mask->getValidateMask()) {
+            list($region, $expectedValue) = $this->mask->getValidateMask();
+
+            if (isset($detailedResult[$region])) {
+                $avaliatedValue = $detailedResult[$region][0];
+                $lcs = $this->LCS($expectedValue, $avaliatedValue);
+                $len = max(strlen($expectedValue), strlen($avaliatedValue));
+
+                if ($lcs < $len-Tarsius::$templateValidationTolerance) {
+                    throw new \Exception("Template não reconhecido, " 
+                        ."valor avaliado '$avaliatedValue' diferente do esperado '{$expectedValue}'. LCS: '{$lcs}' ");
+                }
+                // return $lcs; # TODO: salvar nos dados de saída 
+
+            } else {
+                throw new \Exception("Região {$region} não definida no template.");
+            }
+        }
+    }
+
+    /**
+     * Longest common subsequence problem
+     * @link https://en.wikipedia.org/wiki/Longest_common_subsequence_problem link
+     */
+    private function LCS($a, $b)
+    {
+      $C = [];
+      $m = strlen($a);
+      $n = strlen($b);
+
+      for($i=0;$i<=$m;$i++) { if(!isset($C[$i])) $C[$i] = []; $C[$i][0] = 0; }
+      for($i=0;$i<=$n;$i++) { $C[0][$i] = 0; }     
+      for($i=1;$i<=$m;$i++){
+        for($j=1;$j<=$n;$j++){
+          if($a[$i-1] == $b[$j-1]){
+            $C[$i][$j] = $C[$i-1][$j-1] + 1;
+          } else {
+            $C[$i][$j] = $C[$i-1][$j] > $C[$i][$j-1] ? $C[$i-1][$j] : $C[$i][$j-1];          
+          }
+        }
+      }
+      return $C[$m][$n];
+    }
 
     /**
      * Monta lista com todos as informações do processamento e resultados otidos.
