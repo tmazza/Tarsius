@@ -14,12 +14,21 @@ class Tarsius
      * @var bool $debugEnable Se deve gerar dados intermediários para visualização
      *      e análise dos resultados parciais obtidos durante o processamento
      */
-    static public $enableDebug = false;
+    static public $enableDebug = true;
+    /**
+     * @var string $debugDir Diretório onde serão salvos os arquivos gerados durante debug
+     *      pelo processo.
+     */
+    static public $debugDir = __DIR__ . DIRECTORY_SEPARATOR . '..' 
+                                      . DIRECTORY_SEPARATOR . '..' 
+                                      . DIRECTORY_SEPARATOR . 'debug';
     /**
      * @var string $runtimeDir Diretório para manipulação de arquivos gerados e acessados
      *      pelo processo.
      */
-    static public $runtimeDir = __DIR__ . DIRECTORY_SEPARATOR . 'runtime';
+    static public $runtimeDir = __DIR__ . DIRECTORY_SEPARATOR . '..' 
+                                        . DIRECTORY_SEPARATOR . '..' 
+                                        . DIRECTORY_SEPARATOR . 'runtime';
     /**
      * Corte entre pixel pretos e brancos. 
      * 

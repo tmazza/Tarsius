@@ -92,7 +92,13 @@ class ImageGd extends Image
      */
     public function save($image, $name)
     {
-        imagepng($image, self::$debugDir  . microtime(true) . "_" . rand(0,100) . "_{$name}.png");
+        if (!is_dir(Tarsius::$debugDir)) {
+            $old = umask(0);
+            mkdir(Tarsius::$debugDir, 0777);
+            umask($old);
+        }
+        $filename = microtime(true) . "_" . rand(0,100) . "_{$name}.png";
+        imagepng($image, Tarsius::$debugDir . DIRECTORY_SEPARATOR . $filename);
     }
 
 

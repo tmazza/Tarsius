@@ -14,7 +14,8 @@ trait ImageDebug
     /**
      * Grava uma imagem no diretório de DEBUG definido em $debugDir. 
      * Todas as implementações da função concatenam como prefixo do 
-     * nome da imagem o timestamp atual
+     * nome da imagem o timestamp atual. O diretória Tarsius::$debugDir
+     * deve ser criado caso não exista.
      *
      * @param resource $image Imagem que deve ser gravada
      * @param string $name Nome que deve ser atribuído ao arquivo

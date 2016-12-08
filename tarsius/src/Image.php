@@ -21,10 +21,6 @@ abstract class Image
      */
     const DEFAULT_RESOLUTION = 300;
     /**
-     * @var static string $anchorsDir Caminho para diretório contendo as imagens das âncoras.
-     */
-    protected static $debugDir = __DIR__ . DIRECTORY_SEPARATOR . 'debug' . DIRECTORY_SEPARATOR;
-    /**
      * @var string $name Nome completo do arquivo sendo manipulado.
      */
     protected $name;
