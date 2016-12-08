@@ -52,52 +52,83 @@ class MaskGenerator extends Mask
         // $this->setScale($this->image->getResolution());
         $this->setScale(300);
 
-        # Busca âncoras comparando com todos os objetos da imagem
-        $anchors = $this->getAnchors();
+        # Busca centro das âncoras
+        $anchors = $this->getCenterAnchors();
 
         # Gera posição das regiões
         $copy = $this->image->getCopy();
         $regions = [];
+        $base = $anchors[self::ANCHOR_TOP_LEFT];
         foreach ($this->config[self::REGIONS] as $block) {
             # bloco de elipses
             if($block['tipo'] == 0) {
                 $blocos = $this->gerarBlocos($block, $copy);
-                $base = $anchors[self::ANCHOR_TOP_LEFT]->getCenter();
-                $regions = array_merge($regions, $this->formataRegioes($block, $blocos, $base));
+                $regions = array_merge($regions, $this->formataRegioes($block, $blocos, $anchors));
 
                 # debug
                 foreach ($regions as $id => $r) {
-                    $x = ($r[1] * $this->scale) + $base[0];
-                    $y = ($r[2] * $this->scale) + $base[1];
+                    list($p1,$p3) = $r[1];
+                    list($p2,$p4) = $r[2];
+
+                    # coonvert para pixel
+                    list($x1, $y1) = $p1;
+                    list($x2, $y2) = $p2;
+                    list($x3, $y3) = $p3;
+                    list($x4, $y4) = $p4;
+
+                    $p1 = [$x1*$this->scale, $y1*$this->scale];
+                    $p2 = [$x2*$this->scale, $y2*$this->scale];
+                    $p3 = [$x3*$this->scale, $y3*$this->scale];
+                    $p4 = [$x4*$this->scale, $y4*$this->scale];
+
+                    # converte pontos para 
+
+                    $anchor1 = $anchors[Mask::ANCHOR_TOP_LEFT];
+                    $anchor2 = $anchors[Mask::ANCHOR_TOP_RIGHT];
+                    $anchor3 = $anchors[Mask::ANCHOR_BOTTOM_RIGHT];
+                    $anchor4 = $anchors[Mask::ANCHOR_BOTTOM_LEFT];
+                    # soma âncora base de cada ponto
+                    $p1 = [bcadd($p1[0], $anchor1[0], 14), bcadd($p1[1], $anchor1[1], 14)];
+                    $p2 = [bcadd($p2[0], $anchor2[0], 14), bcadd($p2[1], $anchor2[1], 14)];
+                    $p3 = [bcadd($p3[0], $anchor3[0], 14), bcadd($p3[1], $anchor3[1], 14)];
+                    $p4 = [bcadd($p4[0], $anchor4[0], 14), bcadd($p4[1], $anchor4[1], 14)];
+
+                    $width = $anchor2[0] - $anchor1[0];
+                    $height = $anchor3[1] - $anchor2[1];
+
+                    $p13 = $this->getMidPoint($p1, $p3, $width, $height);
+                    $p24 = $this->getMidPoint($p2, $p4, $width, $height);
+                    list($x, $y)  = $this->getMidPoint($p13, $p24, $width, $height);
+
                     $this->image->writeText($copy, $id, [$x+2, $y-5], self::$staticDir . 'OpenSans-Regular.ttf');
                 }
 
             } else if($block['tipo'] == 1) { # OCR
 
-                // list($x1,$y1) = $cb['p1'];
-                // list($x2,$y2) = $cb['p2'];
+                list($x1,$y1) = $block['p1'];
+                list($x2,$y2) = $block['p2'];
 
-                // $x1 = ($x1 - $this->ancoraBase[0])/$this->escala; # Converte para milimetros
-                // $y1 = ($y1 - $this->ancoraBase[1])/$this->escala; # Converte para milimetros
-                // $x2 = ($x2 - $this->ancoraBase[0])/$this->escala; # Converte para milimetros
-                // $y2 = ($y2 - $this->ancoraBase[1])/$this->escala; # Converte para milimetros
+                $this->image->drawRectangle($copy, $block['p1'], $block['p2']);
+                $this->image->writeText($copy, $block['id'], $block['p1'], self::$staticDir . 'OpenSans-Regular.ttf');
 
-                // $regiaoOCR = [
-                //   $cb['id'] => [$cb['tipo'],[$x1,$y1],[$x2,$y2]],
-                // ];
-                // $regioes = array_merge($regioes,$regiaoOCR);
+                $p1 = [($x1 - $base[0])/$this->scale, ($y1 - $base[1])/$this->scale];
+                $p2 = [($x2 - $base[0])/$this->scale, ($y2 - $base[1])/$this->scale];
+
+                $regiaoOCR = [
+                    $block['id'] => [
+                        $block['tipo'],
+                        [$x1,$y1],
+                        [$x2,$y2],
+                    ],
+                ];
+                $regions = array_merge($regions,$regiaoOCR);
             }
         }
 
-        $content = $this->criaArquivoTemplate($regions, $anchors);
+        $content = $this->criaArquivoTemplate($regions, $base, $anchors);
 
         # gera diretório para template
-        $templateDir = dirname($this->imageName) . DIRECTORY_SEPARATOR . $this->name;
-        if (!is_dir($templateDir)) {
-            $old = umask(0);
-            mkdir($templateDir, 0777);
-            umask($old);
-        }
+        $templateDir = dirname($this->imageName);
         # grava arquivo de template
         $filename = $templateDir . DIRECTORY_SEPARATOR . 'template.json';
         $h = fopen($filename,'w+');
@@ -122,7 +153,7 @@ class MaskGenerator extends Mask
      * Tarsius::$minArea e Tarsius::$maxArea e compara com cada uma das
      * assinaturas das âncoras da máscara.
      */
-    private function getAnchors()
+    private function getCenterAnchors()
     {
         $sigAnchors = [
             self::ANCHOR_TOP_LEFT => $this->getSignatureOfAnchor(self::ANCHOR_TOP_LEFT),
@@ -149,7 +180,7 @@ class MaskGenerator extends Mask
             throw new \Exception("Uma ou mais âncoras não foram encontradas.");
         }
 
-        return $anchors;
+        return array_map(function($i) { return $i->getCenter(); }, $anchors);
     }
 
   /**
@@ -245,20 +276,28 @@ class MaskGenerator extends Mask
      *      | @param casoFalse string ou function sendo que funcao equivalente ao casoTrue
      *      
      */
-    protected function formataRegioes($block, $blocos, $baseAnchor)
+    protected function formataRegioes($block, $blocos, $anchors)
     {
         $regioes = [];
         foreach ($blocos as $cBloco => $lista) {
             foreach ($lista as $cLinha => $l) {
                 $count = 0;
                 foreach ($l as $cObjeto => $c) {
+                    $anchor1 = $anchors[self::ANCHOR_TOP_LEFT];
+                    $anchor2 = $anchors[self::ANCHOR_TOP_RIGHT];
+                    $anchor3 = $anchors[self::ANCHOR_BOTTOM_RIGHT];
+                    $anchor4 = $anchors[self::ANCHOR_BOTTOM_LEFT];
+
                     # Converte para milimetros
-                    $x = ($c[0] - $baseAnchor[0]) / $this->scale; 
-                    $y = ($c[1] - $baseAnchor[1]) / $this->scale; 
+                    $p1 = [($c[0] - $anchor1[0])/$this->scale,($c[1] - $anchor1[1])/$this->scale];
+                    $p3 = [($c[0] - $anchor3[0])/$this->scale,($c[1] - $anchor3[1])/$this->scale];
+
+                    $p2 = [($c[0] - $anchor2[0])/$this->scale,($c[1] - $anchor2[1])/$this->scale];
+                    $p4 = [($c[0] - $anchor4[0])/$this->scale,($c[1] - $anchor4[1])/$this->scale];
 
                     $genId = $block['id'];
                     $idRegiao = is_string($genId) ? $genId : $genId($cBloco,$cLinha,$cObjeto);
-                    $regioes[$idRegiao] = $this->formataTipoRegiao($block, $x, $y, $cBloco, $cLinha, $cObjeto);
+                    $regioes[$idRegiao] = $this->formataTipoRegiao($block, [$p1,$p3],[$p2,$p4], $cBloco, $cLinha, $cObjeto);
                     $count++;
                 }
             }
@@ -293,12 +332,10 @@ class MaskGenerator extends Mask
     * junto com a fomatação da saída e os valores necessários para interpretação
     * da folha. 
     */
-    protected function criaArquivoTemplate($regions, $anchors)
+    protected function criaArquivoTemplate($regions, $base, $anchors)
     {
 
         list($hor,$ver) = $this->getDistanciaAncoras($anchors);
-
-        $base = $anchors[self::ANCHOR_TOP_LEFT]->getCenter();
 
         $startPoint = [$base[0]/$this->scale, $base[1]/$this->scale];
         
@@ -312,7 +349,7 @@ class MaskGenerator extends Mask
             self::ELLIPSE_HEIGHT    => 2.5,     # TODO: obter da médias das regiões do tipo elipse? ou solicitar?
             self::ELLIPSE_WIDTH     => 4.36,    # TODO: obter da médias das regiões do tipo elipse? ou solicitar?
             self::REGIONS           => $regions,
-            self::NUM_ANCHORS       => $this->config[self::NUM_ANCHORS] ?? 1,
+            self::NUM_ANCHORS       => $this->config[self::NUM_ANCHORS] ?? 4,
             self::OUTPUT_FORMAT     => $outputFormat,
             self::VALIDATE_MASK     => $validateMask,
         ];
@@ -322,11 +359,11 @@ class MaskGenerator extends Mask
 
     private function getDistanciaAncoras(&$anchors)
     {
-        $a1 = $anchors[self::ANCHOR_TOP_LEFT]->getCenter();
-        $a2 = $anchors[self::ANCHOR_BOTTOM_RIGHT]->getCenter();
-        $a4 = $anchors[self::ANCHOR_BOTTOM_LEFT]->getCenter();
-        $hor = bcdiv(bcsub($a2[0],$a1[1]), $this->scale, 14);
-        $ver = bcdiv(bcsub($a4[1],$a1[1]), $this->scale, 14);
+        $a1 = $anchors[self::ANCHOR_TOP_LEFT];
+        $a2 = $anchors[self::ANCHOR_BOTTOM_RIGHT];
+        $a4 = $anchors[self::ANCHOR_BOTTOM_LEFT];
+        $hor = bcdiv(bcsub($a2[0], $a1[0]), $this->scale, 14);
+        $ver = bcdiv(bcsub($a4[1], $a1[1]), $this->scale, 14);
         
         return [$hor, $ver];
     }
