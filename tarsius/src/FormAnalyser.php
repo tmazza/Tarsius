@@ -217,23 +217,27 @@ class FormAnalyser
         list($p2,$p4) = $region[2];
 
         $anchor1 = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getCenter();
-        $anchor3 = $this->anchors[Mask::ANCHOR_TOP_RIGHT]->getCenter();
-        $anchor2 = $this->anchors[Mask::ANCHOR_BOTTOM_RIGHT]->getCenter();
+        $anchor2 = $this->anchors[Mask::ANCHOR_TOP_RIGHT]->getCenter();
+        $anchor3 = $this->anchors[Mask::ANCHOR_BOTTOM_RIGHT]->getCenter();
         $anchor4 = $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->getCenter();
         # soma âncora base de cada ponto
         $p1 = [bcadd($p1[0], $anchor1[0], 14), bcadd($p1[1], $anchor1[1], 14)];
-        $p3 = [bcadd($p3[0], $anchor3[0], 14), bcadd($p3[1], $anchor3[1], 14)];
         $p2 = [bcadd($p2[0], $anchor2[0], 14), bcadd($p2[1], $anchor2[1], 14)];
+        $p3 = [bcadd($p3[0], $anchor3[0], 14), bcadd($p3[1], $anchor3[1], 14)];
         $p4 = [bcadd($p4[0], $anchor4[0], 14), bcadd($p4[1], $anchor4[1], 14)];
         # normaliza pontos considerando rotação
         $p1 = $this->rotatePoint($p1, $anchor1, $this->rotation);
-        $p3 = $this->rotatePoint($p3, $anchor3, $this->rotation);
         $p2 = $this->rotatePoint($p2, $anchor2, $this->rotation);
+        $p3 = $this->rotatePoint($p3, $anchor3, $this->rotation);
         $p4 = $this->rotatePoint($p4, $anchor4, $this->rotation);
         # calcula pontos médios entre pares de âncoras
-        $p13 = $this->getMidPoint($p1, $p3);
-        $p24 = $this->getMidPoint($p2, $p4);
-        return $this->getMidPoint($p13, $p24);
+
+        $width = $anchor2[0] - $anchor1[0];
+        $height = $anchor3[1] - $anchor2[1];
+
+        $p13 = $this->getMidPoint($p1, $p3, $width, $height);
+        $p24 = $this->getMidPoint($p2, $p4, $width, $height);
+        return $this->getMidPoint($p13, $p24, $width, $height);
     }
 
     /**

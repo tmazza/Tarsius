@@ -70,14 +70,28 @@ trait Math
     /**
      * Retorna o ponto médio entre dois pontos
      */
-    public function getMidPoint($p1, $p2)
+    public function getMidPoint($p1, $p2, $width = false, $height = false)
     {
         $minX = min($p1[0],$p2[0]); $maxX = max($p1[0],$p2[0]);
         $minY = min($p1[1],$p2[1]); $maxY = max($p1[1],$p2[1]);
-        return [
-            (($maxX - $minX) / 2) + $minX,
-            (($maxY - $minY) / 2) + $minY,
-        ];
+        
+        $minRateX = $maxRateX = 0.5;
+        $minRateY = $maxRateY = 0.5;
+        # Controle eixo x considerando disntância para âncora mais próxima
+        if ($width) {
+            $maxRateX = $minX / $width;
+            $minRateX = 1 - $maxRateX;
+        }
+        # Controle eixo x considerando disntância para âncora mais próxima
+        if ($height) {
+            $maxRateY = $minY / $height;
+            $minRateY = 1 - $maxRateY;
+        }
+
+        $x = $minRateX*$minX + $maxRateX*$maxX;
+        $y = $minRateY*$minY + $maxRateY*$maxY;
+
+        return [$x, $y];
 
     }
 
