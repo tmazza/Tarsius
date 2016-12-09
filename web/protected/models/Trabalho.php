@@ -23,7 +23,6 @@ class Trabalho extends CActiveRecord
 	const statusFinalizado = 2;
 	const statusDeveParar = 3;
 
-
 	/**
 	 * @return string the associated database table name
 	 */

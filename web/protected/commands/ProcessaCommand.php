@@ -1,169 +1,168 @@
 <?php
-include_once(Yii::getPathOfAlias('webroot') . '/../../src/Image.php');
-class ProcessaCommand extends CConsoleCommand {
+/**
+ * @author Tiago Mazzarollo <tmazza@email.com>
+ */
 
-	public $pid;
-	public $dirBase;
-	public $dirInBase;
+/**
+ * Aplica máscara a uma imagem ou a um diretório de trabalho.
+ */
+class ProcessaCommand extends CConsoleCommand 
+{
+
 	public $dirIn;
-	public $dirOut;
 	public $trabalho;
-	private $resolucao = 300;
 
-	public $dirDoneFile; # Diretório onde arquivos de log serão salvos
+	/**
+	 * Processa uma imagem aplicando o template. resultado é retornado em stdin
+	 *
+	 * @param string $arquivo Caminho absoluto para image que deve ser processdao
+	 * @param string $template Nome do template a ser aplicado, $template deve ser
+	 * 		um nome existente dentro do diretório definido em templatesDir no arquivo
+	 *		de configuração da aplicação.
+	 */
+	public function actionIndex($arquivo=false, $template=false)
+	{
+		if (!($arquivo && $template)){
+			die("Informe o trabalho e o template em uso. \n\n\t--template=<ID-TRABALHO>\n\t--arquivo=<ID-ARQUIVO>\n\n");
+		}
+		if (!file_exists($arquivo)) {
+			die("Imagem '{$arquivo}' não existe ou não pode ser encontrada.\n");
+		}
+		$template = Yii::app()->params['templatesDir'] . '/' . $template . '/template.json';
 
-	public function __construct(){
-		$this->dirBase = __DIR__ . '/../../../data/runtime';
-	}
-
-	public function actionIndex($dirIn=false,$dirOut=false,$trabId=false){
+		$form = new Tarsius\Form($arquivo, $template);
 		try {
-			$this->exec($dirIn,$dirOut,$trabId);
+			$output = $form->evaluate();
+			print_r($output);
+			echo 'Tempo decorrido: ' . $output['totalTime'] . "\n";
 		} catch(Exception $e) {
-			# TODO: devolver imagens e mudar status do processo
-			$erro = new Erro;
-			$erro->trabalho_id = $trabId;
-			$erro->texto = CHtml::tag('h3',$e->getMessage()) . '<hr>' . $e->__toString();
-			$erro->read = 0;
-			$erro->save();
+			echo $e->getMessage() . "\n" . $e;	
 		}
-	}
-
-	private function exec($dirIn,$dirOut,$trabId){
-		$this->criaValidaDiretorios($dirIn,$dirOut,$trabId);
-			
-		$files = array_filter(scandir($this->dirIn),function($i) { 
-		  return pathinfo($i, PATHINFO_EXTENSION) == 'jpg'; 
-		});
-
-		$count = 0;
-		$first = true;
-		foreach ($files as $i => $f) {
-		  	$count++;
-		  	if($first || $count % 10 == 0){
-		  		$this->trabalho = Trabalho::model()->findByPk($trabId);
-		  		$this->log('status atualizado para '. $this->trabalho->status);
-			}
-
-		 	$template = $this->trabalho->template;
-	     	$arquivo = $this->dirIn.'/'.$f;
-	   	 	$arquivoDest = $this->dirOut.'/'.$f;
-
-			if($this->trabalho->status == 1){
-				$start = time();
-				try {
-					$this->log('Processando ' . $f);
-					$image = new Image($template,$this->trabalho->taxaPreenchimento);
-					$image->exec($arquivo,$this->resolucao);
-					$image->output['arquivo'] = $arquivoDest; # TODO: é usado no debug?
-					$imageOutPut = $image->output;
-					$this->log('Processamento realizado ' . $f);
-				} catch(Exception $e){
-  			 	  $this->log('Erro ao processamento ' . $f);
-				  $imageOutPut = $e->getMessage();
-				}
-				#$this->export($f,$imageOutPut);
-			}
-			$ok = rename($arquivo,$arquivoDest);
-
-			if($this->trabalho->status == 1){ // Trabalho executando | folha interpretada
-	  			Yii::app()->db->createCommand()->insert('finalizado', array(
-				    'trabalho_id'=>$this->trabalho->id,
-				  	'nome'=>$f,	
-				    'conteudo'=>json_encode($imageOutPut),
-			  		'dataFechamento'=>time(),	  
-				));
-			} else {  # | folha somente renomeada
-			  $qtd = Distribuido::model()->updateAll([
-			  	'status'=>3,	
-			  	'nome'=>$f . '-(canelada em ' . date('d/m/Y H:i:s') . ')',	
-			  	'dataFechamento'=>time(),	  
-			  ],[
-			  	'condition'=>"trabalho_id={$this->trabalho->id} AND status = 1  AND nome='{$f}'",
-			  ]);
-			}
-
-		 	$this->log(($ok ? 'OK':'FALHA') . " | Renomando de {$arquivo} para {$arquivoDest} ");
-		}
-
-  		Processo::model()->updateAll([
-			'status'=>2,
-			'dataFim'=>time(),
-		],"trabalho_id={$trabId} AND pid={$this->pid}");
-
-		rmdir($this->dirIn);
-
-		$this->log('Finalizado');
 	}
 
 	/**
-	 * @param $model int id na table Distribuido
+	 * Processa diretório definido em $dirIn do trabalho na pasta do trabalho $trabId, 
+	 * a qual terá como diretório base o caminho definido em runtimeDir no arquivo de configuração
+	 * da aplicação movendo cada imagem processada para $dirOut
+	 *
+	 * @param string Caminho relativo do diretório dentro de $runtimeDir/trab-$trabId.
+	 * @param string Caminho absoluto do diretório onde as imagens devem ser removidas. 
+	 * @param int $trabId Número do trabalho a ser processado.
 	 */
-	public function actionReprocessa($args=[],$minMatch=0.8,$validaTemplate=true)
-	{
-		foreach ($args as $id) {
-			$model = Distribuido::model()->findByPk($id,"status = " . Distribuido::StatusReprocessamento);
-			
-			if(is_null($model)){
-				echo "Arquivo para reprocessamento não encontrado. ID: '{$id}'\n";
-			} else {
-				$ok = true;
-				try {
-					$image = new Image($model->trabalho->template,$model->trabalho->taxaPreenchimento,$minMatch);
-					$image->validaTemplate = $validaTemplate;
-					$image->exec($model->trabalho->sourceDir.'/'.$model->nome);
-					$msg = $image->output;			
-				} catch (Exception $e) {
-					$ok = false;
-					$msg = $e->getMessage();
+	public function actionDirectory($dirIn=false, $dirOut=false, $trabId=false){
+		try {
+			$this->initParameters($dirIn, $dirOut, $trabId);
+
+			# Busca todos os arquivos jpg do diretório
+			$files = CFileHelper::findFiles($this->dirIn, [
+				'fileTypes' => ['jpg'],
+			]);		
+
+			$count = 0; $first = true;
+
+			foreach ($files as $imageName) {
+			   	$count++;
+
+			   	# atualiza objeto trabalho com valores do banco
+			   	if ($first || $count % 10 == 0) {
+			   		$this->trabalho = Trabalho::model()->findByPk($trabId);
+			   		if (is_null($this->trabalho)) {
+			   			throw new Exception("Trabalho '{$trabId}' não encontrado.");
+			   		}
+					# TODO: configurar tarsius (inlcurir capos no tarbalho e passar para Tarsius::config)
+				 	$template = Yii::app()->params['templatesDir'] . '/' . $this->trabalho->template . '/template.json';
 				}
 
-				$model->resultado->conteudo = json_encode($msg);
-				$model->resultado->update(['conteudo']);
+				# interpreta regiões da imagem
+		   	 	if ($this->trabalho->status == Trabalho::statusExecutando) {
+					$form = new Tarsius\Form($imageName, $template);
+					$result = $form->evaluate();
+					$basename = basename($imageName);
+					$content = json_encode($result);
+					$exported = $this->export($result);
+					Finalizado::insertOne($this->trabalho->id, $basename, $content, $exported);
+				} 
 
-				$model->status = Distribuido::StatusAguardando;
-				$model->update(['status']);
+				# move arquivo para diretório destino/de saída
+				if (!rename($imageName, $dirOut . basename($imageName))) {
+					$diretoSaida = $dirOut . basename($imageName);
+					throw new Exception("Arquivo '{$imageName}' não pode ser movido para '{$diretoSaida}'. ");
+				}
+
+				# Cancela folha distruída caso trabalho tenha sido pausado.
+				if ($this->trabalho->status !== Trabalho::statusExecutando) {
+					$qtd = Distribuido::model()->updateAll([
+						'status' 		 => Distribuido::StatusParado,	
+						'nome' 			 => basename($imageName) . ' - canelada em ' . date('d/m/Y H:i:s'),	
+						'dataFechamento' => time(),	  
+					],[
+						'condition' => "trabalho_id={$this->trabalho->id}" 
+								. " AND status=" . Distribuido::StatusParado
+								. " AND nome='" . basename($imageName) . "'",
+					]);
+					if ($qtd !== 1) {
+						throw new Exception("Erro ao cancelar distribuição de '{$imageName}'. ");
+					}
+				}
+
+				
 			}
+
+	  		# remove todo o diretório de trabalho do processo
+			if (!rmdir($this->dirIn)) {
+				throw new Exception("Diretório '{$this->dirIn}' não pode ser removido. ");
+			}
+
+		} catch(Exception $e) {
+
+			Erro::insertOne($this->trabalho->id, $e->getMessage(), $e->__toString());
+
 		}
 	}
 
-	public function actionFile($arquivo=false,$template=false){
-		if(!($arquivo || $template)){
-			die("Informe o trabalho e o template em uso. \n\n\t--template=<ID-TRABALHO>\n\t--arquivo=<ID-ARQUIVO>\n\n");
-		}
-		$image = new Image($template,0.3);
-		$image->exec($arquivo);
-		print_r($image->output);
-	}
-	
-	private function criaValidaDiretorios($dirIn,$dirOut,$trabId)
+	/**
+	 * Verifica se parãmetros informados estão de acordo como o esperado.
+	 * 
+	 * @param string $dirIn
+	 * @param string $dirOut
+	 * @param int $trabId
+	 */
+	private function initParameters($dirIn, $dirOut, $trabId)
 	{
-		if(!$dirIn) die("Informe um diretorio de trabalho.\n");
-		if(!$dirOut) die("Informe um diretorio de origem.\n");
-		if(!$trabId) die("Qual o trabID ?.\n");
-		$this->dirInBase = $dirIn;
+		if(!$dirIn) die("Informe um diretorio de trabalho. Use --dirIn=<CAMINHO-RELATIVO>\n");
+		if(!$dirOut) die("Informe um diretorio para expotar as imagens. Use --dirOut=<CAMINHO-ABSOLUTO>\n");
+		if(!$trabId) die("Qual o ID do trabalho? Use --trabId=<ID-TRABALHO>\n");
+			
+		$runtimeDir = Yii::app()->params['runtimeDir'];
+		if(!is_dir($runtimeDir)){
+			die("Diretorio '{$runtimeDir}' não encontrado ou não existe.\n");
+		}
+		if(!is_dir($dirOut)){
+			die("Diretorio '{$dirOut}' não encontrado ou não existe.\n");
+		}
 
-		$this->dirIn .= $this->dirBase . '/trab-'.$trabId.'/exec/ready/' . $dirIn;
-		$this->dirOut = $dirOut;
-		if(!is_dir($this->dirBase))	die("Diretorio de trabalho nao encontrado.\n");
+		$dirOut = trim($dirOut);
+		if (substr($dirOut, -1) !== '/') {
+			$dirOut .= '/';
+		}
 
-		$this->pid = getmypid();
-
-		$this->dirDoneFile = $this->dirBase.'/trab-'.$trabId.'/file';
-		if(!is_dir($this->dirDoneFile)) mkdir($this->dirDoneFile,0777);
+		$this->dirIn .=  "{$runtimeDir}/trab-{$trabId}/exec/ready/{$dirIn}";
 	}
 
-	private function export($f,$imageOutPut)
-	{	
-		// $output = json_encode($imageOutPut);
-		// $export = fopen($this->dirDoneFile.'/'.$f.'.json','w');
-		// fwrite($export,$output);
-		// fclose($export);
-	}
-
-	private function log($msg){
-		Yii::log($msg,'trace','tarsius.processa.T'.$this->trabalho->id.'.'.$this->dirInBase);
+	/**
+	 * Salva no banco definido em dbExport resultado do processamento da imagem
+	 *
+	 * @todo Exportar registro. Criar modelo defaul export.
+	 *
+	 * @param array $result
+	 */
+	private function export($result)
+	{
+		try {
+			return false;
+		} catch(Exception $e) {
+			return false;
+		}
 	}
 
 }
-

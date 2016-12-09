@@ -40,4 +40,17 @@ class Erro extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+	/**
+	 * Registra erro no trabalho
+	 */
+	public static function insertOne($trabalhoID, $text, $trace = false)
+	{
+		Yii::app()->db->createCommand()->insert('erro', array(
+		    'trabalho_id' => $trabalhoID,
+		  	'texto'		  => $text,	
+		  	'trace'		  => $trace,	
+		));
+	}
+
 }

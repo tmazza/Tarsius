@@ -67,4 +67,27 @@ class Finalizado extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+	/**
+	 * Insere um registro em finalizado.
+	 *
+	 * @param int
+	 * @param string
+	 * @param string
+	 * @param bool
+	 */
+	public static function insertOne($trabalhoID, $fileName, $content, $exported)
+	{
+		$qtd = Yii::app()->db->createCommand()->insert('finalizado', array(
+		    'trabalho_id'	 => $trabalhoID,
+		  	'nome'			 => $fileName,	
+		    'conteudo'		 => $content,
+		    'exportado'		 => (int) $exported,
+	  		'dataFechamento' => time(),	  
+		));
+		if ($qtd !== 1) {
+			throw new Exception("Falha salvar registro de finalizado.");
+		}
+	}
+
 }

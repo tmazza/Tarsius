@@ -1,5 +1,11 @@
 <?php
+/**
+ * @author Tiago Mazzarollo <tmazza@email.com>
+ */
 
+/**
+ * Geração e manipulação de templates.
+ */
 class TemplateCommand extends CConsoleCommand {
 
 	private $resolucaoBase = 300;
@@ -7,6 +13,8 @@ class TemplateCommand extends CConsoleCommand {
 	/**
 	 * Reprocessa template $nome, usando como diretório base 
 	 * Yii::app()->params['templatesDir'].
+	 *
+	 * @param string $nome
 	 */
 	public function actionIndex($nome=false)
 	{
