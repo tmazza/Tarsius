@@ -10,7 +10,7 @@ class MaskTest extends TestCase
 {
     public function testConstruct()
     {
-        $maskName = __DIR__ . '/templates/formTest1.json';
+        $maskName = __DIR__ . '/templates/template.json';
         $obj = new Mask($maskName);
         $this->assertInstanceOf('Tarsius\Mask', $obj);
     }

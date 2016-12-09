@@ -13,8 +13,8 @@ class ImageGdTest extends TestCase
 
     public function __construct()
     {
-        $this->imageName = __DIR__  . '/images/formTest1.jpg';
-        $this->imageName2 = __DIR__  . '/images/formTest2.jpg';
+        $this->imageName = __DIR__  . '/images/i1.jpg';
+        $this->imageName2 = __DIR__  . '/images/i2.jpg';
     }
 
     public function testConstruct()
