@@ -8,8 +8,12 @@
             "email": "tmazza@email.com"
         }
     ],
-    "require": {},
+    "require": {
+    },
     "autoload": {
         "psr-4": {"Tarsius\\": "src/"}
+    },
+    "require-dev": {
+        "phpdocumentor/phpdocumentor": "^2.9"
     }
 }
