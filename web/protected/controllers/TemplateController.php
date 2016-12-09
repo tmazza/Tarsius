@@ -113,7 +113,6 @@ class TemplateController extends BaseController {
 			fclose($h);
 		}
 
-
 		$this->render('edicaoSaida',[
 			'template' => $template,
 			'content' => $content,
