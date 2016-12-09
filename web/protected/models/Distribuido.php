@@ -106,4 +106,21 @@ class Distribuido extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+	/**
+	 * Insere um novo registro
+	 */
+	public static function insertOne($trabID, $filename, $dir)
+	{
+        $model = new Distribuido();
+        $model->nome = $filename;
+        $model->status = self::StatusAguardando;
+        $model->trabalho_id = $trabID;
+        $model->tempDir = $dir;
+        $model->dataDistribuicao = time();
+        if(!$model->save()) {
+        	throw new Exception("Falha ao inserir registro {$file} em distribuído.");
+        }
+	}
+
 }
