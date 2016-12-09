@@ -87,7 +87,6 @@ class FormAnalyser
                 throw new \Exception("Tipo de região '{$type}' desconhecido.");
             }
         }
-
         # DEBUG
         if (Tarsius::$enableDebug) {
             $this->image->save($copy, 'elipses');
@@ -269,11 +268,10 @@ class FormAnalyser
         $filename = Tarsius::$runtimeDir . '/_' . md5(rand(0,9999).microtime(true)) . '.jpg';
         $this->image->cropAndCreate($filename, $p1, $p2);
 
+
         $cmd = "tesseract {$filename} -psm 8 stdout digits";
-        $handle = popen($cmd, 'r');
-        $output = trim(fread($handle, 2096));
-        pclose($handle);
-        
+        exec($cmd, $output);
+        $output = $output[0];
         
         if (!Tarsius::$enableDebug) {
             unlink($filename);

@@ -108,8 +108,9 @@ class MaskGenerator extends Mask
                 list($x1,$y1) = $block['p1'];
                 list($x2,$y2) = $block['p2'];
 
-                $this->image->drawRectangle($copy, $block['p1'], $block['p2']);
-                $this->image->writeText($copy, $block['id'], $block['p1'], self::$staticDir . 'OpenSans-Regular.ttf');
+                $rgb = [72, 61, 139];
+                $this->image->drawRectangle($copy, $block['p1'], $block['p2'], $rgb);
+                $this->image->writeText($copy, $block['id'], $block['p1'], self::$staticDir . 'OpenSans-Regular.ttf',15,0.0,$rgb);
 
                 $p1 = [($x1 - $base[0])/$this->scale, ($y1 - $base[1])/$this->scale];
                 $p2 = [($x2 - $base[0])/$this->scale, ($y2 - $base[1])/$this->scale];
@@ -117,8 +118,8 @@ class MaskGenerator extends Mask
                 $regiaoOCR = [
                     $block['id'] => [
                         $block['tipo'],
-                        [$x1,$y1],
-                        [$x2,$y2],
+                        $p1,
+                        $p2,
                     ],
                 ];
                 $regions = array_merge($regions,$regiaoOCR);

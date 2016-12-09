@@ -69,6 +69,8 @@ class Form
      */
     public function evaluate()
     {
+        $time = microtime(true);
+
         # Primeira escala considerada é baseada na resolução extraída dos meta dados da imagem
         $this->setScale($this->image->getResolution());
         
@@ -90,7 +92,7 @@ class Form
         $this->validateMask($detailedResult);
 
         # Monta resultado com as regiões avaliadas e agrupamentos definidos no $outputFormat da máscara
-        return $this->completeResults($detailedResult);
+        return $this->completeResults($detailedResult, $time);
 
     }
 
@@ -199,7 +201,7 @@ class Form
 
         $this->anchors[$anchor] = $this->image->findObject($signature, $startPoint, $this->scale, $minArea, $maxArea);
         if ($this->anchors[$anchor] === false) {
-            throw new Exception("Âncora {$anchor} não encontrada.");           
+            throw new \Exception("Âncora {$anchor} não encontrada.");           
         }
     }
 
@@ -235,7 +237,7 @@ class Form
                     $posAnchor1[1] + $verticalDistance,
                 ], $posAnchor1, $this->rotation); 
             default:
-                throw new Exception("Operação inválida. Âncora {$anchor} desconhecida.");
+                throw new \Exception("Operação inválida. Âncora {$anchor} desconhecida.");
         }
     }
 
@@ -305,7 +307,7 @@ class Form
      * @return array Lista informações das parâmetros usados durante o processamento, dos
      *      resultados brutos obtidos e dos resultados formatadas. 
      */
-    private function completeResults(&$detailedResult)
+    private function completeResults(&$detailedResult, $time)
     {
 
         $regionResult = array_map(function($i) { return $i[0]; }, $detailedResult); 
@@ -315,8 +317,8 @@ class Form
         # Configuração utilizada
         $class = new \ReflectionClass('Tarsius\Tarsius');
         $configuration = $class->getStaticProperties();
-
         return [
+            'totalTime' => microtime(true) - $time,
             'imageName' => $this->imageName,
             'maskName' => $this->maskName,
             'configuration' => $configuration,
