@@ -98,11 +98,11 @@ class ProcessaCommand extends CConsoleCommand
                         'dataFechamento' => time(),   
                     ],[
                         'condition' => "trabalho_id={$this->trabalho->id}" 
-                                . " AND status=" . Distribuido::StatusParado
+                                . " AND status=" . Distribuido::StatusAguardando
                                 . " AND nome='" . basename($imageName) . "'",
                     ]);
-                    if ($qtd !== 1) {
-                        throw new Exception("Erro ao cancelar distribuição de '" . basename($imageName) . "'. ");
+                    if ($qtd != 1) {
+                        throw new Exception("Erro ao cancelar distribuição de '" . basename($imageName) . "'. QTD: {$qtd}");
                     }
                 }
 

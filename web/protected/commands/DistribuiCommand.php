@@ -55,7 +55,9 @@ class DistribuiCommand extends CConsoleCommand
                 $this->trabalho->update(['status']); 
 
             } catch(Exception $e) {
+
                 Erro::insertOne($this->trabalho->id, $e->getMessage(), $e->__toString());
+
             }
 
         } else {
@@ -137,6 +139,7 @@ class DistribuiCommand extends CConsoleCommand
                     $tempDir = $execDir . '/' . $dirName . '/';
                     CFileHelper::createDirectory($tempDir, 0777);
 
+
                     foreach ($bloco as $file) {
                         if (rename($sourceDir . $file, $tempDir . $file)){
                             Distribuido::insertOne($this->trabalho->id, $file, $dirName);
@@ -144,6 +147,7 @@ class DistribuiCommand extends CConsoleCommand
                             throw new Exception("Falha ao mover arquivo: {$file} \n");
                         }
                     }
+
 
                     # Diretorio final após buscar todas imagens do processo
                     rename($tempDir, $readyDir . '/' . $dirName); 
@@ -189,10 +193,13 @@ class DistribuiCommand extends CConsoleCommand
             throw new Exception('Trabalho ' . $id . ' não encontrado.');
         }
         if (is_null($this->trabalho->sourceDir)) {
-            throw new Exception('Diretório de trabalho não definido.');
+            throw new Exception('Diretório com imagens não definido no trabalho.');
+        }
+        if (!is_readable($this->trabalho->sourceDir)) {
+            throw new Exception("Sem permissão de leitura no diretório {$this->trabalho->sourceDir}.");
         }
         if (!is_dir($this->trabalho->sourceDir)) {
-            throw new Exception('Diretório de trabalho não existe ou sem permissão de acesso.');
+            throw new Exception("Diretório de trabalho não existe ou sem permissão de acesso.");
         }
     }
 
