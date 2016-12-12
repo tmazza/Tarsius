@@ -93,7 +93,7 @@ class Signature
 	 *
 	 * @return float Taxa de semelhanças entre duas assinaturas
 	 */
-	public static function compare(array $signature1, array $signature2, int $angle = 0)
+	public static function compare($signature1, $signature2, $angle = 0)
 	{
 		$s = 0;
 		for ($i = 0; $i < self::$n; $i++) {
@@ -113,7 +113,7 @@ class Signature
 	 * e somente os pontos que foram considerados
 	 *
 	 */
-	public static function print(array $matrix)
+	public static function printSignature($matrix)
 	{
 		echo "\n";
 		foreach ($matrix as $linha => $colunas) {

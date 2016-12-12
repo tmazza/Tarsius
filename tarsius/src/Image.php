@@ -46,25 +46,25 @@ abstract class Image
      *
      * @return Image 
      */
-    abstract public function load(): Image;
+    abstract public function load();
 
     /**
      * Define se ponto da imagem é preto ou branco.
      */
-    abstract public function isBlack(int $x, int $y): bool;
+    abstract public function isBlack($x, $y);
 
     /**
      * Retorna a largura da imagem
      * 
      * @return int Largura da da imagem
      */
-    abstract public function getWidth(): int;
+    abstract public function getWidth();
     /**
      * Retorna a altura da imagem
      * 
      * @return int Altura da da imagem
      */
-    abstract public function getHeight(): int;
+    abstract public function getHeight();
     /**
      * Cria arquivo com recorte da imagem
      * 
@@ -79,7 +79,7 @@ abstract class Image
      *
      * @var string $name Caminho completo para a imagem a ser carregada
      */
-    public function __construct(string $name)
+    public function __construct($name)
     {
         $this->name = $name;
     }
@@ -93,7 +93,7 @@ abstract class Image
      *
      * @link http://stackoverflow.com/a/12988682 referência
      */
-    public function getResolution(): int
+    public function getResolution()
     {
         if (!$this->resolution) {
             $handle = fopen($this->name,'r');
@@ -121,7 +121,7 @@ abstract class Image
      *
      * @return array conjunto de pontos pretos indexados pelo eixo x e y na imagem.
      */
-    public function getPointsBetween(array $p1, array $p2): array
+    public function getPointsBetween($p1, $p2)
     {
         list($x0, $y0) = $p1;
         list($x1, $y1) = $p2;
@@ -150,7 +150,7 @@ abstract class Image
      *
      * @return Object[] conjunto de objetos encontrados
      */
-    public function getObjectsBetween(array $p1, array $p2, int $minArea, int $maxArea): array
+    public function getObjectsBetween($p1, $p2, $minArea, $maxArea)
     {
         $points = $this->getPointsBetween($p1, $p2);
 
@@ -181,7 +181,7 @@ abstract class Image
      *
      * @return array lista de objetos encontrados
      */
-    public function getAllObjects(int $minArea, int $maxArea)
+    public function getAllObjects($minArea, $maxArea)
     {
         $p1 = [0, 0];
         $p2 = [$this->getWidth(), $this->getHeight()];
@@ -201,10 +201,10 @@ abstract class Image
      * @param mixed $config int|bool Área máxima para considerar objeto
      *
      */
-    public function findObject(array &$objectSignature, array &$centralPoint, float $scale, $minArea = false, $maxArea = false)
+    public function findObject(&$objectSignature, &$centralPoint, $scale, $minArea = false, $maxArea = false)
     {
-        $minArea = $minArea ?? Tarsius::$minArea;
-        $maxArea = $maxArea ?? Tarsius::$maxArea;
+        $minArea = $minArea ? $minArea : Tarsius::$minArea;
+        $maxArea = $maxArea ? $maxArea : Tarsius::$maxArea;
       
         $minMatch = Tarsius::$minMatchObject;
         $searchArea = Tarsius::$searchArea * $scale;

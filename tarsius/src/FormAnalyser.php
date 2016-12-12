@@ -118,9 +118,11 @@ class FormAnalyser
     private function evaluateEllipse(&$region, &$copy)
     {
         $center = $this->getPointWithCorretion($this->applyResolution($region, $this->scale));   
-        $minMatch = $region[5] ?? Tarsius::$minMatchEllipse;
-        $elpWidth = $this->applyResolution($region[6] ?? $this->mask->getEllipseWidth(), $this->scale);
-        $elpHeight = $this->applyResolution($region[7] ?? $this->mask->getEllipseHeight(), $this->scale);
+        
+
+        $minMatch = isset($region[5]) && is_float($region[5]) ? $region[5] : Tarsius::$minMatchEllipse;
+        $elpWidth  = $this->applyResolution(isset($region[6]) ? $region[6] : $this->mask->getEllipseWidth(), $this->scale);
+        $elpHeight = $this->applyResolution(isset($region[7]) ? $region[7] : $this->mask->getEllipseHeight(), $this->scale);
 
         list($p1, $p2) = $this->image->createRectangle($center, $elpWidth/1.95, $elpHeight/1.95);
         $points = $this->image->getPointsBetween($p1, $p2);

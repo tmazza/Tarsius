@@ -14,7 +14,7 @@ class Tarsius
      * @var bool $debugEnable Se deve gerar dados intermediários para visualização
      *      e análise dos resultados parciais obtidos durante o processamento
      */
-    static public $enableDebug = true;
+    static public $enableDebug = false;
     /**
      * @var string $debugDir Diretório onde serão salvos os arquivos gerados durante debug
      *      pelo processo.
@@ -92,13 +92,13 @@ class Tarsius
     /**
      * Altera valores default dos parâmetros
      */
-    public static function config(array $config)
+    public static function config($config)
     {
         $class = new \ReflectionClass(__CLASS__);
         $parameters = $class->getStaticProperties();
 
         foreach (array_keys($parameters) as $param) {
-            self::${$param} = $config[$param] ?? self::${$param};
+            self::${$param} = isset($config[$param]) ? $config[$param] : self::${$param};
         }
     }
 

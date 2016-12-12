@@ -53,7 +53,7 @@ class Form
      * @param string $imageName Nome da imagem a ser processada.
      * @param string $maskName  Nome da máscara que deve ser aplicada na imagem.
      */
-    public function __construct(string $imageName, string $maskName)
+    public function __construct($imageName, $maskName)
     {
         $this->imageName = $imageName;
         $this->maskName = $maskName;
@@ -152,7 +152,7 @@ class Form
     /**
      * Define escala em pixel considerando valor da resolução em dpi.
      */
-    private function setScale(int $resolution)
+    private function setScale($resolution)
     {
         $this->scale = $resolution / 25.4;
     }
@@ -160,7 +160,7 @@ class Form
     /**
      * Define escala considerando valor igual a quantidade de pixel por milímetro.
      */
-    private function setScaleDirect(float $scale)
+    private function setScaleDirect($scale)
     {
         $this->scale = $scale;
     }
@@ -187,7 +187,7 @@ class Form
      *
      * @param int $anchor Âncora sendo procurada
      */
-    private function getAnchor(int $anchor)
+    private function getAnchor($anchor)
     {
         $signature = $this->mask->getSignatureOfAnchor($anchor);
         $startPoint = $this->getExpectedAnchorPosition($anchor);
@@ -210,7 +210,7 @@ class Form
      *
      * @param int $anchor Âncora a ser avaliada
      */ 
-    private function getExpectedAnchorPosition(int $anchor)
+    private function getExpectedAnchorPosition($anchor)
     {
         if($anchor !== Mask::ANCHOR_TOP_LEFT){
             $posAnchor1 = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getCenter();
