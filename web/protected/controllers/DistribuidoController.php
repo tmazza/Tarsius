@@ -96,7 +96,7 @@ class DistribuidoController extends BaseController
                     $x = $r[2];
                     $y = $r[3];
 
-                    $minMatchEllipse = $r[4] ?? Tarsius\Tarsius::$minMatchEllipse;          
+                    $minMatchEllipse = isset($r[4]) ? $r[4] : Tarsius\Tarsius::$minMatchEllipse;          
 
                     if($r[1] > $minMatchEllipse) {
                       imagefilledellipse($original,$x,$y,$w,$h, imagecolorallocatealpha($original,255,255,0,75));

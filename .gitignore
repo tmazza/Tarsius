@@ -15,3 +15,5 @@ data/template/*
 data/runtime/*
 web/protected/config/dbExport.php
 dev
+runtime
+debug
