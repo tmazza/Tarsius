@@ -22,7 +22,7 @@ trait Math
                 $data[$k] = $this->applyResolution($v, $scale);
             }
         } else {
-            $data = bcmul($data,$scale,14);
+            $data = $data * $scale;
         }
         return $data;
     }
@@ -62,9 +62,9 @@ trait Math
      */
     public function distance($p1, $p2)
     {
-        $deltaX = bcsub($p1[0], $p2[0], 14);
-        $deltaY = bcsub($p1[1], $p2[1], 14);
-        return bcsqrt(bcmul($deltaX, $deltaX, 14) + bcmul($deltaY, $deltaY, 14), 14);
+        $deltaX = $p1[0] - $p2[0];
+        $deltaY = $p1[1] - $p2[1];
+        return sqrt($deltaX*$deltaX + $deltaY*$deltaY);
     }
 
     /**

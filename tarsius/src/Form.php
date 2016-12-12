@@ -82,8 +82,8 @@ class Form
         $a4 = $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->getCenter();
         $observed = $this->distance($a1,$a4);
         $expected = $this->mask->getVerticalDistance();
-        $this->setScaleDirect(bcdiv($observed, $expected, 14));
-        
+        $this->setScaleDirect($observed / $expected);
+
         # Avalia regiões da imagem
         $analyser = new FormAnalyser($this->image, $this->mask, $this->anchors, $this->scale, $this->rotation);
         $detailedResult = $analyser->evaluateRegions();
@@ -154,7 +154,7 @@ class Form
      */
     private function setScale(int $resolution)
     {
-        $this->scale = bcdiv($resolution, 25.4, 14);
+        $this->scale = $resolution / 25.4;
     }
 
     /**
@@ -322,7 +322,7 @@ class Form
             'imageName' => $this->imageName,
             'maskName' => $this->maskName,
             'configuration' => $configuration,
-            'scale' => bcmul($this->scale, 25.4, 14),
+            'scale' => $this->scale * 25.4,
             'rotation' => $this->rotation,
             'regionsResult' => $detailedResult,
             'result' => $compiledResult,
