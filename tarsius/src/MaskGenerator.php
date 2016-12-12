@@ -36,7 +36,7 @@ class MaskGenerator extends Mask
      * @param string $imageName Nome da imagem a ser processada.
      * @param array $config Arquivo para geração do template
      */
-    public function __construct(string $name, string $imageName, array $config)
+    public function __construct($name, $imageName, $config)
     {
         parent::__construct($name);
         $this->imageName = $imageName;
@@ -49,8 +49,7 @@ class MaskGenerator extends Mask
     public function generate()
     {
         # Considerada escala definida nos meta dados da imagem
-        // $this->setScale($this->image->getResolution());
-        $this->setScale(300);
+        $this->setScale($this->image->getResolution());
 
         # Busca centro das âncoras
         $anchors = $this->getCenterAnchors();
@@ -144,7 +143,7 @@ class MaskGenerator extends Mask
     /**
      * Define escala em pixel considerando valor da resolução em dpi.
      */
-    private function setScale(int $resolution)
+    private function setScale($resolution)
     {
         $this->scale = bcdiv($resolution, 25.4, 14);
     }
@@ -350,7 +349,7 @@ class MaskGenerator extends Mask
             self::ELLIPSE_HEIGHT    => 2.5,     # TODO: obter da médias das regiões do tipo elipse? ou solicitar?
             self::ELLIPSE_WIDTH     => 4.36,    # TODO: obter da médias das regiões do tipo elipse? ou solicitar?
             self::REGIONS           => $regions,
-            self::NUM_ANCHORS       => $this->config[self::NUM_ANCHORS] ?? 4,
+            self::NUM_ANCHORS       => isset($this->config[self::NUM_ANCHORS]) ? $this->config[self::NUM_ANCHORS] : 4,
             self::OUTPUT_FORMAT     => $outputFormat,
             self::VALIDATE_MASK     => $validateMask,
         ];
