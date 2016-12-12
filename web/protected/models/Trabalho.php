@@ -68,6 +68,7 @@ class Trabalho extends CActiveRecord
 			'pid' => 'Pid',
 			'tempoDistribuicao' => 'Tempo de distribuição',
 			'taxaPreenchimento' => 'Taxa preenchimento mínimo',
+			'urlImagens' => 'URL das imagens',
 		);
 	}
 
