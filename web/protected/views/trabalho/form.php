@@ -106,16 +106,32 @@ $this->menu = [
 
 	<fieldset>
 		<legend>Exportação dos resultados</legend>
+
 		<div class="uk-form-row">
+
 		    <?= $form->labelEx($model,'export',['class'=>'uk-form-label']); ?>
 
 		    <div class="uk-form-controls">
-			    <?= $form->textArea($model,'export',[
-			    	'id'=>'taxPre',
-			    	'style'=>'width:100%;min-height:200px;',
-			    ]); 
+		    	<?php $count = 0; ?>
+		    	<table id='export' class="uk-table uk-table-condensed">
+		    		<tr>
+		    			<th>Região no template</th>
+		    			<th>Coluna da tabela de exportação</th>
+		    			<th><a href='#!' onclick="addField()" class="uk-button uk-button-primary"><b>+</b></a></th>
+		    		</tr>
 
-			    ?>
+		    		<?php foreach ($model->export as $key => $value): ?>
+		    			<tr>
+		    				<td><input name="export[<?=$count?>][a]" value="<?=$key?>"/></td>
+		    				<td><input name="export[<?=$count?>][b]" value="<?=$value?>"/></td>
+		    				<td><a href="#!" onclick="$(this).parent().parent().remove();" class="uk-button">&#10006;</a></td>
+		    			</tr>
+		    			<?php $count++; ?>
+		    		<?php endforeach; ?>
+
+		    	</table>
+		    	<hr>
+
 			    <?= $form->error($model,'export'); ?>
 			</div>
 		</div>
@@ -127,4 +143,19 @@ $this->menu = [
 
 </div>
 
+
 <?php $this->endWidget(); ?>
+
+<script>
+var count = <?=$count?>;
+function addField(){
+	var input1 = '<input name="export['+count+'][a]" />';
+	var input2 = '<input name="export['+count+'][b]" />';
+	var html = '';
+	html += '<tr><td>'+input1+'</td><td>'+input2+'</td><td><a href="#!" onclick="$(this).parent().parent().remove();" class="uk-button">&#10006;</a></td></tr>';
+
+	$('#export').append(html);
+
+	count++;
+}
+</script>

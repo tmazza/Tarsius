@@ -56,14 +56,27 @@ class TrabalhoController extends BaseController
      */
     public function actionEditar($id){
         $model = Trabalho::model()->findByPk((int)$id);
+        $model->export = json_decode($model->export, true);
 
         if(isset($_POST['Trabalho'])){
             $model->attributes = $_POST['Trabalho'];
+
+
+            $export = is_array($model->export) ? $model->export : [];
+            if (isset($_POST['export']) && is_array($_POST['export'])) {
+              $keys = array_column($_POST['export'], 'a');
+              $values = array_column($_POST['export'], 'b');
+              $export = array_combine($keys, $values);
+              print_r($export);
+            }
+            $model->export = json_encode($export);
+
             if($model->validate()){
                 $model->save();
                 $this->redirect($this->createUrl('/trabalho/index'));
             }
-        }
+        } 
+
 
         $this->render('form',[
             'model'=>$model,
