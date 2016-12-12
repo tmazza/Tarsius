@@ -165,6 +165,7 @@ class FormAnalyser
           $fillRate,
           $center[0],
           $center[1],
+          $minMatch,
         ];
 
     }

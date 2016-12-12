@@ -70,12 +70,16 @@ class ProcessaCommand extends CConsoleCommand
                     if (is_null($this->trabalho)) {
                         throw new Exception("Trabalho '{$trabId}' não encontrado.");
                     }
-                    # TODO: configurar tarsius (inlcurir capos no tarbalho e passar para Tarsius::config)
+                    # TODO: configurar tarsius (inlcurir campos no tarbalho e passar para Tarsius::config)
                     $template = Yii::app()->params['templatesDir'] . '/' . $this->trabalho->template . '/template.json';
                 }
 
                 # interpreta regiões da imagem
                 if ($this->trabalho->status == Trabalho::statusExecutando) {
+
+                    # TODO: ter try catch para evitar que todo processamento seja parado em caso 
+                    # de âncora não encontrada ou outro tipo de erro de identificação
+
                     $form = new Tarsius\Form($imageName, $template);
                     $result = $form->evaluate();
                     $basename = basename($imageName);
