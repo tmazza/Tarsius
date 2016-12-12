@@ -50,7 +50,7 @@ class Object
      *
      * @return int[][] Conjunto de pontos da imagem
      */
-    public function getPoints(): array
+    public function getPoints()
     {
         return $this->points;
     }
@@ -60,7 +60,7 @@ class Object
      *
      * @return int área do objeto
      */
-    public function getArea(): int
+    public function getArea()
     {
         if (!$this->area) {
             $this->area = count($this->points);
@@ -73,7 +73,7 @@ class Object
      *
      * @return int[][] Centro de massa do objeto
      */
-    public function getCenter(): array
+    public function getCenter()
     {
         if (!$this->centro) {
             $area = $this->getArea();

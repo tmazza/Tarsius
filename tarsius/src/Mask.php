@@ -120,7 +120,7 @@ class Mask
      * @param string $type Tipo de manipulador de imagem que de ser usado para carregamento
      *      das imagens das âncoras
      */
-    public function __construct(string $name, string $type = ImageFactory::GD)
+    public function __construct($name, $type = ImageFactory::GD)
     {
         $this->name = $name;
         $this->type = $type;
@@ -131,7 +131,7 @@ class Mask
      *
      * @throws Exeception Quando START_POINT,DIST_ANC_HOR ou DIST_ANC_VER não for informado.
      */
-    public function load(): Mask
+    public function load()
     {
         $extension = pathinfo($this->name,PATHINFO_EXTENSION);
         if ($extension !== 'json') {

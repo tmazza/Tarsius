@@ -23,7 +23,7 @@ class ImageFactory
      *
      * @return Image Retorna o objeto criado.
      */
-    public static function create(string $imageName, string $type): Image
+    public static function create($imageName, $type)
     {
         if ($type === self::GD) {
             return new ImageGd($imageName);

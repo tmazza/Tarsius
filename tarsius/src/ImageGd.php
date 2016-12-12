@@ -13,7 +13,7 @@ class ImageGd extends Image
      * @throws Exception Caso o arquivo não exista ou a extensão seja inválida
      *      ou o processo não tenha permissão de leitura no arquivo.
      */
-    public function load(): Image
+    public function load()
     {
         $extension = pathinfo($this->name,PATHINFO_EXTENSION);
         if ($extension !== 'jpg') {
@@ -37,7 +37,7 @@ class ImageGd extends Image
      * @todo tornar busca das cores do pixel mais eficiente
      * @link http://stackoverflow.com/questions/13791207/better-way-to-get-map-of-all-pixels-of-an-image-with-gd Avaliar
      */
-    public function isBlack(int $x, int $y): bool
+    public function isBlack($x, $y)
     {
         $rgb = imagecolorat($this->image, $x, $y);
         if (is_numeric($rgb)) {
@@ -57,7 +57,7 @@ class ImageGd extends Image
     /**
      * Extrai informação de largura da imagem
      */
-    public function getWidth(): int
+    public function getWidth()
     {
         if (!$this->width) {
             $this->width = imagesx($this->image);
@@ -68,7 +68,7 @@ class ImageGd extends Image
     /**
      * Extrai informação de altura da imagem
      */
-    public function getHeight(): int
+    public function getHeight()
     {
         if (!$this->height) {
             $this->height = imagesy($this->image);

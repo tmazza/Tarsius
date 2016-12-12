@@ -45,7 +45,7 @@ class ConnectedComponent
      * 
      * @param int $area Área mínima para ser considerado como objeto.
      */
-    public function setMinArea(int $area)
+    public function setMinArea($area)
     {
         $this->minArea = $area;
     }
@@ -55,7 +55,7 @@ class ConnectedComponent
      * 
      * @param int $area Área máxima para ser considerado como objeto.
      */
-    public function setMaxArea(int $area)
+    public function setMaxArea($area)
     {
         $this->maxArea = $area;
     }
@@ -66,7 +66,7 @@ class ConnectedComponent
      *
      * @param int[][] $pontos Pontos de foreground(pretos) quer serão processados.
      */
-    public function getObjects(array $points)
+    public function getObjects($points)
     {
 
         list($finalLabels, $t_l) = $this->applyLabels($points);
@@ -144,11 +144,12 @@ class ConnectedComponent
      *
      * @return int[] conjunto de labels que podem ser do pixel em avaliaçõa.
      */
-    private function getLabelsOfMask(&$x, &$y, &$finalLabels) {
-        $left     = $finalLabels[$x - 1][$y]     ?? false;
-        $topLeft  = $finalLabels[$x - 1][$y - 1] ?? false;
-        $top      = $finalLabels[$x][$y - 1]     ?? false;
-        $topRight = $finalLabels[$x + 1][$y - 1] ?? false;
+    private function getLabelsOfMask(&$x, &$y, &$finalLabels)
+    {
+        $left     = isset($finalLabels[$x - 1][$y])     ? $finalLabels[$x - 1][$y]     : false;
+        $topLeft  = isset($finalLabels[$x - 1][$y - 1]) ? $finalLabels[$x - 1][$y - 1] : false;
+        $top      = isset($finalLabels[$x][$y - 1])     ? $finalLabels[$x][$y - 1]     : false;
+        $topRight = isset($finalLabels[$x + 1][$y - 1]) ? $finalLabels[$x + 1][$y - 1] : false;
 
         $posiveis = array();
         if ($left) {
@@ -170,7 +171,8 @@ class ConnectedComponent
     /**
      * Label Equivalence Resolving
      */
-    private function resolve($old, $new, &$t_l, &$e_l) {
+    private function resolve($old, $new, &$t_l, &$e_l)
+    {
         # Percorre labels contidos em S(v) alterando T(l) = u
         foreach ($e_l[$old] as $l) {
             $t_l[$l] = $new;
