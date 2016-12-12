@@ -79,6 +79,7 @@ class TrabalhoController extends BaseController
 
 
         $this->render('form',[
+            'perfis' => CHtml::listData(TrabalhoPerfil::model()->findAll(['order'=>'descricao ASC']), 'id', 'descricao'),
             'model'=>$model,
             'templates' => $this->getTemplate(),
         ]);
@@ -126,6 +127,7 @@ class TrabalhoController extends BaseController
     private function getInfoTrabalho($id)
     {       
         $trabalho = Trabalho::model()->findByPk((int)$id);
+
         $qtdDistribuida = Yii::app()->db->createCommand()
                 ->select('count(*)')
                 ->from('distribuido')

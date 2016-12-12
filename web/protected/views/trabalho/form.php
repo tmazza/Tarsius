@@ -84,20 +84,29 @@ $this->menu = [
 	<fieldset>
 		<legend>Processamento</legend>
 		<div class="uk-form-row">
-		    <?= $form->labelEx($model,'taxaPreenchimento',['class'=>'uk-form-label']); ?>
+		    <?= $form->labelEx($model,'perfil_id',['class'=>'uk-form-label']); ?>
 
 		    <div class="uk-form-controls">
-			    <?= $form->textField($model,'taxaPreenchimento',[
+			    <?= $form->dropDownList($model,'perfil_id', $perfis,[
 			    	'id'=>'taxPre',
+			    	'prompt' => 'Selecione...',
 			    ]); 
 			    ?>
-			    <?= $form->error($model,'taxaPreenchimento'); ?>
-			    <br>
-			    <small>
-			    	Taxa de preenchimento mínimo (de 0 a 1) para considerar um elipse como marcada.
-			    	Use ponto para definir a taxa de preenchimento, por exemplo, para 30% informe 0.3
+			    <?php if(count($perfis) > 0): ?>
+				    <?=CHtml::link('Ver configurações disponíveis', $this->createUrl('/perfil/index'),[
+				    	'target' => '_blank',
+				    ]);?>
+				     | 
+				<?php endif; ?>
+			    <?=CHtml::link('Criar nova configuração', $this->createUrl('/perfil/create'),[
+			    	'target' => '_blank',
+			    ]);?>
 
-			    </small>
+			    <br>
+			    <small>Caso nenhum perfil de configuração seja utilizado, os valores default de processmento serão aplicados.</small>
+
+			    <?= $form->error($model,'perfil_id'); ?>
+			    <br>
 			</div>
 		</div>
 	</fieldset>
