@@ -56,7 +56,7 @@ class DistribuiCommand extends CConsoleCommand
 
             } catch(Exception $e) {
 
-                Erro::insertOne($this->trabalho->id, $e->getMessage(), $e->__toString());
+                Erro::insertOne($trabId, $e->getMessage(), $e->__toString());
 
             }
 
