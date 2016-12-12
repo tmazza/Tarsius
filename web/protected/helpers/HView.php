@@ -34,14 +34,18 @@ class HView {
   }
 
   public static function fMsg($msg){
-    Yii::app()->user->setFlash('msg',$msg);
+    Yii::app()->user->setFlash('msg', $msg);
   }
 
   public static function renderFlashes(){
     $flashes = Yii::app()->user->getFlashes();
     $html = '';
-    foreach ($flashes as $k => $msg) {
-      $html .= CHtml::tag($msg,['class'=>'uk-alert']);
+    if(count($flashes) > 0){
+      $html .= '<hr>';
+      foreach ($flashes as $k => $msg) {
+        $html .= CHtml::tag('div', ['class'=>'uk-alert'], $msg);
+      }
+      $html .= '<hr>';
     }
     return $html;
   }

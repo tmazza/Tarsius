@@ -10,6 +10,7 @@ $this->menu = [
 	<?=CHtml::link('Excluir',$this->createUrl('/trabalho/DeleteErro',[
 		'id' => $e->id,
 	]));?>
-	<pre><?=$e->texto;?></pre><hr>
+    <pre><?=$e->texto;?></pre><hr>
+	<pre><?=$e->trace;?></pre><br><hr><br>
 <?php endforeach; ?>
 

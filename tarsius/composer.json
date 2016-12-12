@@ -1,0 +1,19 @@
+{
+    "name": "tmazza/tarsius",
+    "description": "Tarsius",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Tiago Mazzarollo",
+            "email": "tmazza@email.com"
+        }
+    ],
+    "require": {
+    },
+    "autoload": {
+        "psr-4": {"Tarsius\\": "src/"}
+    },
+    "require-dev": {
+        "phpdocumentor/phpdocumentor": "^2.9"
+    }
+}

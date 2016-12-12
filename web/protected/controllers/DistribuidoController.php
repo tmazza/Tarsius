@@ -1,78 +1,115 @@
 <?php
-class DistribuidoController extends BaseController {
+/**
+ * @author Tiago Mazzarollo <tmazza@email.com>
+ */
 
-	public function actionVer($id,$renovar=false){
-		include_once __DIR__ . '/../../../src/Helper.php';
-		$model = Distribuido::model()->findByPk((int)$id);
-		Yii::app()->clientScript->registerScriptFile($this->wb.'/jquery.elevatezoom.min.js');
-		try {
-			if(is_null($model)){
-				throw new Exception("Registro finalizado ID:'$id' não encontrado.", 3);
-			} else {
-				$debugImage = self::getDebugImage($model,$renovar);
+/**
+ * Visualização dos resultados obtidos durante processamento
+ */
+class DistribuidoController extends BaseController
+{
 
-				$this->render('ver',[
-					'model'=>$model,
-					'debugImage'=>$debugImage,
-				]);
-			}
-		} catch(Exception $e){
-			$this->render('verComErro',[
-				'model'=>$model,
-				'msg' => $e->getMessage(),
-			]);
-		}
+    /**
+     * Mostrar imagem com região e valores do processamento
+     */
+    public function actionVer($id, $renovar=false)
+    {
+        Yii::app()->clientScript->registerScriptFile($this->wb.'/jquery.elevatezoom.min.js');
+        $model = Distribuido::model()->findByPk((int)$id);
 
-	}
+        try {
+            if(is_null($model)){
+                throw new Exception("Registro finalizado ID:'$id' não encontrado.", 3);
+            } else {
 
-	public static function getDebugImage($dist,$renovar=false){		
-		include_once __DIR__ . '/../../../src/Helper.php';
-		$baseDir	 = __DIR__ . '/../../../data/runtime/trab-'.$dist->trabalho->id;
-		$file = $dist->nome;
+                $debugImage = self::getDebugImage($model,$renovar);
 
-		$imgDir = $baseDir.'/img/';
-		$reviewImage = $imgDir.substr($file,0,-4) . '.png';
+                $this->render('ver',[
+                    'model'=>$model,
+                    'debugImage'=>$debugImage,
+                ]);
+            }
+        } catch(Exception $e){
 
-		if(!file_exists($reviewImage) || $renovar){
-			
-			# cria diretorio para imagens de debug
-			if(!is_dir($imgDir)) mkdir($imgDir,0777);
-			# busca json de debug
-			$jsonFile = $baseDir.'/file/' . $file . '.json';
-			$output = json_decode($dist->resultado->conteudo,true);
+            HView::fMsg(CHtml::tag('h3', [], $e->getMessage()) . CHtml::tag('pre', [], $e));                
 
-			if(is_string($output))
-				throw new Exception($output, 2);
+            $this->render('verComErro',[
+                'model'=>$model,
+            ]);
+        }
 
-			# carrega imagem original
-			$originalFile = $dist->trabalho->sourceDir.'/'.$dist->nome;
-			if(!file_exists($originalFile)) throw new Exception("Arquivo '{originalFile}' não encontrado.", 1);
-			$original = imagecreatefromjpeg($originalFile);
+    }
 
-			$strTempalte = file_get_contents(Yii::app()->params['templatesDir'] . '/' . $dist->trabalho->template . '/template.json');
-			$template = json_decode($strTempalte,true);
-			$preenchimentoMinimo = $dist->trabalho->taxaPreenchimento;
-			$escala = $output['escala'];
-			$regioes = $output['regioes'];
-			# Desenha formas nas posições avaliadas
-			foreach ($regioes as $r) {
-				if(!is_array($r[1])){ # skip OCR
-				    $w = $escala * $template['elpLargura'] ;
-				    $h = $escala * $template['elpAltura'];
-				    list($x,$y) = Helper::rotaciona([$r[2],$r[3]],$output['ancoras'][1],0);
+    /**
+     * Gera imagem de debug
+     */
+    public static function getDebugImage($dist, $renovar=false)
+    {
+        $baseDir = Yii::app()->params['runtimeDir'] . "/trab-{$dist->trabalho->id}/";
+        $imgDir = $baseDir . 'img/';
+        $file = $dist->nome;
 
-				    if($r[1] > $preenchimentoMinimo) { # todo: adicionar taxa de PREENCHIMENTO_MINIMO no template!
-				      imagefilledellipse($original,$x,$y,$w,$h, imagecolorallocatealpha($original,255,255,0,75));
-				    } else {
-				      imageellipse($original,$x,$y,$w,$h, imagecolorallocate($original, 255,0,255));
-				    }
-				}
-			}
+        # cria diretorio para imagens de debug
+        if (!is_dir($imgDir)) {
+            CFileHelper::createDirectory($imgDir, 0777);
+        }
 
-			imagepng($original,$reviewImage);
-		}
-		return  Yii::app()->baseUrl . '/../data/runtime/trab-'.$dist->trabalho->id.'/img/'.substr($file,0,-4) . '.png';
-	}
+        $reviewImage = $imgDir . substr($file,0,-4) . '.png';
+
+
+        if(!file_exists($reviewImage) || $renovar){
+            
+            $output = json_decode($dist->resultado->conteudo, true);
+
+            # Caso seja somente uma mensagem de erro
+            if(is_string($output)){
+                throw new Exception($output);
+            }
+
+            # carrega imagem original
+            $sourceDir = $dist->trabalho->sourceDir;
+            if (substr($sourceDir, -1) != '/') {
+                $sourceDir .= '/';
+            }
+            $originalFile = $sourceDir . '/' . $dist->nome;
+
+            if (!is_readable($originalFile)) {
+                throw new Exception("Sem permissão de leitura em '{originalFile}'.");
+            } else if(!file_exists($originalFile)){
+                throw new Exception("Arquivo '{originalFile}' não encontrado.");
+            }
+            $original = imagecreatefromjpeg($originalFile);
+
+            $pathTemplate = Yii::app()->params['templatesDir'] . '/' . $dist->trabalho->template . '/template.json';
+
+            $strTempalte = file_get_contents($pathTemplate);
+            $template = json_decode($strTempalte,true);
+
+            $escala = $output['scale'] / 25.4;
+            $regioes = $output['regionsResult'];    
+
+            # Desenha formas nas posições avaliadas
+            foreach ($regioes as $r) {
+                if(!is_array($r[1])){ # skip OCR
+                    $w = $escala * $template[Tarsius\Mask::ELLIPSE_WIDTH] ;
+                    $h = $escala * $template[Tarsius\Mask::ELLIPSE_HEIGHT];
+                    $x = $r[2];
+                    $y = $r[3];
+
+                    $minMatchEllipse = $r[4] ?? Tarsius\Tarsius::$minMatchEllipse;          
+
+                    if($r[1] > $minMatchEllipse) {
+                      imagefilledellipse($original,$x,$y,$w,$h, imagecolorallocatealpha($original,255,255,0,75));
+                    } else {
+                      imageellipse($original,$x,$y,$w,$h, imagecolorallocate($original, 255,0,255));
+                    }
+                }
+            }
+
+            imagepng($original,$reviewImage);
+        }
+        return  Yii::app()->baseUrl . '/../data/runtime/trab-'.$dist->trabalho->id.'/img/'.substr($file,0,-4) . '.png';
+    }
 
 
 }
