@@ -36,3 +36,10 @@
 
 # Autoloag
     Usado do próprio composer
+
+# Uso hhvm
+
+alterar php.ini para uso do php, incluir 
+
+hvm.php7.all=true
+

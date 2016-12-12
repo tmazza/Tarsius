@@ -88,10 +88,10 @@ class MaskGenerator extends Mask
                     $anchor3 = $anchors[Mask::ANCHOR_BOTTOM_RIGHT];
                     $anchor4 = $anchors[Mask::ANCHOR_BOTTOM_LEFT];
                     # soma âncora base de cada ponto
-                    $p1 = [bcadd($p1[0], $anchor1[0], 14), bcadd($p1[1], $anchor1[1], 14)];
-                    $p2 = [bcadd($p2[0], $anchor2[0], 14), bcadd($p2[1], $anchor2[1], 14)];
-                    $p3 = [bcadd($p3[0], $anchor3[0], 14), bcadd($p3[1], $anchor3[1], 14)];
-                    $p4 = [bcadd($p4[0], $anchor4[0], 14), bcadd($p4[1], $anchor4[1], 14)];
+                    $p1 = [$p1[0] + $anchor1[0], $p1[1] + $anchor1[1]];
+                    $p2 = [$p2[0] + $anchor2[0], $p2[1] + $anchor2[1]];
+                    $p3 = [$p3[0] + $anchor3[0], $p3[1] + $anchor3[1]];
+                    $p4 = [$p4[0] + $anchor4[0], $p4[1] + $anchor4[1]];
 
                     $width = $anchor2[0] - $anchor1[0];
                     $height = $anchor3[1] - $anchor2[1];
@@ -363,8 +363,8 @@ class MaskGenerator extends Mask
         $a1 = $anchors[self::ANCHOR_TOP_LEFT];
         $a2 = $anchors[self::ANCHOR_BOTTOM_RIGHT];
         $a4 = $anchors[self::ANCHOR_BOTTOM_LEFT];
-        $hor = bcdiv(bcsub($a2[0], $a1[0]), $this->scale, 14);
-        $ver = bcdiv(bcsub($a4[1], $a1[1]), $this->scale, 14);
+        $hor = ($a2[0] - $a1[0]) / $this->scale;
+        $ver = ($a4[1] - $a1[1]) / $this->scale;
         
         return [$hor, $ver];
     }

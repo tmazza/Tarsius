@@ -14,7 +14,7 @@ class Tarsius
      * @var bool $debugEnable Se deve gerar dados intermediários para visualização
      *      e análise dos resultados parciais obtidos durante o processamento
      */
-    static public $enableDebug = false;
+    static public $enableDebug = true;
     /**
      * @var string $debugDir Diretório onde serão salvos os arquivos gerados durante debug
      *      pelo processo.

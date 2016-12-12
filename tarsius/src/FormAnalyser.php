@@ -221,10 +221,10 @@ class FormAnalyser
         $anchor3 = $this->anchors[Mask::ANCHOR_BOTTOM_RIGHT]->getCenter();
         $anchor4 = $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->getCenter();
         # soma âncora base de cada ponto
-        $p1 = [bcadd($p1[0], $anchor1[0], 14), bcadd($p1[1], $anchor1[1], 14)];
-        $p2 = [bcadd($p2[0], $anchor2[0], 14), bcadd($p2[1], $anchor2[1], 14)];
-        $p3 = [bcadd($p3[0], $anchor3[0], 14), bcadd($p3[1], $anchor3[1], 14)];
-        $p4 = [bcadd($p4[0], $anchor4[0], 14), bcadd($p4[1], $anchor4[1], 14)];
+        $p1 = [$p1[0] + $anchor1[0], $p1[1] + $anchor1[1]];
+        $p2 = [$p2[0] + $anchor2[0], $p2[1] + $anchor2[1]];
+        $p3 = [$p3[0] + $anchor3[0], $p3[1] + $anchor3[1]];
+        $p4 = [$p4[0] + $anchor4[0], $p4[1] + $anchor4[1]];
         # normaliza pontos considerando rotação
         $p1 = $this->rotatePoint($p1, $anchor1, $this->rotation);
         $p2 = $this->rotatePoint($p2, $anchor2, $this->rotation);
@@ -259,8 +259,8 @@ class FormAnalyser
         $p1 = $this->rotatePoint($this->applyResolution($region[1], $this->scale), $anchor1, $this->rotation);
         $p2 = $this->rotatePoint($this->applyResolution($region[2], $this->scale), $anchor1, $this->rotation);
         
-        $p1 = [bcadd($p1[0], $anchor1[0], 14), bcadd($p1[1], $anchor1[1], 14)];
-        $p2 = [bcadd($p2[0], $anchor1[0], 14), bcadd($p2[1], $anchor1[1], 14)];
+        $p1 = [$p1[0] + $anchor1[0], $p1[1] + $anchor1[1]];
+        $p2 = [$p2[0] + $anchor1[0], $p2[1] + $anchor1[1]];
 
         if (Tarsius::$enableDebug) {
             $this->image->drawRectangle($copy, $p1, $p2);
@@ -268,7 +268,6 @@ class FormAnalyser
 
         $filename = Tarsius::$runtimeDir . '/_' . md5(rand(0,9999).microtime(true)) . '.jpg';
         $this->image->cropAndCreate($filename, $p1, $p2);
-
 
         $cmd = "tesseract {$filename} -psm 8 stdout digits";
         exec($cmd, $output);
