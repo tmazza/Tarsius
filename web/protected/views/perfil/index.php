@@ -1,6 +1,6 @@
 <?php
 $this->menu=array(
-    ['Novo perfil', $this->createUrl('/perfil/create')],
+    ['Nova configuração', $this->createUrl('/perfil/create')],
 );
 ?>
 

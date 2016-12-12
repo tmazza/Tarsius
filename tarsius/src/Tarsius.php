@@ -30,7 +30,7 @@ class Tarsius
                                         . DIRECTORY_SEPARATOR . '..' 
                                         . DIRECTORY_SEPARATOR . 'runtime';
     /**
-     * Corte entre pixel pretos e brancos. 
+     * @var int $threshold Corte entre pixel pretos e brancos. 
      * 
      * @todo usar limiar dinâmico
      * @todo possibilitar configuração em tempo de execução
