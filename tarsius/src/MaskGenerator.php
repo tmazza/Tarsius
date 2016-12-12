@@ -38,6 +38,7 @@ class MaskGenerator extends Mask
      */
     public function __construct($name, $imageName, $config)
     {
+        set_time_limit(0);
         parent::__construct($name);
         $this->imageName = $imageName;
         $this->image = ImageFactory::create($imageName, ImageFactory::GD);
