@@ -1,111 +1,97 @@
--- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
+-- phpMyAdmin SQL Dump
+-- version 4.5.4.1deb2ubuntu2
+-- http://www.phpmyadmin.net
 --
--- Host: imagens-concursos.ufrgs.br    Database: tarsius
--- ------------------------------------------------------
--- Server version	5.5.51
+-- Host: localhost
+-- Generation Time: Dec 12, 2016 at 02:43 PM
+-- Server version: 5.7.16-0ubuntu0.16.04.1
+-- PHP Version: 7.0.8-0ubuntu0.16.04.3
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `tarsius`
+--
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `distribuido`
 --
 
-DROP TABLE IF EXISTS `distribuido`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `distribuido` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nome` varchar(40) DEFAULT NULL,
+  `id` int(11) NOT NULL,
+  `nome` varchar(256) DEFAULT NULL,
   `status` int(11) DEFAULT '0',
   `trabalho_id` int(11) DEFAULT NULL,
   `tempDir` varchar(40) DEFAULT NULL,
   `dataDistribuicao` int(11) DEFAULT NULL,
   `dataFechamento` int(11) DEFAULT NULL,
   `output` text,
-  `exportado` tinyint(1) DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `idx_distribuido_nome` (`nome`),
-  KEY `isx_distribuido_trabalho` (`trabalho_id`),
-  KEY `idx_distribuido_status` (`status`),
-  KEY `idx_dist_all` (`status`,`nome`,`id`,`exportado`)
-) ENGINE=InnoDB AUTO_INCREMENT=192556 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  `exportado` tinyint(1) DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `erro`
 --
 
-DROP TABLE IF EXISTS `erro`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `erro` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `trabalho_id` int(11) DEFAULT NULL,
   `texto` text,
   `read` int(11) DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  `trace` text
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `finalizado`
 --
 
-DROP TABLE IF EXISTS `finalizado`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `finalizado` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `nome` varchar(200) DEFAULT NULL,
   `conteudo` text,
   `trabalho_id` int(11) DEFAULT NULL,
   `dataFechamento` int(11) DEFAULT NULL,
-  `exportado` int(11) DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `idx_finalizado_nome` (`nome`,`trabalho_id`),
-  KEY `idx_finalizado_trab_d` (`trabalho_id`),
-  KEY `all` (`id`,`nome`,`trabalho_id`,`dataFechamento`)
-) ENGINE=InnoDB AUTO_INCREMENT=174236 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  `exportado` int(11) DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `processo`
 --
 
-DROP TABLE IF EXISTS `processo`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `processo` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `pid` int(11) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `trabalho_id` int(11) DEFAULT NULL,
   `workDir` text,
   `qtd` int(11) DEFAULT NULL,
   `dataInicio` int(11) DEFAULT NULL,
-  `dataFim` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2472 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  `dataFim` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `trabalho`
 --
 
-DROP TABLE IF EXISTS `trabalho`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `trabalho` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL,
   `nome` varchar(45) DEFAULT NULL,
   `sourceDir` text,
   `status` int(11) DEFAULT '0',
@@ -116,17 +102,79 @@ CREATE TABLE `trabalho` (
   `distribuindo` int(11) DEFAULT '0',
   `export` text,
   `urlImagens` text,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+  `command` varchar(256) NOT NULL DEFAULT 'php'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `distribuido`
+--
+ALTER TABLE `distribuido`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_distribuido_nome` (`nome`),
+  ADD KEY `isx_distribuido_trabalho` (`trabalho_id`),
+  ADD KEY `idx_distribuido_status` (`status`),
+  ADD KEY `idx_dist_all` (`status`,`nome`,`id`,`exportado`);
+
+--
+-- Indexes for table `erro`
+--
+ALTER TABLE `erro`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `finalizado`
+--
+ALTER TABLE `finalizado`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_finalizado_nome` (`nome`,`trabalho_id`),
+  ADD KEY `idx_finalizado_trab_d` (`trabalho_id`),
+  ADD KEY `all` (`id`,`nome`,`trabalho_id`,`dataFechamento`);
+
+--
+-- Indexes for table `processo`
+--
+ALTER TABLE `processo`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `trabalho`
+--
+ALTER TABLE `trabalho`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `distribuido`
+--
+ALTER TABLE `distribuido`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+--
+-- AUTO_INCREMENT for table `erro`
+--
+ALTER TABLE `erro`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+--
+-- AUTO_INCREMENT for table `finalizado`
+--
+ALTER TABLE `finalizado`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+--
+-- AUTO_INCREMENT for table `processo`
+--
+ALTER TABLE `processo`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+--
+-- AUTO_INCREMENT for table `trabalho`
+--
+ALTER TABLE `trabalho`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2016-11-29 15:36:55
