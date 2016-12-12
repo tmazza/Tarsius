@@ -1,8 +1,7 @@
 <?php
-declare(strict_types=0);
 include 'vendor/autoload.php';
 
-$imageName = __DIR__  . '/tests/images/formTest1.jpg';
+$imageName = __DIR__  . '/tests/images/i4.jpg';
 $maskName = __DIR__ . '/tests/templates/template.json';
 
 Tarsius\Tarsius::config([
