@@ -41,7 +41,7 @@ class Tarsius
      *      das âncoras. Após encontrar a primeira âncora o valor da área desta será usado
      *      como referência de área máxima tendo uma tolerância de $areaTolerance
      */
-    static public $minArea = 800;
+    static public $minArea = 400;
     /**
      * @var int $maxArea Área máxima para considerar objeto durante carregamento e busca
      *      das âncoras. Após encontrar a primeira âncora o valor da área desta será usado
@@ -88,6 +88,14 @@ class Tarsius
      *      comparação de validador de template. Mask.validateMask
      */
     static public $templateValidationTolerance = 3;
+    /**
+     * @var boll $dynamicPointReference Para definir um ponto, por exemplo o centro de um elipse, as
+     * quatro âncoras são utilizadas como referência. Caso $dynamicPointReference não seja aplicado
+     * todos os pontos terão o mesmo 'peso' na hora definir o ponto real (único). Com o uso de $dynamicPointReference
+     * quanto mais próximo da âncora de referência o ponto estiver maior será o seu 'peso' ao definir
+     * o ponto real.
+     */
+    static public $dynamicPointReference = false;
 
     /**
      * Altera valores default dos parâmetros

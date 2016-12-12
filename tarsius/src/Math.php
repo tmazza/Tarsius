@@ -77,15 +77,17 @@ trait Math
         
         $minRateX = $maxRateX = 0.5;
         $minRateY = $maxRateY = 0.5;
-        # Controle eixo x considerando disntância para âncora mais próxima
-        if ($width) {
-            $maxRateX = $minX / $width;
-            $minRateX = 1 - $maxRateX;
-        }
-        # Controle eixo x considerando disntância para âncora mais próxima
-        if ($height) {
-            $maxRateY = $minY / $height;
-            $minRateY = 1 - $maxRateY;
+        if(Tarsius::$dynamicPointReference) {
+            # Controle eixo x considerando disntância para âncora mais próxima
+            if ($width) {
+                $maxRateX = $minX / $width;
+                $minRateX = 1 - $maxRateX;
+            }
+            # Controle eixo x considerando disntância para âncora mais próxima
+            if ($height) {
+                $maxRateY = $minY / $height;
+                $minRateY = 1 - $maxRateY;
+            }
         }
 
         $x = $minRateX*$minX + $maxRateX*$maxX;

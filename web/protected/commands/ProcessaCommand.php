@@ -76,15 +76,19 @@ class ProcessaCommand extends CConsoleCommand
 
                 # interpreta regiões da imagem
                 if ($this->trabalho->status == Trabalho::statusExecutando) {
-
-                    # TODO: ter try catch para evitar que todo processamento seja parado em caso 
-                    # de âncora não encontrada ou outro tipo de erro de identificação
-
-                    $form = new Tarsius\Form($imageName, $template);
-                    $result = $form->evaluate();
+                    
                     $basename = basename($imageName);
-                    $content = json_encode($result);
-                    $exported = $this->export($result);
+
+                    try {
+                        $form = new Tarsius\Form($imageName, $template);
+                        $result = $form->evaluate();
+                        $content = json_encode($result);
+                        $exported = $this->export($result);
+                    } catch(Exception $e) {
+                        $exported = false;
+                        $content = json_encode($e->getMessage() . ' <hr> ' . $e->__toString());
+                    }
+
                     Finalizado::insertOne($this->trabalho->id, $basename, $content, $exported);
                 } 
 
@@ -128,6 +132,8 @@ class ProcessaCommand extends CConsoleCommand
             }
 
         } catch(Exception $e) {
+
+            # TODO: mover imagens apra diretorios de destino
 
             Erro::insertOne($this->trabalho->id, $e->getMessage(), $e->__toString());
 
