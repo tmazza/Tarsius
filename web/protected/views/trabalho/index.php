@@ -1,6 +1,7 @@
 <?php
 $this->menu = [
 	['Novo trabalho',$this->createUrl('/trabalho/novo')],
+	['Configurações de processamento',$this->createUrl('/perfil/index')],
 ];
 ?>
 <h2>Trabalhos</h2>

@@ -20,6 +20,12 @@
         <div id="offcanvas" class="uk-offcanvas">
             <div class="uk-offcanvas-bar">
                 <ul class="uk-nav uk-nav-offcanvas">
+                    <?php
+                    echo CHtml::tag('li', [], CHtml::link('Trabalhos', $this->createUrl('/trabalho/index')));
+                    echo CHtml::tag('li', [], CHtml::link('Templates', $this->createUrl('/template/index')));
+                    echo CHtml::tag('li', [], CHtml::link('Avaliações', $this->createUrl('/avaliacao/index')));
+                    ?>
+                    <li class="uk-nav-divider"></li>
                     <?php 
                     foreach ($this->menu as $i)
                         echo '<li>' . CHtml::link($i[0],$i[1],isset($i[2])?$i[2]:[]) . '</li>';

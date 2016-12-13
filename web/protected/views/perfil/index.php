@@ -1,11 +1,10 @@
 <?php
 $this->menu=array(
     ['Nova configuração', $this->createUrl('/perfil/create')],
+    ['Voltar para lista de trabalhos', $this->createUrl('/trabalho/index')],
 );
 ?>
-<br>
-
-<h2>Configurações de processamento</h2>
+<h2>Perfis de configuração de processamento</h2>
 <hr>
 
 <table class="uk-table">
