@@ -320,7 +320,7 @@ class MaskGenerator extends Mask
           $casoFalse = $cb['casoFalse'];
           $regiao[] = is_string($casoTrue) ? $casoTrue : $casoTrue($cBloco,$cLinha,$cObjeto);
           $regiao[] = is_string($casoFalse) ? $casoFalse : $casoFalse($cBloco,$cLinha,$cObjeto);
-          $regiao[] = 0.5; # TODO
+          $regiao[] = Tarsius::$minMatchEllipse;
         }
 
         return $regiao;

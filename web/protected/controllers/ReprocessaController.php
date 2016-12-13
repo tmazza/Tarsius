@@ -18,6 +18,7 @@ class ReprocessaController extends BaseController {
 	}
 
 	private function aplicaMascara($model,$pontos){
+		# TODO: adapatar para nova versão
 		if(count($pontos) == 4){
 			$ok = true;
 			try {

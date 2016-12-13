@@ -30,7 +30,7 @@ class Tarsius
                                         . DIRECTORY_SEPARATOR . '..' 
                                         . DIRECTORY_SEPARATOR . 'runtime';
     /**
-     * Corte entre pixel pretos e brancos. 
+     * @var int $threshold Corte entre pixel pretos e brancos. 
      * 
      * @todo usar limiar dinâmico
      * @todo possibilitar configuração em tempo de execução
@@ -102,12 +102,20 @@ class Tarsius
      */
     public static function config($config)
     {
-        $class = new \ReflectionClass(__CLASS__);
-        $parameters = $class->getStaticProperties();
-
-        foreach (array_keys($parameters) as $param) {
+        $parameters = self::getParameters();
+        foreach ($parameters as $param) {
             self::${$param} = isset($config[$param]) ? $config[$param] : self::${$param};
         }
     }
 
+    /**
+     * Retorna a lista de parâmetros públicos da classe
+     *
+     * @return array
+     */
+    public static function getParameters()
+    {
+        $class = new \ReflectionClass(__CLASS__);
+        return array_keys($class->getStaticProperties());
+    }
 }

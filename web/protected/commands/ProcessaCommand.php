@@ -70,7 +70,9 @@ class ProcessaCommand extends CConsoleCommand
                     if (is_null($this->trabalho)) {
                         throw new Exception("Trabalho '{$trabId}' não encontrado.");
                     }
-                    # TODO: configurar tarsius (inlcurir campos no tarbalho e passar para Tarsius::config)
+                    
+                    $this->applyJobConfiguration();
+
                     $template = Yii::app()->params['templatesDir'] . '/' . $this->trabalho->template . '/template.json';
                 }
 
@@ -184,6 +186,24 @@ class ProcessaCommand extends CConsoleCommand
         } catch(Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * Aplica as confirações do trabalho.
+     */
+    private function applyJobConfiguration()
+    {
+        if(!is_null($this->trabalho->perfil)) {
+            $parameters = Tarsius\Tarsius::getParameters();
+            $filtered = array_filter(
+                $this->trabalho->perfil->attributes,
+                function ($key) use ($parameters) {
+                    return in_array($key, $parameters);
+                },
+                ARRAY_FILTER_USE_KEY
+            );
+            Tarsius\Tarsius::config($filtered);
+        }        
     }
 
 }

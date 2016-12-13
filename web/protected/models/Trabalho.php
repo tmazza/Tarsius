@@ -38,9 +38,9 @@ class Trabalho extends CActiveRecord
 	{
 		return array(
 			array('nome, sourceDir, tempoDistribuicao', 'required'),
-			array('status, pid, tempoDistribuicao', 'numerical', 'integerOnly'=>true),
+			array('status, pid, tempoDistribuicao, perfil_id', 'numerical', 'integerOnly'=>true),
 			array('status','default','setOnEmpty'=>true,'value'=>0),
-			array('nome, sourceDir, template, taxaPreenchimento, export, urlImagens', 'safe'),
+			array('nome, sourceDir, template, export, urlImagens', 'safe'),
 			array('id, nome, sourceDir, status, pid, tempoDistribuicao', 'safe', 'on'=>'search'),
 		);
 	}
@@ -52,6 +52,7 @@ class Trabalho extends CActiveRecord
 		return array(
 			'processos' => array(self::HAS_MANY, 'Processo', 'trabalho_id', 'order'=>'id DESC', 'condition' => 'status != 2'),
 			'distribuidos' => array(self::HAS_MANY, 'Distribuido', 'trabalho_id', 'select'=>'nome'),
+			'perfil' => array(self::BELONGS_TO, 'TrabalhoPerfil', 'perfil_id'),
 		);
 	}
 
@@ -67,7 +68,9 @@ class Trabalho extends CActiveRecord
 			'status' => 'Status',
 			'pid' => 'Pid',
 			'tempoDistribuicao' => 'Tempo de distribuição',
-			'taxaPreenchimento' => 'Taxa preenchimento mínimo',
+			'urlImagens' => 'URL das imagens',
+			'export' => 'Exportação',
+			'perfil_id' => 'Configuração de processamento',
 		);
 	}
 
@@ -126,11 +129,6 @@ class Trabalho extends CActiveRecord
 	            'label'=>'Tempo de distribuição',
 	            'type'=>'raw',
 	            'value'=>$model->tempoDistribuicao . ' segundo(s)',
-	        ),
-	        array(
-	            'label'=>'Preenchimento mínimo',
-	            'type'=>'raw',
-	            'value'=> number_format($model->taxaPreenchimento*100,0,',','.').'%',
 	        ),
 	    ];
 	}
