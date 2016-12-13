@@ -16,6 +16,11 @@
                <?=CHtml::link('Avaliações',$this->createUrl('/avaliacao/index'));?>
             </li>
         </ul>
+        <ul class="uk-navbar-nav uk-hidden-small uk-margin-top uk-float-right">
+            <li class="<?=$this->id=='avaliacao'?'uk-active':'';?>">
+                   <?=CHtml::link('<i class="uk-icon uk-icon-cog"></i>',$this->createUrl('/configuracao/index'));?>
+            </li>
+        </ul>
         <a href="#offcanvas" class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas></a>
         <div class="uk-navbar-brand uk-navbar-center uk-visible-small">
             <?=CHtml::image($this->wb . '/img/logo2.png','Logo Tarsius',[
