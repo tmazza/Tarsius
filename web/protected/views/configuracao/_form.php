@@ -20,12 +20,22 @@
 		<?php echo $form->labelEx($model,'maxProcessosAtivos', ['class' => 'uk-form-label']); ?>
 		<?php echo $form->textField($model,'maxProcessosAtivos'); ?>
 		<?php echo $form->error($model,'maxProcessosAtivos'); ?>
+		<br>
+		<small>
+		Quantidade máxima de processo que estarão ativos ao mesmo tempo.
+		</small>
 	</div>
 
 	<div class="uk-form-row">
 		<?php echo $form->labelEx($model,'maxAquivosProcessos', ['class' => 'uk-form-label']); ?>
 		<?php echo $form->textField($model,'maxAquivosProcessos'); ?>
 		<?php echo $form->error($model,'maxAquivosProcessos'); ?>
+		<br><br>
+		<small>
+		Quantidade máxima de arquivos atribuídas para um processo. Um novo processo só é criado
+		quando existem novos imagens no diretório do trabalho e a quantidade de processos ativos
+		for menor do que o limite definido.
+		</small>
 	</div>
 
 	<br>
