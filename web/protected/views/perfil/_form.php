@@ -18,7 +18,7 @@
 			<?= $form->error($model,'descricao'); ?>
 			<br>
 			<small>
-				Nome para identificar a configuração. Uso somente letras, números e espaços.
+				Nome para identificar a configuração. Use somente letras, números e espaços.
 			</small>
 		</div>
 	</fieldset>
@@ -110,17 +110,11 @@
 				<?= $form->textField($model,'minArea'); ?> e
 				<?= $form->textField($model,'maxArea'); ?> pixel
 				<br>
-				TODO: TEXTO!!!
 				<small>
-				Área mínima para considerar objeto durante carregamento e busca
-		        das âncoras. Após encontrar a primeira âncora o valor da área desta será usado
-		        como referência de área máxima tendo uma tolerância de $areaTolerance
-				</small>
-				<br>
-				<small>
-				Área máxima para considerar objeto durante carregamento e busca
-		        das âncoras. Após encontrar a primeira âncora o valor da área desta será usado
-		        como referência de área máxima tendo uma tolerância de $areaTolerance
+				Área mínima e máxima para considerar o objeto durante carregamento e busca
+		        das âncoras. 
+		        <br>Após encontrar a primeira âncora esse valores serão alterados, será usado
+		        como referência a área do objeto encontrado e a tolerância definida em $areaTolerance
 				</small>
 				<?= $form->error($model,'minArea'); ?>
 				<?= $form->error($model,'maxArea'); ?>
@@ -132,8 +126,8 @@
 				<?= $form->error($model,'areaTolerance'); ?>
 				<br>
 				<small>
-				Tolerância na busca das âncoras, usado após encontrar a primeira
-		        âncora. Por exemplo, caso a área da âncora encontrada seja de 1000 pixel e $areaTolerance
+				Tolerância na busca das âncoras, usado após a primeira âncora ser encontrada.
+		        Por exemplo, caso a área da âncora encontrada seja de 1000 pixel e $areaTolerance
 		        seja 0.4 o valor de $minArea e $maxArea serão, respectivamente, 600 e 1400.
 				</small>
 			</div>
@@ -171,8 +165,8 @@
 			<?= $form->error($model,'templateValidationTolerance'); ?>
 			<br>
 			<small>
-			uantidade de diferenças aceitas durante 
-	        comparação de validador de template. Mask.validateMask
+			Quantidade de diferenças aceitas na comparação da região usada para validação template.
+			Usado somente se o campo validaReconhecimento foi definido no template.
 			</small>
 		</div>
 

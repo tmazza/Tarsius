@@ -62,19 +62,19 @@ class TrabalhoPerfil extends CActiveRecord
     {
         return array(
             'id' => 'ID',
-            'descricao' => 'Descricao',
-            'enableDebug' => 'Enable Debug',
+            'descricao' => 'Descrição',
+            'enableDebug' => 'Habilitar depuração',
             'threshold' => 'Threshold',
-            'minArea' => 'Min Area',
-            'maxArea' => 'Max Area',
-            'areaTolerance' => 'Area Tolerance',
-            'minMatchObject' => 'Min Match Object',
-            'maxExpansions' => 'Max Expansions',
-            'expasionRate' => 'Expasion Rate',
+            'minArea' => 'Área mínima',
+            'maxArea' => 'Área máxima',
+            'areaTolerance' => 'Tolerância área',
+            'minMatchObject' => 'Igualdade mínima entre objetos',
+            'maxExpansions' => 'Quantidade máxima de expansões',
+            'expasionRate' => 'Taxa de expansão',
             'searchArea' => 'Search Area',
-            'minMatchEllipse' => 'Min Match Ellipse',
-            'templateValidationTolerance' => 'Template Validation Tolerance',
-            'dynamicPointReference' => 'Dynamic Point Reference',
+            'minMatchEllipse' => 'Taxa de preenchimento mínimo para elipses',
+            'templateValidationTolerance' => 'Tolerância na validação do template',
+            'dynamicPointReference' => 'Referência dinâmica nos pontos',
         );
     }
 

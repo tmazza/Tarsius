@@ -4,7 +4,7 @@ $this->menu=array(
 );
 ?>
 <br>
-<h2>Nova congiguração de processamento</h2>
+<h2>Nova configuração de processamento</h2>
 <hr>
 
 <?php $this->renderPartial('_form', array('model'=>$model)); ?>

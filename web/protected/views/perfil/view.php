@@ -1,7 +1,6 @@
 <?php
 $this->menu=array(
 	['Voltar para lista',   $this->createUrl('/perfil/index')],
-	['Exlcluir',   $this->createUrl('/perfil/delete', ['id' => $model->id]) , ['confirm' => 'Certeza?']],
 );
 ?>
 
