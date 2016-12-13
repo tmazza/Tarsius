@@ -3,7 +3,7 @@
 		<h3>
 			<?= CHtml::encode($data->descricao); ?>
 			<?php if($data->ativo): ?>
-				<div class="uk-badge uk-badge-success">ativa</div>			
+				<div class="uk-badge uk-badge-success">ativo</div>			
 			<?php endif; ?>
 		</h3>
 	</td>

@@ -1,6 +1,6 @@
 <?php
 $this->menu=array(
-	['Cancelar', $this->createUrl('/configuracao/view', ['id'=>$model->id])],
+	['Cancelar', $this->createUrl('/configuracao/index')],
 );
 ?>
 

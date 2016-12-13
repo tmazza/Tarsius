@@ -11,12 +11,6 @@
 	<?php echo $form->errorSummary($model); ?>
 
 	<div class="uk-form-row">
-		<?php echo $form->labelEx($model,'ativo', ['class' => 'uk-form-label']); ?>
-		<?php echo $form->textField($model,'ativo'); ?>
-		<?php echo $form->error($model,'ativo'); ?>
-	</div>
-
-	<div class="uk-form-row">
 		<?php echo $form->labelEx($model,'descricao', ['class' => 'uk-form-label']); ?>
 		<?php echo $form->textField($model,'descricao',array('rows'=>6, 'cols'=>50)); ?>
 		<?php echo $form->error($model,'descricao'); ?>

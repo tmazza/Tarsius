@@ -32,7 +32,7 @@ class ConfiguracaoController extends BaseController
 						'condition' => 'id != ' . $model->id,
 					]);
 				}
-				$this->redirect(array('view','id'=>$model->id));
+				$this->redirect(array('index'));
 			}
 		}
 
@@ -61,7 +61,7 @@ class ConfiguracaoController extends BaseController
 						'condition' => 'id != ' . $model->id,
 					]);
 				}
-				$this->redirect(array('view','id'=>$model->id));
+				$this->redirect(array('index'));
 			}
 		}
 
