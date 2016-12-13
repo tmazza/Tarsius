@@ -10,13 +10,13 @@
 class DistribuiCommand extends CConsoleCommand
 {
 
-    # TODO: tornar configurável na aplicação
-    private $qtdProcessadores = 2;
-    private $limiteProcessos = 1;
+    private $qtdProcessadores = false;
+    private $limiteProcessos = false;
     private $tamMaxBlocoPorProcesso = 80;
 
     private $trabalho;
     private $dirBase;
+
 
     /** 
      * Distribui imagens de um diertorio de tempo em tempo. Cria um processo para 
@@ -82,7 +82,13 @@ class DistribuiCommand extends CConsoleCommand
             $this->qtdProcessadores = $processadores;      
         }
         # Quantidade máxima de processos
-        $this->limiteProcessos = $this->qtdProcessadores + ceil(0.10*$processadores);
+        $config = Configuracao::model()->find("ativo=1");
+        if (is_null($config)) {
+            throw new Exception("Nenhuma configuração global ativa.");
+        }
+        $this->limiteProcessos = is_null($config->maxProcessosAtivos) ? $processadores : $config->maxProcessosAtivos;
+        $this->tamMaxBlocoPorProcesso = is_null($config->maxAquivosProcessos) ? 80 : $config->maxAquivosProcessos;
+        
     }
 
     /**
@@ -111,8 +117,10 @@ class DistribuiCommand extends CConsoleCommand
             $files = array_diff($files, $this->trabalho->getJaDistribuidos());
 
             # define quantidade de processos que podem ser criados.
-            $porcessosAtivos = $this->trabalho->qtdProcessosAtivos();
-            $processosLivres = $this->limiteProcessos - $porcessosAtivos;   
+            $processosAtivos = $this->trabalho->qtdProcessosAtivos();
+            $processosLivres = $this->limiteProcessos ? $this->limiteProcessos - $processosAtivos : $processosAtivos;   
+
+            echo $processosLivres;
 
             $qtdArquivos = count($files);
     
@@ -123,7 +131,7 @@ class DistribuiCommand extends CConsoleCommand
 
                 # aplica limite na quantiade de imagens por processo
                 $tamBlocoPorProcesso = ceil($qtdArquivos / $processosLivres);
-                if ($tamBlocoPorProcesso > $this->tamMaxBlocoPorProcesso) {
+                if ($this->tamMaxBlocoPorProcesso && $tamBlocoPorProcesso > $this->tamMaxBlocoPorProcesso) {
                     $tamBlocoPorProcesso = $this->tamMaxBlocoPorProcesso;
                 }
 
