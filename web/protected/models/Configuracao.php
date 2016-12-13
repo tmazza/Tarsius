@@ -66,4 +66,23 @@ class Configuracao extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+	/**
+	 * Ativa configuração $id
+	 *
+	 * @return bool 
+	 */
+	public function makeActive()
+	{
+		self::model()->updateAll([
+			'ativo' => 0,
+		]);
+		return self::model()->updateAll([
+			'ativo' => 1,
+		],[
+			'condition' => 'id = ' . $this->id,
+		]) == 1;
+
+	}
+
 }

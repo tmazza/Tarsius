@@ -94,6 +94,17 @@ class ConfiguracaoController extends BaseController
 		));
 	}
 
+
+	public function actionMakeActive($id)
+	{
+		if($this->loadModel($id)->makeActive()){
+			HView::fMsg('Configuração ativa alterada.');
+		} else {
+			HView::fMsg('NÃO foi possível atualizar a configuração ativa ativa alterada.');
+		}
+		$this->redirect($this->createUrl('/configuracao/index'));
+	}	
+
 	/**
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
