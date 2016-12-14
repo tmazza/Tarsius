@@ -46,15 +46,22 @@
 			
 			<div class="uk-form-row">
 				<?php echo $form->labelEx($model,'exportType', ['class' => 'uk-form-label']); ?>
-				<?php echo $form->dropDownList($model,'exportType', Configuracao::getTipos()); ?>
+				<?php echo $form->dropDownList($model,'exportType', Configuracao::getTipos(), [
+					'onchange' => 'hideShowExport()',
+					'id' => 'exportType',
+				]); ?>
 				<?php echo $form->error($model,'exportType'); ?>
 				<br>
 				<small>
-				
+				<ul>
+					<li>Desabilitada: os arquivos processados ficarão disponíveis como "Processados", sem possibilidade de exportá-los</li>
+					<li>Pendente: os arquivos processados ficarão disponíveis como "Não exportados" e será possível exportá-los em outro momento.</li>
+					<li>Outros: os arquivos processados seão exportados para o banco de dados definido. Caso algum erro ocorra durante a exportação ou a configuração seja inválida esse arquivos ficarão no estado "Não exportados" e poderão ser manualmente exportado.</li>
+				</ul>
 				</small>
-			</div>
+			</div>	
 
-			<div class="uk-form-row">
+			<div class="uk-form-row toExport">
 				<?php echo $form->labelEx($model,'exportHost', ['class' => 'uk-form-label']); ?>
 				<?php echo $form->textField($model,'exportHost'); ?>
 				<?php echo $form->error($model,'exportHost'); ?>
@@ -64,7 +71,7 @@
 				</small>
 			</div>
 			
-			<div class="uk-form-row">
+			<div class="uk-form-row toExport">
 				<?php echo $form->labelEx($model,'exportDatabase', ['class' => 'uk-form-label']); ?>
 				<?php echo $form->textField($model,'exportDatabase'); ?>
 				<?php echo $form->error($model,'exportDatabase'); ?>
@@ -74,7 +81,7 @@
 				</small>
 			</div>
 			
-			<div class="uk-form-row">
+			<div class="uk-form-row toExport">
 				<?php echo $form->labelEx($model,'exportPort', ['class' => 'uk-form-label']); ?>
 				<?php echo $form->textField($model,'exportPort'); ?>
 				<?php echo $form->error($model,'exportPort'); ?>
@@ -84,7 +91,7 @@
 				</small>
 			</div>
 			
-			<div class="uk-form-row">
+			<div class="uk-form-row toExport">
 				<?php echo $form->labelEx($model,'exportUser', ['class' => 'uk-form-label']); ?>
 				<?php echo $form->textField($model,'exportUser'); ?>
 				<?php echo $form->error($model,'exportUser'); ?>
@@ -94,7 +101,7 @@
 				</small>
 			</div>
 			
-			<div class="uk-form-row">
+			<div class="uk-form-row toExport">
 				<?php echo $form->labelEx($model,'exportPwd', ['class' => 'uk-form-label']); ?>
 				<?php echo $form->passwordField($model,'exportPwd'); ?>
 				<?php echo $form->error($model,'exportPwd'); ?>
@@ -104,7 +111,7 @@
 				</small>
 			</div>
 
-			<div class="uk-form-row">
+			<div class="uk-form-row toExport">
 				<?php echo $form->labelEx($model,'exportTable', ['class' => 'uk-form-label']); ?>
 				<?php echo $form->textField($model,'exportTable'); ?>
 				<?php echo $form->error($model,'exportTable'); ?>
@@ -125,3 +132,23 @@
 <?php $this->endWidget(); ?>
 
 </div><!-- form -->
+
+<script type="text/javascript">
+$(document).ready(function() {
+	
+	$('#exportType').change(function() {
+		hideShowExport();
+	});
+
+	function hideShowExport() {
+		var val = $('#exportType').val();
+		if (val == 0 || val == 1) {
+			$('.toExport').hide();
+		} else {
+			$('.toExport').show();
+		}
+	}
+	hideShowExport();
+});
+
+</script>

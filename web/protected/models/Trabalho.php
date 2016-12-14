@@ -157,4 +157,73 @@ class Trabalho extends CActiveRecord
 		$this->update(['distribuindo']);
 	}
 
+
+	/**
+     * Exporta 1 arquivo
+     *
+     * @param int $id
+     * @param CActiveRecord $modelFinalizado Registro de Finalizado
+     * @param array $output Resultado do processamento
+     */
+    public static function export($id, $modelFinalizado, $output){
+      try {
+
+        $active = Configuracao::getActive();
+
+        if ($modelFinalizado->exportado == 1) {
+          throw new Exception("Arquivo '" . $modelFinalizado->nome . "' já exportado.");          
+        }
+
+        $trabalho = Trabalho::model()->findByPk((int) $id);
+
+        if(is_null($trabalho)){
+          throw new Exception("Trabalho {$id} não encontrado.");
+        } else {
+
+            # TODO: possibilitar configuração global
+            $output['exportTime'] = date('Y-m-d H:i:s');
+            $output['filename'] = pathinfo($modelFinalizado->nome, PATHINFO_FILENAME);
+
+            $exportFileds = json_decode($trabalho->export, true);
+
+            $exportContent = [];
+            foreach ($exportFileds as $targetColumn => $outputID) {
+              if (!isset($output[$outputID])) {
+                Erro::insertOne("Região {$outputID} definida para exportação, mas não encontrada no resultado do processamento.");
+              }
+              $exportContent[$targetColumn] = $output[$outputID];
+            }
+
+            if ($active->isExportEnable()) {
+              # Cria modelo para export
+              $model = new Export();
+              foreach ($exportContent as $attr => $value) {
+                $model->{$attr} = $value;
+              }
+
+              if ($model->validate()) {
+                
+                if ($model->save()) {
+                  $modelFinalizado->exportado=1;
+                  $modelFinalizado->update(['exportado']);
+                }
+
+              } else {
+                throw new Exception(json_encode($model->getErrors()));
+              }
+            } else if ($active->isExportWating()) {
+                throw new Exception("Exportação pendente. Defina como o arquivo deve ser exportado ou desabilite a exportação.");
+            } else {
+              # não exporta nada e atualiza a situação do registro de finalizado exportado
+              $modelFinalizado->exportado=1;
+              $modelFinalizado->update(['exportado']);
+            }
+        }
+        return true;
+      } catch(Exception $e) {
+        Erro::insertOne($id, $e->getMessage(), $e->__toString());
+        return $e->getMessage();
+      }
+    }
+
 }

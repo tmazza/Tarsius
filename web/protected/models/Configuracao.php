@@ -14,7 +14,8 @@ class Configuracao extends CActiveRecord
 {
 
 	const EXPORT_NONE = 0;
-	const EXPORT_MYSQL = 1;
+	const EXPORT_WAIT = 1;
+	const EXPORT_MYSQL = 2;
 
 	public static $active = false;
 
@@ -120,6 +121,7 @@ class Configuracao extends CActiveRecord
 	{
 		return [
 			self::EXPORT_NONE => 'Desabilitada',
+			self::EXPORT_WAIT => 'Pendente',
 			self::EXPORT_MYSQL => 'Mysql',
 		];
 	}
@@ -128,4 +130,15 @@ class Configuracao extends CActiveRecord
 	{
 		return $this->exportType == self::EXPORT_MYSQL;
 	}
+
+	public function isExportEnable()
+	{
+		return $this->exportType != self::EXPORT_NONE && $this->exportType != self::EXPORT_WAIT;
+	}
+	
+	public function isExportWating()
+	{
+		return $this->exportType == self::EXPORT_WAIT;
+	}
+
 }

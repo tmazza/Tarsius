@@ -304,12 +304,12 @@ class TrabalhoController extends BaseController
         ]);
         foreach ($finalizadas as $f) {
            $conteudo = json_decode($f->conteudo,true);
-           if(isset($conteudo['saidaFormatada'])){
-            $this->export($id,$f,$conteudo['saidaFormatada']);
+           if(isset($conteudo['result'])) {
+            Trabalho::export($id, $f, $conteudo['result']);
           }
         }
         $qtd = count($finalizadas);
-        HView::fMsg($qtd . HView::plural('exportado',$qtd));
+        HView::fMsg($qtd . ' ' . HView::plural('exportado',$qtd));
         $this->redirect($this->createUrl('/trabalho/ver',[
             'id'=>$id,
         ]));
@@ -320,73 +320,24 @@ class TrabalhoController extends BaseController
      */
     public function actionForcaExport($id)
     {
-        echo '<pre>';
-
         $model = Distribuido::model()->findByPk((int)$id);
         $output = json_decode($model->resultado->conteudo,true);
         if(isset($output['result'])) {
-            $this->export($model->trabalho_id, $model->resultado,$output['result']);
-            Yii::app()->user->setFlash('success','Export realizado.');
+            $export = Trabalho::export($model->trabalho_id, $model->resultado,$output['result']);
+            if($export === true){
+              HView::fMsg('Export realizado.');
+            } else {
+              HView::fMsg($export);
+
+            }
         } else {
-            Yii::app()->user->setFlash('error','Valores do resultado do processamento não encontrados..');
+            HView::fMsg('Valores do resultado do processamento não encontrados..');
         }
         $this->redirect($this->createUrl('/trabalho/naoDistribuidas',[
             'id'=>$model->trabalho_id,
         ]));
     }
 
-    /**
-     * Exporta 1 arquivo de imagem
-     */
-    private function export($id,$modelFinalizado,$output){
-      try {
-
-        if ($modelFinalizado->exportado == 1) {
-          throw new Exception("Arquivo '" . $modelFinalizado->nome . "' já exportado.");          
-        }
-
-        $trabalho = Trabalho::model()->findByPk((int) $id);
-
-        if(is_null($trabalho)){
-          throw new Exception("Trabalho {$id} não encontrado.");
-        } else {
-
-            # TODO: possibilitar configuração global
-            $output['exportTime'] = date('Y-m-d H:i:s');
-            $output['filename'] = pathinfo($modelFinalizado->nome, PATHINFO_FILENAME);
-
-            $exportFileds = json_decode($trabalho->export, true);
-
-            $exportContent = [];
-            foreach ($exportFileds as $targetColumn => $outputID) {
-              if (!isset($output[$outputID])) {
-                echo 'TODO: salvar erro e dar mensagem de que região nao existe.';
-                exit;
-              }
-              $exportContent[$targetColumn] = $output[$outputID];
-            }
-
-            # Cria modelo para export
-            $model = new Export();
-            foreach ($exportContent as $attr => $value) {
-              $model->{$attr} = $value;
-            }
-
-            if ($model->validate()) {
-              
-              if ($model->save()) {
-                $modelFinalizado->exportado=1;
-                $modelFinalizado->update(['exportado']);
-              }
-
-            } else {
-              throw new Exception(json_encode($model->getErrors()));
-            }
-        }
-      } catch(Exception $e) {
-        Erro::insertOne($id, $e->getMessage(), $e->__toString());
-      }
-    }
 
     /**
      * Lista todos os erros que ocorrem no trabalho (erros gerados por DistribuiCommand e 
