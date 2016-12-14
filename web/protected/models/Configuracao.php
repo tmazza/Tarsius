@@ -16,6 +16,7 @@ class Configuracao extends CActiveRecord
 	const EXPORT_NONE = 0;
 	const EXPORT_WAIT = 1;
 	const EXPORT_MYSQL = 2;
+	const EXPORT_HTTP = 3;
 
 	public static $active = false;
 
@@ -35,7 +36,7 @@ class Configuracao extends CActiveRecord
 		return array(
 			array('descricao', 'required'),
 			array('ativo, maxProcessosAtivos, maxAquivosProcessos', 'numerical', 'integerOnly'=>true),
-			array('id, ativo, descricao, maxProcessosAtivos, maxAquivosProcessos, exportType, exportHost, exportDatabase, exportPort, exportTable, exportUser, exportPwd', 'safe'),
+			array('id, ativo, descricao, maxProcessosAtivos, maxAquivosProcessos, exportType, exportHost, exportDatabase, exportPort, exportTable, exportUser, exportPwd, exportUrl', 'safe'),
 		);
 	}
 
@@ -66,6 +67,7 @@ class Configuracao extends CActiveRecord
 			'exportTable' => 'Tabela',
 			'exportUser' => 'Usuário',
 			'exportPwd' => 'Senha',
+			'exportUrl' => 'URL',
 		);
 	}
 
@@ -123,6 +125,7 @@ class Configuracao extends CActiveRecord
 			self::EXPORT_NONE => 'Desabilitada',
 			self::EXPORT_WAIT => 'Pendente',
 			self::EXPORT_MYSQL => 'Mysql',
+			self::EXPORT_HTTP => 'Requisição HTTP/POST',
 		];
 	}
 
@@ -139,6 +142,11 @@ class Configuracao extends CActiveRecord
 	public function isExportWating()
 	{
 		return $this->exportType == self::EXPORT_WAIT;
+	}
+
+	public function isHttpExport()
+	{
+		return $this->exportType == self::EXPORT_HTTP;
 	}
 
 }

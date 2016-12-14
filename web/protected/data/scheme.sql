@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 14, 2016 at 03:36 PM
+-- Generation Time: Dec 14, 2016 at 04:34 PM
 -- Server version: 5.7.16-0ubuntu0.16.04.1
--- PHP Version: 7.0.8-0ubuntu0.16.04.3
+-- PHP Version: 7.0.14-2+deb.sury.org~xenial+1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -38,7 +38,8 @@ CREATE TABLE `configuracao` (
   `exportPort` varchar(64) DEFAULT NULL,
   `exportTable` varchar(64) DEFAULT NULL,
   `exportUser` varchar(64) DEFAULT NULL,
-  `exportPwd` varchar(256) DEFAULT NULL
+  `exportPwd` varchar(256) DEFAULT NULL,
+  `exportUrl` text
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -216,22 +217,22 @@ ALTER TABLE `configuracao`
 -- AUTO_INCREMENT for table `distribuido`
 --
 ALTER TABLE `distribuido`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=374;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=404;
 --
 -- AUTO_INCREMENT for table `erro`
 --
 ALTER TABLE `erro`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 --
 -- AUTO_INCREMENT for table `finalizado`
 --
 ALTER TABLE `finalizado`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=295;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=325;
 --
 -- AUTO_INCREMENT for table `processo`
 --
 ALTER TABLE `processo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=137;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=145;
 --
 -- AUTO_INCREMENT for table `trabalho`
 --

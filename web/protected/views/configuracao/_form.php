@@ -61,7 +61,7 @@
 				</small>
 			</div>	
 
-			<div class="uk-form-row toExport">
+			<div class="uk-form-row toExport toDb">
 				<?php echo $form->labelEx($model,'exportHost', ['class' => 'uk-form-label']); ?>
 				<?php echo $form->textField($model,'exportHost'); ?>
 				<?php echo $form->error($model,'exportHost'); ?>
@@ -71,7 +71,7 @@
 				</small>
 			</div>
 			
-			<div class="uk-form-row toExport">
+			<div class="uk-form-row toExport toDb">
 				<?php echo $form->labelEx($model,'exportDatabase', ['class' => 'uk-form-label']); ?>
 				<?php echo $form->textField($model,'exportDatabase'); ?>
 				<?php echo $form->error($model,'exportDatabase'); ?>
@@ -81,7 +81,7 @@
 				</small>
 			</div>
 			
-			<div class="uk-form-row toExport">
+			<div class="uk-form-row toExport toDb">
 				<?php echo $form->labelEx($model,'exportPort', ['class' => 'uk-form-label']); ?>
 				<?php echo $form->textField($model,'exportPort'); ?>
 				<?php echo $form->error($model,'exportPort'); ?>
@@ -91,7 +91,7 @@
 				</small>
 			</div>
 			
-			<div class="uk-form-row toExport">
+			<div class="uk-form-row toExport toDb">
 				<?php echo $form->labelEx($model,'exportUser', ['class' => 'uk-form-label']); ?>
 				<?php echo $form->textField($model,'exportUser'); ?>
 				<?php echo $form->error($model,'exportUser'); ?>
@@ -101,7 +101,7 @@
 				</small>
 			</div>
 			
-			<div class="uk-form-row toExport">
+			<div class="uk-form-row toExport toDb">
 				<?php echo $form->labelEx($model,'exportPwd', ['class' => 'uk-form-label']); ?>
 				<?php echo $form->passwordField($model,'exportPwd'); ?>
 				<?php echo $form->error($model,'exportPwd'); ?>
@@ -111,13 +111,26 @@
 				</small>
 			</div>
 
-			<div class="uk-form-row toExport">
+			<div class="uk-form-row toExport toDb">
 				<?php echo $form->labelEx($model,'exportTable', ['class' => 'uk-form-label']); ?>
 				<?php echo $form->textField($model,'exportTable'); ?>
 				<?php echo $form->error($model,'exportTable'); ?>
 				<br>
 				<small>
 				
+				</small>
+			</div>
+
+			<div class="uk-form-row toExport toUrl">
+				<?php echo $form->labelEx($model,'exportUrl', ['class' => 'uk-form-label']); ?>
+				<?php echo $form->textField($model,'exportUrl'); ?>
+				<?php echo $form->error($model,'exportUrl'); ?>
+				<br>
+				<small>
+				As regiões definidas para exportação serão enviadas em formato JSON para a URL definida com o conteúdo
+				resultante do processamento no índice 'data'.
+				A aplicação espera retorno com status code 201 caso o registro tenha sido inserido com sucesso, 
+				qualquer outro valor será tratado como erro e o registro continuará como "Não exportado"			
 				</small>
 			</div>
 
@@ -146,6 +159,13 @@ $(document).ready(function() {
 			$('.toExport').hide();
 		} else {
 			$('.toExport').show();
+		}
+		if (val == 3) {
+			$('.toDb').hide();
+			$('.toUrl').show();
+		} else {
+			$('.toUrl').hide();
+			$('.toDb').show();
 		}
 	}
 	hideShowExport();

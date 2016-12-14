@@ -90,4 +90,10 @@ class Finalizado extends CActiveRecord
 		}
 	}
 
+	public function setAsExportado()
+	{
+      $this->exportado=1;
+      $this->update(['exportado']);
+	}
+
 }
