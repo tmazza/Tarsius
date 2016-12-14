@@ -184,8 +184,8 @@ class ProcessaCommand extends CConsoleCommand
         $active = Configuracao::getActive();
      
         # TODO: possibilitar configuração global
-        $output['exportTime'] = date('Y-m-d H:i:s');
-        $output['filename'] = pathinfo($name, PATHINFO_FILENAME);
+        $result['exportTime'] = date('Y-m-d H:i:s');
+        $result['filename'] = pathinfo($name, PATHINFO_FILENAME);
 
         $exportFileds = json_decode($this->trabalho->export, true);
         $exportContent = Trabalho::getExportContent($this->trabalho->id, $result, $exportFileds);
