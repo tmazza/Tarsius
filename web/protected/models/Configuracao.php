@@ -17,6 +17,7 @@ class Configuracao extends CActiveRecord
 	const EXPORT_WAIT = 1;
 	const EXPORT_MYSQL = 2;
 	const EXPORT_HTTP = 3;
+	const EXPORT_SQLSERVER = 4;
 
 	public static $active = false;
 
@@ -125,6 +126,7 @@ class Configuracao extends CActiveRecord
 			self::EXPORT_NONE => 'Desabilitada',
 			self::EXPORT_WAIT => 'Pendente',
 			self::EXPORT_MYSQL => 'Mysql',
+			self::EXPORT_SQLSERVER => 'SQL Server',
 			self::EXPORT_HTTP => 'Requisição HTTP/POST',
 		];
 	}
@@ -133,6 +135,12 @@ class Configuracao extends CActiveRecord
 	{
 		return $this->exportType == self::EXPORT_MYSQL;
 	}
+
+	public function isSqlServerExport()
+	{
+		return $this->exportType == self::EXPORT_SQLSERVER;
+	}
+
 
 	public function isExportEnable()
 	{

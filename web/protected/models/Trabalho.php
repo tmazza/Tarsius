@@ -245,17 +245,9 @@ class Trabalho extends CActiveRecord
             }
 
         } else {
-            # Cria modelo para export
-            $model = new Export();
-            foreach ($exportContent as $attr => $value) {
-                $model->{$attr} = $value;
-            }
-
-            if ($model->validate()) {
-                return $model->save();
-            } else {
-                throw new Exception(json_encode($model->getErrors()));
-            }
+            $active = Configuracao::getActive();
+            $table = 'CONCURSOS.dbo.LEITURA'; #    return $active->exportTable;
+            return Export::db()->createCommand()->insert($table, $exportContent) == 1;
         }
     }
 

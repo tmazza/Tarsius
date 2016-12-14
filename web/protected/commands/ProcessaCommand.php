@@ -208,13 +208,12 @@ class ProcessaCommand extends CConsoleCommand
     {
         if(!is_null($this->trabalho->perfil)) {
             $parameters = Tarsius\Tarsius::getParameters();
-            $filtered = array_filter(
-                $this->trabalho->perfil->attributes,
-                function ($key) use ($parameters) {
-                    return in_array($key, $parameters);
-                },
-                ARRAY_FILTER_USE_KEY
-            );
+            $filtered = [];
+            foreach ($this->trabalho->perfil->attributes as $key => $value) {
+                if (in_array($key, $parameters)) {
+                    $filtered[$key] = $value;
+                }
+            }
             Tarsius\Tarsius::config($filtered);
         }        
     }
