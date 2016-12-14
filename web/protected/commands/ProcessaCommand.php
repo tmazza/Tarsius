@@ -85,7 +85,7 @@ class ProcessaCommand extends CConsoleCommand
                         $form = new Tarsius\Form($imageName, $template);
                         $result = $form->evaluate();
                         $content = json_encode($result);
-                        $exported = $this->export($result);
+                        $exported = $this->export($imageName, $result['result']);
                     } catch(Exception $e) {
                         $exported = false;
                         $content = json_encode($e->getMessage() . ' <hr> ' . $e->__toString());
@@ -119,6 +119,11 @@ class ProcessaCommand extends CConsoleCommand
                 
             }
 
+            # remove todo o diretório de trabalho do processo
+            if (!rmdir($this->dirIn)) {
+                throw new Exception("Diretório '{$this->dirIn}' não pode ser removido. ");
+            }
+
             # Atualiza status do processo. Usado para controlar a distribuição
             $qtd = Processo::model()->updateAll([
                 'status'  => Processo::StatusFinalizado,
@@ -126,11 +131,6 @@ class ProcessaCommand extends CConsoleCommand
             ], "trabalho_id={$trabId} AND pid={$this->pid}");
             if ($qtd != 1) {
                 throw new Exception("Erro ao atualizar processo. PID: '{$this->pid}'.");
-            }
-
-            # remove todo o diretório de trabalho do processo
-            if (!rmdir($this->dirIn)) {
-                throw new Exception("Diretório '{$this->dirIn}' não pode ser removido. ");
             }
 
         } catch(Exception $e) {
@@ -179,13 +179,26 @@ class ProcessaCommand extends CConsoleCommand
      *
      * @param array $result
      */
-    private function export($result)
+    private function export(&$name, &$result)
     {
-        try {
+        $active = Configuracao::getActive();
+     
+        # TODO: possibilitar configuração global
+        $output['exportTime'] = date('Y-m-d H:i:s');
+        $output['filename'] = pathinfo($name, PATHINFO_FILENAME);
+
+        $exportFileds = json_decode($this->trabalho->export, true);
+        $exportContent = Trabalho::getExportContent($this->trabalho->id, $result, $exportFileds);
+
+        if ($active->isExportEnable()) {
+            return Trabalho::doExport($active, $exportContent);
+        } else if ($active->isExportWating()) {
             return false;
-        } catch(Exception $e) {
-            return false;
+        } else {
+            return true;
         }
+
+        return false;
     }
 
     /**

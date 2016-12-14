@@ -186,71 +186,95 @@ class Trabalho extends CActiveRecord
 
             $exportFileds = json_decode($trabalho->export, true);
 
-            $exportContent = [];
-            foreach ($exportFileds as $targetColumn => $outputID) {
-              if (!isset($output[$outputID])) {
-                Erro::insertOne("Região {$outputID} definida para exportação, mas não encontrada no resultado do processamento.");
-              }
-              $exportContent[$targetColumn] = $output[$outputID];
-            }
+            $exportContent = self::getExportContent($id, $output, $exportFileds);
+
 
             if ($active->isExportEnable()) {
-                if ($active->isHttpExport()) {
-
-                    $url = $active->exportUrl;
-                    $data = ['data'=>json_encode($exportContent)];
-
-                    $ch = curl_init();
-                    $options = [
-                        CURLOPT_URL => $url,
-                        CURLOPT_HEADER => false,
-                        CURLOPT_POST => true,
-                        CURLOPT_POSTFIELDS => $data,
-                        CURLOPT_RETURNTRANSFER => true,
-                    ];
-                    curl_setopt_array($ch, $options);
-
-                    curl_exec($ch);
-                    $return = curl_getinfo($ch);
-
-                    curl_close($ch);
-
-                    $code = isset($return['http_code']) ? $return['http_code'] : 500;
-
-                    if ($code == 201) {
-                        $modelFinalizado->setAsExportado();
-                    } else {
-                        throw new Exception("Falha ao exportar registro.");
-                    }
-
-                } else {
-                    # Cria modelo para export
-                    $model = new Export();
-                    foreach ($exportContent as $attr => $value) {
-                        $model->{$attr} = $value;
-                    }
-
-                    if ($model->validate()) {
-                        if ($model->save()) {
-                          $modelFinalizado->setAsExportado();
-                        }
-                    } else {
-                        throw new Exception(json_encode($model->getErrors()));
-                    }
+                if (self::doExport($active, $exportContent)) {
+                    $modelFinalizado->setAsExportado();
                 }
             } else if ($active->isExportWating()) {
                 throw new Exception("Exportação pendente. Defina como o arquivo deve ser exportado ou desabilite a exportação.");
             } else {
-              # não exporta nada e atualiza a situação do registro de finalizado exportado
-              $modelFinalizado->exportado=1;
-              $modelFinalizado->update(['exportado']);
+                $modelFinalizado->setAsExportado();
             }
         }
+
         return true;
+
       } catch(Exception $e) {
+
         Erro::insertOne($id, $e->getMessage(), $e->__toString());
         return $e->getMessage();
+
       }
+    }
+
+
+    /**
+     * Aplica exportação de acordo com o tipo definido.
+     */
+    public static function doExport(&$active, &$exportContent)
+    {
+        if ($active->isHttpExport()) {
+
+            $url = $active->exportUrl;
+            $data = ['data'=>json_encode($exportContent)];
+
+            $ch = curl_init();
+            $options = [
+                CURLOPT_URL => $url,
+                CURLOPT_HEADER => false,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $data,
+                CURLOPT_RETURNTRANSFER => true,
+            ];
+            curl_setopt_array($ch, $options);
+
+            $response = curl_exec($ch);
+            $return = curl_getinfo($ch);
+
+            curl_close($ch);
+
+            $code = isset($return['http_code']) ? $return['http_code'] : 500;
+
+            if ($code == 201) {
+                return true;
+            } else {
+                throw new Exception("Falha ao exportar registro: " . $response);
+            }
+
+        } else {
+            # Cria modelo para export
+            $model = new Export();
+            foreach ($exportContent as $attr => $value) {
+                $model->{$attr} = $value;
+            }
+
+            if ($model->validate()) {
+                return $model->save();
+            } else {
+                throw new Exception(json_encode($model->getErrors()));
+            }
+        }
+    }
+
+
+    /**
+     * Retorna array com chaves sendo o nome do atribuito definidio na exportação
+     * do trabalho e valor interpretado da região.
+     */
+    public static function getExportContent($id, &$result, &$export)
+    { 
+        $exportContent = [];
+        foreach ($export as $targetColumn => $outputID) {
+          if (isset($result[$outputID])) {
+            $exportContent[$targetColumn] = $result[$outputID];
+          } else {
+            Erro::insertOne($id, "Região {$outputID} definida para exportação, mas não encontrada no resultado do processamento.", is_null($result) ? 'SIM' : 'NAO');
+          }
+        }
+        return $exportContent;
     }
 
 }
