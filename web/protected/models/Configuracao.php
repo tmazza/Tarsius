@@ -12,6 +12,14 @@
  */
 class Configuracao extends CActiveRecord
 {
+
+	const EXPORT_NONE = 0;
+	const EXPORT_WAIT = 1;
+	const EXPORT_MYSQL = 2;
+	const EXPORT_HTTP = 3;
+
+	public static $active = false;
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -28,7 +36,7 @@ class Configuracao extends CActiveRecord
 		return array(
 			array('descricao', 'required'),
 			array('ativo, maxProcessosAtivos, maxAquivosProcessos', 'numerical', 'integerOnly'=>true),
-			array('id, ativo, descricao, maxProcessosAtivos, maxAquivosProcessos', 'safe', 'on'=>'search'),
+			array('id, ativo, descricao, maxProcessosAtivos, maxAquivosProcessos, exportType, exportHost, exportDatabase, exportPort, exportTable, exportUser, exportPwd, exportUrl', 'safe'),
 		);
 	}
 
@@ -52,6 +60,14 @@ class Configuracao extends CActiveRecord
 			'descricao' => 'Descrição',
 			'maxProcessosAtivos' => 'Limite de processo ativos',
 			'maxAquivosProcessos' => 'Limite de arquivos por processo',
+			'exportType' => 'Tipo banco de dados',
+			'exportHost' => 'Endereço (host)',
+			'exportDatabase' => 'Base de dados',
+			'exportPort' => 'Porta',
+			'exportTable' => 'Tabela',
+			'exportUser' => 'Usuário',
+			'exportPwd' => 'Senha',
+			'exportUrl' => 'URL',
 		);
 	}
 
@@ -83,6 +99,54 @@ class Configuracao extends CActiveRecord
 			'condition' => 'id = ' . $this->id,
 		]) == 1;
 
+	}
+
+	/**
+	 * Retorna o perfil de confdiguração ativo.
+	 *
+	 * @throws Exception Caso nenhum perfil esteja ativo.
+	 *
+	 * @return CActiveRecord
+	 */
+	public static function getActive()
+	{
+		if (!self::$active) {
+			self::$active = self::model()->find("ativo=1");
+			if (is_null(self::$active)) {
+				throw new Exception("Nenhum configuração ativa.");
+			}
+		}
+		return self::$active;
+	}
+
+	public static function getTipos()
+	{
+		return [
+			self::EXPORT_NONE => 'Desabilitada',
+			self::EXPORT_WAIT => 'Pendente',
+			self::EXPORT_MYSQL => 'Mysql',
+			self::EXPORT_HTTP => 'Requisição HTTP/POST',
+		];
+	}
+
+	public function isMySqlExport()
+	{
+		return $this->exportType == self::EXPORT_MYSQL;
+	}
+
+	public function isExportEnable()
+	{
+		return $this->exportType != self::EXPORT_NONE && $this->exportType != self::EXPORT_WAIT;
+	}
+	
+	public function isExportWating()
+	{
+		return $this->exportType == self::EXPORT_WAIT;
+	}
+
+	public function isHttpExport()
+	{
+		return $this->exportType == self::EXPORT_HTTP;
 	}
 
 }

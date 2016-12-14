@@ -19,7 +19,6 @@ return array(
     'components' => array(
         'urlManager'  => require __DIR__ . '/rotas.php',
         'db'          => require __DIR__ . '/database.php',
-        'dbExport'    => require __DIR__ . '/dbExport.php',
         'errorHandler' => array(
             'errorAction' => '/site/error',
         ),

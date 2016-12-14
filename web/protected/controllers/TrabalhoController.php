@@ -304,70 +304,40 @@ class TrabalhoController extends BaseController
         ]);
         foreach ($finalizadas as $f) {
            $conteudo = json_decode($f->conteudo,true);
-           if(isset($conteudo['saidaFormatada'])){
-            $this->export($id,$f,$conteudo['saidaFormatada'],basename($conteudo['arquivo']));
+           if(isset($conteudo['result'])) {
+            Trabalho::export($id, $f, $conteudo['result']);
           }
         }
         $qtd = count($finalizadas);
-        HView::fMsg($qtd . HView::plural('exportado',$qtd));
+        HView::fMsg($qtd . ' ' . HView::plural('exportado',$qtd));
         $this->redirect($this->createUrl('/trabalho/ver',[
             'id'=>$id,
         ]));
     }
     
     /**
-     * TODO: usada???
+     * Exporta um arquivo.
      */
     public function actionForcaExport($id)
     {
         $model = Distribuido::model()->findByPk((int)$id);
         $output = json_decode($model->resultado->conteudo,true);
-        if(isset($output['saidaFormatada'])) {
-            $this->export($model->trabalho_id, $model->resultado,$output['saidaFormatada'],$model->nome);
-            Yii::app()->user->setFlash('success','Export realizado.');
+        if(isset($output['result'])) {
+            $export = Trabalho::export($model->trabalho_id, $model->resultado,$output['result']);
+            if($export === true){
+              HView::fMsg('Export realizado.');
+            } else {
+              HView::fMsg($export);
+
+            }
         } else {
-            Yii::app()->user->setFlash('error','Falha ao exportar.');
+            HView::fMsg('Valores do resultado do processamento não encontrados..');
         }
         $this->redirect($this->createUrl('/trabalho/naoDistribuidas',[
             'id'=>$model->trabalho_id,
         ]));
     }
 
-    /**
-     * Exporta 1 arquivo de imagem
-     */
-    private function export($id,$controleExportada,$valor,$NomeArquivo){
-      try {
-        $trabalho = Trabalho::model()->findByPk((int) $id);
-        if(is_null($trabalho)){
-          throw new Exception('', 1);
-        } else {
-            $export = json_decode($trabalho->export,true);
-            $export = array_map(function($i) use($valor) {
-                return $valor[$i];
-            },$export);
-
-            $model = new Leitura();
-            $model->NomeArquivo = substr($NomeArquivo, 0,-4);
-            $model->attributes = $export;
-
-            if($model->validate()){
-              if($model->save()){
-                $controleExportada->exportado=1;
-                $controleExportada->update(['exportado']);
-              }
-            } else {
-              throw new Exception(json_encode($model->getErrors()), 1);
-            }
-        }
-      } catch(Exception $e){
-        $erro = new Erro;
-        $erro->trabalho_id = $id;
-        $erro->texto = $e->getMessage() . ' | ' . json_encode($e);
-        $erro->read = 0;
-        $erro->save();
-      }
-    }
 
     /**
      * Lista todos os erros que ocorrem no trabalho (erros gerados por DistribuiCommand e 

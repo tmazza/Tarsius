@@ -17,7 +17,7 @@
             </li>
         </ul>
         <ul class="uk-navbar-nav uk-hidden-small uk-margin-top uk-float-right">
-            <li class="<?=$this->id=='avaliacao'?'uk-active':'';?>">
+            <li class="<?=$this->id=='configuracao'?'uk-active':'';?>">
                    <?=CHtml::link('<i class="uk-icon uk-icon-cog"></i>',$this->createUrl('/configuracao/index'));?>
             </li>
         </ul>
