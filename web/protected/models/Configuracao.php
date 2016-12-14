@@ -13,6 +13,7 @@
 class Configuracao extends CActiveRecord
 {
 
+	const EXPORT_NONE = 0;
 	const EXPORT_MYSQL = 1;
 
 	public static $active = false;
@@ -33,7 +34,7 @@ class Configuracao extends CActiveRecord
 		return array(
 			array('descricao', 'required'),
 			array('ativo, maxProcessosAtivos, maxAquivosProcessos', 'numerical', 'integerOnly'=>true),
-			array('id, ativo, descricao, maxProcessosAtivos, maxAquivosProcessos', 'safe', 'on'=>'search'),
+			array('id, ativo, descricao, maxProcessosAtivos, maxAquivosProcessos, exportType, exportHost, exportDatabase, exportPort, exportTable, exportUser, exportPwd', 'safe'),
 		);
 	}
 
@@ -57,6 +58,13 @@ class Configuracao extends CActiveRecord
 			'descricao' => 'Descrição',
 			'maxProcessosAtivos' => 'Limite de processo ativos',
 			'maxAquivosProcessos' => 'Limite de arquivos por processo',
+			'exportType' => 'Tipo banco de dados',
+			'exportHost' => 'Endereço (host)',
+			'exportDatabase' => 'Base de dados',
+			'exportPort' => 'Porta',
+			'exportTable' => 'Tabela',
+			'exportUser' => 'Usuário',
+			'exportPwd' => 'Senha',
 		);
 	}
 
@@ -108,6 +116,13 @@ class Configuracao extends CActiveRecord
 		return self::$active;
 	}
 
+	public static function getTipos()
+	{
+		return [
+			self::EXPORT_NONE => 'Desabilitada',
+			self::EXPORT_MYSQL => 'Mysql',
+		];
+	}
 
 	public function isMySqlExport()
 	{

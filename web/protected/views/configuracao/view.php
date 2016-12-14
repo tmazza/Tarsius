@@ -15,7 +15,12 @@ $this->widget('zii.widgets.CDetailView', array(
 		'ativo',
 		'descricao',
 		'maxProcessosAtivos',
-		'maxAquivosProcessos',
+        'exportType',
+        'exportHost',
+        'exportDatabase',
+        'exportPort',
+        'exportTable',
+        'exportUser',
 	),
 ));
 ?>
