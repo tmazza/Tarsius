@@ -218,4 +218,53 @@ class ProcessaCommand extends CConsoleCommand
         }        
     }
 
+
+    /**
+     * Processa conjunto de registro definidos em $args aplicando as confirgurações de 
+     * do valor mínimo para considerar dois objetos iguais mínimo e uso do validador 
+     * de tempalte definidos. 
+     *
+     * @param array $args Conjunto de PK dos registro em Distribuido
+     * @param float $minMatch Valor mínimo para considerar dois objetos iguais
+     * @param bool $validaTemplate Se deve ser aplicada a validação do template.
+     */
+    public function actionRedo($args=[], $minMatch=0.8, $validaTemplate=true)
+    {
+        Tarsius\Tarsius::config([
+            'minMatchEllipse' => $minMatch,
+        ]);
+
+        try {
+            foreach ($args as $id) {
+                $model = Distribuido::model()->findByPk($id, "status = " . Distribuido::StatusReprocessamento);
+                
+                if (is_null($model)){
+                    throw new Exception("Arquivo para reprocessamento não encontrado. ID: '{$id}'");
+                } else {
+
+                    $template = Yii::app()->params['templatesDir'] . '/' . $model->trabalho->template . '/template.json';
+                    if (substr($model->trabalho->sourceDir, -1) !== '/') {
+                        $model->trabalho->sourceDir .= '/';
+                    }
+                    $arquivo = $model->trabalho->sourceDir . $model->nome;
+
+                    $form = new Tarsius\Form($arquivo, $template);
+                    $output = $form->evaluate();
+
+                    $model->resultado->conteudo = json_encode($output);
+                    $model->resultado->update(['conteudo']);
+                    $model->status = Distribuido::StatusAguardando;
+                    $model->update(['status']);
+
+                }
+            }
+        } catch (Exception $e) {
+            if (is_null($model)) {
+                Erro::insertOne('?', $e->getMessage(), $e->__toString());
+            } else {
+                Erro::insertOne($model->trabalho->id, $e->getMessage(), $e->__toString());
+            }
+        }
+    }
+
 }
