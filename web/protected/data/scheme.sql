@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 12, 2016 at 02:43 PM
+-- Generation Time: Dec 14, 2016 at 03:36 PM
 -- Server version: 5.7.16-0ubuntu0.16.04.1
 -- PHP Version: 7.0.8-0ubuntu0.16.04.3
 
@@ -19,6 +19,27 @@ SET time_zone = "+00:00";
 --
 -- Database: `tarsius`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `configuracao`
+--
+
+CREATE TABLE `configuracao` (
+  `id` int(11) NOT NULL,
+  `ativo` int(1) NOT NULL DEFAULT '1',
+  `descricao` text NOT NULL,
+  `maxProcessosAtivos` int(11) DEFAULT NULL,
+  `maxAquivosProcessos` int(11) NOT NULL DEFAULT '80',
+  `exportType` int(11) NOT NULL,
+  `exportHost` varchar(256) DEFAULT NULL,
+  `exportDatabase` varchar(64) DEFAULT NULL,
+  `exportPort` varchar(64) DEFAULT NULL,
+  `exportTable` varchar(64) DEFAULT NULL,
+  `exportUser` varchar(64) DEFAULT NULL,
+  `exportPwd` varchar(256) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -98,16 +119,45 @@ CREATE TABLE `trabalho` (
   `pid` int(11) DEFAULT NULL,
   `tempoDistribuicao` int(11) DEFAULT '10',
   `template` text,
-  `taxaPreenchimento` double DEFAULT '0.3',
   `distribuindo` int(11) DEFAULT '0',
   `export` text,
   `urlImagens` text,
-  `command` varchar(256) NOT NULL DEFAULT 'php'
+  `command` varchar(256) NOT NULL DEFAULT 'php',
+  `perfil_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `trabalho_perfil`
+--
+
+CREATE TABLE `trabalho_perfil` (
+  `id` int(11) NOT NULL,
+  `descricao` text NOT NULL,
+  `enableDebug` int(1) NOT NULL DEFAULT '0',
+  `threshold` int(4) NOT NULL DEFAULT '140',
+  `minArea` int(4) NOT NULL DEFAULT '500',
+  `maxArea` int(5) NOT NULL DEFAULT '4000',
+  `areaTolerance` float NOT NULL DEFAULT '0.4',
+  `minMatchObject` float NOT NULL DEFAULT '0.85',
+  `maxExpansions` int(3) NOT NULL DEFAULT '4',
+  `expasionRate` float NOT NULL DEFAULT '0.5',
+  `searchArea` int(11) NOT NULL DEFAULT '10',
+  `minMatchEllipse` float NOT NULL DEFAULT '0.3',
+  `templateValidationTolerance` int(11) NOT NULL DEFAULT '3',
+  `dynamicPointReference` int(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `configuracao`
+--
+ALTER TABLE `configuracao`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `distribuido`
@@ -144,6 +194,13 @@ ALTER TABLE `processo`
 -- Indexes for table `trabalho`
 --
 ALTER TABLE `trabalho`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_trab_perfil` (`perfil_id`);
+
+--
+-- Indexes for table `trabalho_perfil`
+--
+ALTER TABLE `trabalho_perfil`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -151,30 +208,50 @@ ALTER TABLE `trabalho`
 --
 
 --
+-- AUTO_INCREMENT for table `configuracao`
+--
+ALTER TABLE `configuracao`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+--
 -- AUTO_INCREMENT for table `distribuido`
 --
 ALTER TABLE `distribuido`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=374;
 --
 -- AUTO_INCREMENT for table `erro`
 --
 ALTER TABLE `erro`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 --
 -- AUTO_INCREMENT for table `finalizado`
 --
 ALTER TABLE `finalizado`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=295;
 --
 -- AUTO_INCREMENT for table `processo`
 --
 ALTER TABLE `processo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=137;
 --
 -- AUTO_INCREMENT for table `trabalho`
 --
 ALTER TABLE `trabalho`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+--
+-- AUTO_INCREMENT for table `trabalho_perfil`
+--
+ALTER TABLE `trabalho_perfil`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `trabalho`
+--
+ALTER TABLE `trabalho`
+  ADD CONSTRAINT `fk_trab_perfil` FOREIGN KEY (`perfil_id`) REFERENCES `trabalho_perfil` (`id`);
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
