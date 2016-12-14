@@ -12,6 +12,11 @@
  */
 class Configuracao extends CActiveRecord
 {
+
+	const EXPORT_MYSQL = 1;
+
+	public static $active = false;
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -85,4 +90,27 @@ class Configuracao extends CActiveRecord
 
 	}
 
+	/**
+	 * Retorna o perfil de confdiguração ativo.
+	 *
+	 * @throws Exception Caso nenhum perfil esteja ativo.
+	 *
+	 * @return CActiveRecord
+	 */
+	public static function getActive()
+	{
+		if (!self::$active) {
+			self::$active = self::model()->find("ativo=1");
+			if (is_null(self::$active)) {
+				throw new Exception("Nenhum configuração ativa.");
+			}
+		}
+		return self::$active;
+	}
+
+
+	public function isMySqlExport()
+	{
+		return $this->exportType == self::EXPORT_MYSQL;
+	}
 }
