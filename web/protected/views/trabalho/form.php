@@ -124,8 +124,8 @@ $this->menu = [
 		    	<?php $count = 0; ?>
 		    	<table id='export' class="uk-table uk-table-condensed">
 		    		<tr>
-		    			<th>Região no template</th>
 		    			<th>Coluna da tabela de exportação</th>
+		    			<th>Região no template</th>
 		    			<th><a href='#!' onclick="addField()" class="uk-button uk-button-primary"><b>+</b></a></th>
 		    		</tr>
 
