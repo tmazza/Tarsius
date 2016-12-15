@@ -19,6 +19,7 @@ class Processo extends CActiveRecord
 
 	const StatusExecutando = 1;
 	const StatusFinalizado = 2;
+	const StatusParadaForcada = 3;
 
 	/**
 	 * @return string the associated database table name

@@ -365,6 +365,45 @@ class TrabalhoController extends BaseController
     }
 
 
+    public function actionCancelaProcesso($id)
+    {
+        $processo = Processo::model()->findByPk((int) $id);
+        $dir = $processo->workDir;
+
+        $data = Yii::app()->db->createCommand()
+            ->select('d.id, d.nome')
+            ->from('distribuido d')
+            ->leftJoin('finalizado f', 'f.nome=d.nome and f.trabalho_id=f.trabalho_id')
+            ->where("tempDir = '{$dir}' and f.exportado IS NULL")
+            ->queryAll();
+
+
+        $dirIn = Yii::app()->params['runtimeDir'] . '/trab-' . $processo->trabalho->id . '/exec/ready/'. $dir .'/';
+        if (substr($processo->trabalho->sourceDir, -1) != '/') {
+            $processo->trabalho->sourceDir .= '/';
+        }   
+        $dirOut = $processo->trabalho->sourceDir . '/';
+        $ok = true;
+        foreach ($data as $d) {
+            if (rename($dirIn.$d['nome'], $dirOut.$d['nome'])) {
+               Distribuido::model()->deleteByPk((int) $d['id']);
+            } else {
+                $ok = false;
+            }
+        }
+
+        if ($ok) {
+            $processo->status = Processo::StatusParadaForcada;
+            $processo->update(['status']);
+            HView::fMsg('Todas as imagens foram redistribuídas.');
+        } else {
+            HView::fMsg('Algumas imagens não foram redistribuídas, acesso o diretório de trabalho para confirmar.');
+        }
+        $this->redirect($this->createUrl('/trabalho/ver',[
+            'id' => $processo->trabalho->id,
+        ]));
+    }
+
     
 
 }
