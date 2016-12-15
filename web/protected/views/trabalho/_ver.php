@@ -1,3 +1,14 @@
+<?php
+if(count($erros) > 0){
+    $link = CHtml::link('Erros encontrados',$this->createUrl('/trabalho/verErros',[
+        'id' => (int) $trabalho->id,
+    ]));
+    echo CHtml::tag('div',[
+    	'class' => 'uk-alert uk-alert-danger',
+    ], $link);
+}
+?>
+
 <?php if($trabalho->status == 2): ?>
 	<div class="uk-alert uk-alert-warning">
 		<i class="uk-icon uk-icon-spin uk-icon-spinner"></i>&nbsp;
