@@ -24,6 +24,11 @@ class ReprocessaController extends BaseController {
 
 			try {
 				$template = Yii::app()->params['templatesDir'] . '/' . $model->trabalho->template . '/template.json';
+                
+				if (substr($model->trabalho->sourceDir, -1) != '/') {
+					$model->trabalho->sourceDir .= '/';
+				}	
+				
                 $arquivo = $model->trabalho->sourceDir . $model->nome;
 
                 $anchors = [
