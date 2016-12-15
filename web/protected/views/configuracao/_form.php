@@ -159,13 +159,13 @@ $(document).ready(function() {
 			$('.toExport').hide();
 		} else {
 			$('.toExport').show();
-		}
-		if (val == 3) {
-			$('.toDb').hide();
-			$('.toUrl').show();
-		} else {
-			$('.toUrl').hide();
-			$('.toDb').show();
+			if (val == 3) {
+				$('.toDb').hide();
+				$('.toUrl').show();
+			} else {
+				$('.toUrl').hide();
+				$('.toDb').show();
+			}
 		}
 	}
 	hideShowExport();
