@@ -12,9 +12,6 @@
             <li class="<?=$this->id=='template'?'uk-active':'';?>">
                <?=CHtml::link('Templates',$this->createUrl('/template/index'));?>
             </li>
-            <li class="<?=$this->id=='avaliacao'?'uk-active':'';?>">
-               <?=CHtml::link('Avaliações',$this->createUrl('/avaliacao/index'));?>
-            </li>
         </ul>
         <ul class="uk-navbar-nav uk-hidden-small uk-margin-top uk-float-right">
             <li class="<?=$this->id=='configuracao'?'uk-active':'';?>">
