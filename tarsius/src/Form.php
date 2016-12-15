@@ -9,6 +9,7 @@ use Tarsius\ImageFactory;
 use Tarsius\Mask;
 use Tarsius\Math;
 use Tarsius\FormAnalyser;
+use Tarsius\Object;
 
 class Form
 {
@@ -66,16 +67,23 @@ class Form
     /**
      * Procesa a imagem $imageName utilizando a máscara $maskName.
      *
+     * @param array $anchorsPositons Posição das quatro âncoras que devem ser usadas como
+     * referência na definição da posição das regiões. Pontos devem ser informados em 
+     * pixel.
      */
-    public function evaluate()
+    public function evaluate($anchorsPositons = false)
     {
         $time = microtime(true);
 
         # Primeira escala considerada é baseada na resolução extraída dos meta dados da imagem
         $this->setScale($this->image->getResolution());
         
-        # Localiza as 4 âncoras da máscara        
-        $this->findAnchors();
+        # Localiza as 4 âncoras da máscara    
+        if ($anchorsPositons) {
+            $this->loadAnchors($anchorsPositons);
+        } else {
+            $this->findAnchors();
+        }
         
         # Atualiza informação de escala considerando distâncias esperada e avaliada entre as âncoras
         $a1 = $this->anchors[Mask::ANCHOR_TOP_LEFT]->getCenter();
@@ -96,6 +104,22 @@ class Form
 
     }
 
+    /**
+     * Cria objetos das âncoras definindo somente o ponto de massa.
+     * 
+     */
+    private function loadAnchors($anchorsPositons)
+    {  
+        $this->anchors[Mask::ANCHOR_TOP_LEFT] = new Object();
+        $this->anchors[Mask::ANCHOR_TOP_RIGHT] = new Object();
+        $this->anchors[Mask::ANCHOR_BOTTOM_RIGHT] = new Object();
+        $this->anchors[Mask::ANCHOR_BOTTOM_LEFT] = new Object();
+        
+        $this->anchors[Mask::ANCHOR_TOP_LEFT]->setCenter($anchorsPositons[Mask::ANCHOR_TOP_LEFT]);
+        $this->anchors[Mask::ANCHOR_TOP_RIGHT]->setCenter($anchorsPositons[Mask::ANCHOR_TOP_RIGHT]);
+        $this->anchors[Mask::ANCHOR_BOTTOM_RIGHT]->setCenter($anchorsPositons[Mask::ANCHOR_BOTTOM_RIGHT]);
+        $this->anchors[Mask::ANCHOR_BOTTOM_LEFT]->setCenter($anchorsPositons[Mask::ANCHOR_BOTTOM_LEFT]);
+    }
 
     /**
      * Busca âncoras na imagem. Inicia busca no ponto esperado da âncora definido

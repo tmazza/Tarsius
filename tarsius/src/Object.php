@@ -88,6 +88,17 @@ class Object
     }
 
     /**
+     * Altera o valor do centro do objeto
+     *
+     * @param array $center
+     */
+    public function setCenter($center)
+    {
+        $this->centro = $center;
+    }
+
+
+    /**
      * Calcula o maior raio.
      * A partir do centro calcula a distancia entre todos os pontos do   * objeto, a maior distância é selecionada.
      *
