@@ -8,7 +8,6 @@ if(count($erros) > 0){
     ], $link);
 }
 ?>
-
 <?php if($trabalho->status == 2): ?>
 	<div class="uk-alert uk-alert-warning">
 		<i class="uk-icon uk-icon-spin uk-icon-spinner"></i>&nbsp;

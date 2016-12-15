@@ -348,4 +348,23 @@ class TrabalhoController extends BaseController
         ]));
     }
 
+    /**
+     * Descarta todos os erros que tenho exatamente a mesma mensagem do 
+     * erro informado em $id
+     */
+    public function actionDeleteAllErro($id)
+    {
+        $model = Erro::model()->findByPk((int) $id);
+        $trabId = $model->trabalho_id;
+
+        Erro::model()->deleteAll("texto = '{$model->texto}'");
+
+        $this->redirect($this->createUrl('/trabalho/verErros',[
+            'id' => $trabId,
+        ]));
+    }
+
+
+    
+
 }
