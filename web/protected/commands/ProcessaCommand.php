@@ -230,11 +230,17 @@ class ProcessaCommand extends CConsoleCommand
      */
     public function actionRedo($args=[], $minMatch=0.8, $validaTemplate=true)
     {
-        Tarsius\Tarsius::config([
-            'minMatchEllipse' => $minMatch,
-        ]);
+
+        $config = [
+            'minMatchObject' => $minMatch,
+        ];
+        if (!$validaTemplate) {
+            $config['templateValidationTolerance'] = 1000;
+        }
+        Tarsius\Tarsius::config($config);
 
         try {
+
             foreach ($args as $id) {
                 $model = Distribuido::model()->findByPk($id, "status = " . Distribuido::StatusReprocessamento);
                 
@@ -246,21 +252,31 @@ class ProcessaCommand extends CConsoleCommand
                     if (substr($model->trabalho->sourceDir, -1) !== '/') {
                         $model->trabalho->sourceDir .= '/';
                     }
-                    $arquivo = $model->trabalho->sourceDir . $model->nome;
 
-                    $form = new Tarsius\Form($arquivo, $template);
-                    $output = $form->evaluate();
+                    try {
+                        
+                        $arquivo = $model->trabalho->sourceDir . $model->nome;
+                        $form = new Tarsius\Form($arquivo, $template);
+                        $output = $form->evaluate();
+                        $model->resultado->conteudo = json_encode($output);
+                        $model->resultado->update(['conteudo']);
+                    
+                    } catch(Exception $e) {
+                        
+                    }
 
-                    $model->resultado->conteudo = json_encode($output);
-                    $model->resultado->update(['conteudo']);
                     $model->status = Distribuido::StatusAguardando;
                     $model->update(['status']);
+
+
 
                 }
             }
         } catch (Exception $e) {
+
+            echo $e->getMessage();
             if (is_null($model)) {
-                Erro::insertOne('?', $e->getMessage(), $e->__toString());
+                Erro::insertOne(0, $e->getMessage(), $e->__toString());
             } else {
                 Erro::insertOne($model->trabalho->id, $e->getMessage(), $e->__toString());
             }

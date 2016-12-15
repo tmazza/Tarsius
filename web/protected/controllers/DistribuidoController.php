@@ -31,7 +31,7 @@ class DistribuidoController extends BaseController
             }
         } catch(Exception $e){
 
-            HView::fMsg(CHtml::tag('h3', [], $e->getMessage()) . CHtml::tag('pre', [], $e));                
+            HView::fMsg(CHtml::tag('pre', [], $e->getMessage()));                
 
             $this->render('verComErro',[
                 'model'=>$model,

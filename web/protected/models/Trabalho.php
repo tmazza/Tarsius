@@ -246,7 +246,7 @@ class Trabalho extends CActiveRecord
 
         } else {
             $active = Configuracao::getActive();
-            $table = 'CONCURSOS.dbo.LEITURA'; #    return $active->exportTable;
+            $table = $active->exportTable;
             return Export::db()->createCommand()->insert($table, $exportContent) == 1;
         }
     }
