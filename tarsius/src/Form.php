@@ -350,6 +350,7 @@ class Form
             'rotation' => $this->rotation,
             'regionsResult' => $detailedResult,
             'result' => $compiledResult,
+            'anchors' => array_map(function($i){ return $i->getCenter(); }, $this->anchors),
         ];
 
     }
