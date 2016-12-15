@@ -85,9 +85,14 @@ class DistribuidoController extends BaseController
             $strTempalte = file_get_contents($pathTemplate);
             $template = json_decode($strTempalte,true);
 
+            $anchors = isset($output['anchors']) ? $output['anchors'] : [];
+            if(count($anchors) > 0) {
+                imagerectangle ($original, $anchors[1][0], $anchors[1][1] , $anchors[3][0] , $anchors[3][1] , imagecolorallocate($original, 0, 255, 0) );
+                imagerectangle ($original, $anchors[2][0], $anchors[2][1] , $anchors[4][0] , $anchors[4][1] , imagecolorallocate($original, 255, 0, 0) );
+            }
+
             $escala = $output['scale'] / 25.4;
             $regioes = $output['regionsResult'];    
-
             # Desenha formas nas posições avaliadas
             foreach ($regioes as $r) {
                 if(!is_array($r[1])){ # skip OCR
