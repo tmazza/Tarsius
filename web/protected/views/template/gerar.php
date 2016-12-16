@@ -61,9 +61,11 @@ mustClose = false;
 state = 0;
 lastState = false;
 open = true;
-
+modalActive = false;
 
 function changeState(e){
+  if (!modalActive) {
+
     var keynum;
     if(window.event){ // IE
       keynum = e.keyCode;
@@ -84,6 +86,7 @@ function changeState(e){
       state = lastState;
     }
     atualizaEstado();
+  }
 }
 
 function pick(event) {
@@ -240,7 +243,16 @@ $(window).mousemove(function(e){
 });
 $(document).ready(function(){
   atualizaEstado();
-    initDraw();
+  initDraw();
+
+  $('#edicao-bloco').on({
+      'show.uk.modal': function(){
+          modalActive = true;
+      },
+      'hide.uk.modal': function(){
+          modalActive = false;
+      }
+  });
 });
 
 
@@ -257,6 +269,7 @@ function abreEdicao(){
   $('.state-config').show();
   if(state == 0) $('.not-state-0').hide();
   if(state == 1) $('.not-state-1').hide();
+  
   UIkit.modal('#edicao-bloco').show();
 }
 
@@ -300,7 +313,6 @@ setTimeout(function(){
 
 },1000);
 }
-
 
 </script>
 
