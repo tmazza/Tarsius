@@ -1,6 +1,6 @@
 <h3>Reprocessar imagem <?=$model->nome?></h3>
 
-<canvas id="myCanvas" style='border:1px solid red;'>
+<canvas id="myCanvas" style='border:1px solid red;max-width: none;'>
 Browser não suporta canvas!
 </canvas>
 
