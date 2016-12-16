@@ -6,7 +6,7 @@
   <li>(Esc) Desfaz seleção</li>
 </ul>
 <div onkeypress="" onload="updateView();">
-  <canvas id="myCanvas" width="20" height="20" style='border:1px solid red;margin:0px auto!important;display: block;'>Browser não suporta canvas!</canvas>
+  <canvas id="myCanvas" style='border:1px solid red;margin:0px auto!important;display: block!important;overflow: hidden!important;'>Browser não suporta canvas!</canvas>
   <div style="margin-bottom:200px"></div>
   <div id='pontos'></div>
   <div class='bottom-bar'>
@@ -87,6 +87,8 @@ function changeState(e){
 }
 
 function pick(event) {
+
+
   var elem = $('#myCanvas').position();
   var x = event.layerX - elem.left;
   var y = event.layerY - elem.top;
@@ -423,5 +425,7 @@ table td { border:2px solid #03a9f4; }
   opacity: 0.9;
   margin-right: 20px;
 }
+#myCanvas {
+    max-width: none;}
 -->
 </style>
