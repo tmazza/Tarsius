@@ -1,10 +1,16 @@
 <h2><?=$template?></h2>
 <br>
-<ul class="uk-list uk-margin-left">
-  <li>(E) região com elipses</li>
-  <li>(B) região com código de barras</li>
-  <li>(Esc) Desfaz seleção</li>
-</ul>
+<table class="uk-table" style="max-width:320px">
+  <tr>
+    <td class="state0" style="color:white;width:24px;text-align:center;">E</td><td>região com elipses</td>
+  </tr>
+  <tr>
+    <td class="state1" style="color:white;width:24px;text-align:center;">B</td><td>região com código de barras</td>
+  </tr>
+  <tr>
+    <td class="co">Esc</td><td>Desfaz seleção</td>
+  </tr>
+</table>
 <div onkeypress="" onload="updateView();">
   <canvas id="myCanvas" style='border:1px solid red;margin:0px auto!important;display: block!important;overflow: hidden!important;'>Browser não suporta canvas!</canvas>
   <div style="margin-bottom:200px"></div>
@@ -317,37 +323,37 @@ setTimeout(function(){
 </script>
 
 <div id="edicao-bloco" class="uk-modal">
-    <div class="uk-modal-dialog">
+    <div class="uk-modal-dialog uk-modal-dialog-large">
         <a class="uk-modal-close uk-close"></a>
         <div class="uk-modal-header">
-          <h2>Definições do bloco</h2>
+          <h3>Especificação do bloco</h3>
         </div>
+        <hr>
         <form class="uk-form uk-form-horizontal">
           <div class="uk-form-row state-config not-state-1">
-            <label class="uk-form-label">colunasPorLinha</label>
+            <label class="uk-form-label">Colunas por linha</label>
             <input name='colunasPorLinha' class="bloco-cfg" data-default='15'/><br>
           </div>
           <div class="uk-form-row state-config not-state-1">
-            <label class="uk-form-label">agrupaObjetos</label>
+            <label class="uk-form-label">Agrupar colunas de cada linha em</label>
             <input name='agrupaObjetos' class="bloco-cfg" data-default='5'/><br>
           </div>
           <div class="uk-form-row state-config not-state-1">
-            <label class="uk-form-label">minArea</label>
-             <input name='minArea'  class="bloco-cfg"  data-default='300'/><br>
-          </div>
-          <div class="uk-form-row state-config not-state-1">
-            <label class="uk-form-label">maxArea</label>
-            <input name='maxArea'  class="bloco-cfg"  data-default='3000'/><br>
+            <label class="uk-form-label">Área mínima e máxima para considerar a região um objeto</label>
+             entre
+             <input name='minArea'  class="bloco-cfg"  data-default='300' style='width:80px'/>
+             e
+            <input name='maxArea'  class="bloco-cfg"  data-default='3000' style='width:80px'/><br>
           </div>
           <div class="uk-form-row">
-            <label class="uk-form-label">id</label>
+            <label class="uk-form-label">Identificar ùnico<span class="not-state-1"> para cada região do bloco</span></label>
             <textarea name='id' style='width:600px;height:140px'; class="bloco-cfg"  id='t-id' data-default="function($b,$l,$o) {
   $idQuestao = str_pad($b*20 + $l+1,3,'0',STR_PAD_LEFT);
   return 'e-'.$idQuestao.'-'.($o+1);
 }"></textarea>
           </div>
           <div class="uk-form-row state-config not-state-1">
-            <label class="uk-form-label">casoTrue</label>
+            <label class="uk-form-label">Valor caso elipse esteja preenchida</label>
             <textarea name='casoTrue' style='width:600px;height:200px'; class="bloco-cfg"   id='t-ct' data-default="function($b,$l,$o) { 
   switch ($o){
     case 0: return 'A';
@@ -359,7 +365,7 @@ setTimeout(function(){
 }"></textarea><br>
           </div>
           <div class="uk-form-row state-config not-state-1">
-            <label class="uk-form-label">casoFalse</label>
+            <label class="uk-form-label">Valor caso elipse <b>não</b> esteja preenchida</label>
             <textarea name='casoFalse'  class="bloco-cfg" data-default="W"   id='t-cf' style='width:600px;height:140px';></textarea>
           </div>
         </form>
