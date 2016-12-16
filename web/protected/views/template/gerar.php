@@ -1,12 +1,18 @@
 <h2><?=$template?></h2>
 <br>
-<ul class="uk-list uk-margin-left">
-  <li>(E) região com elipses</li>
-  <li>(B) região com código de barras</li>
-  <li>(Esc) Desfaz seleção</li>
-</ul>
+<table class="uk-table" style="max-width:320px">
+  <tr>
+    <td class="state0" style="color:white;width:24px;text-align:center;">E</td><td>região com elipses</td>
+  </tr>
+  <tr>
+    <td class="state1" style="color:white;width:24px;text-align:center;">B</td><td>região com código de barras</td>
+  </tr>
+  <tr>
+    <td class="co">Esc</td><td>Desfaz seleção</td>
+  </tr>
+</table>
 <div onkeypress="" onload="updateView();">
-  <canvas id="myCanvas" width="20" height="20" style='border:1px solid red;margin:0px auto!important;display: block;'>Browser não suporta canvas!</canvas>
+  <canvas id="myCanvas" style='border:1px solid red;margin:0px auto!important;display: block!important;overflow: hidden!important;'>Browser não suporta canvas!</canvas>
   <div style="margin-bottom:200px"></div>
   <div id='pontos'></div>
   <div class='bottom-bar'>
@@ -61,9 +67,11 @@ mustClose = false;
 state = 0;
 lastState = false;
 open = true;
-
+modalActive = false;
 
 function changeState(e){
+  if (!modalActive) {
+
     var keynum;
     if(window.event){ // IE
       keynum = e.keyCode;
@@ -84,9 +92,12 @@ function changeState(e){
       state = lastState;
     }
     atualizaEstado();
+  }
 }
 
 function pick(event) {
+
+
   var elem = $('#myCanvas').position();
   var x = event.layerX - elem.left;
   var y = event.layerY - elem.top;
@@ -238,7 +249,16 @@ $(window).mousemove(function(e){
 });
 $(document).ready(function(){
   atualizaEstado();
-    initDraw();
+  initDraw();
+
+  $('#edicao-bloco').on({
+      'show.uk.modal': function(){
+          modalActive = true;
+      },
+      'hide.uk.modal': function(){
+          modalActive = false;
+      }
+  });
 });
 
 
@@ -255,6 +275,7 @@ function abreEdicao(){
   $('.state-config').show();
   if(state == 0) $('.not-state-0').hide();
   if(state == 1) $('.not-state-1').hide();
+  
   UIkit.modal('#edicao-bloco').show();
 }
 
@@ -299,41 +320,40 @@ setTimeout(function(){
 },1000);
 }
 
-
 </script>
 
 <div id="edicao-bloco" class="uk-modal">
-    <div class="uk-modal-dialog">
+    <div class="uk-modal-dialog uk-modal-dialog-large">
         <a class="uk-modal-close uk-close"></a>
         <div class="uk-modal-header">
-          <h2>Definições do bloco</h2>
+          <h3>Especificação do bloco</h3>
         </div>
+        <hr>
         <form class="uk-form uk-form-horizontal">
           <div class="uk-form-row state-config not-state-1">
-            <label class="uk-form-label">colunasPorLinha</label>
+            <label class="uk-form-label">Colunas por linha</label>
             <input name='colunasPorLinha' class="bloco-cfg" data-default='15'/><br>
           </div>
           <div class="uk-form-row state-config not-state-1">
-            <label class="uk-form-label">agrupaObjetos</label>
+            <label class="uk-form-label">Agrupar colunas de cada linha em</label>
             <input name='agrupaObjetos' class="bloco-cfg" data-default='5'/><br>
           </div>
           <div class="uk-form-row state-config not-state-1">
-            <label class="uk-form-label">minArea</label>
-             <input name='minArea'  class="bloco-cfg"  data-default='300'/><br>
-          </div>
-          <div class="uk-form-row state-config not-state-1">
-            <label class="uk-form-label">maxArea</label>
-            <input name='maxArea'  class="bloco-cfg"  data-default='3000'/><br>
+            <label class="uk-form-label">Área mínima e máxima para considerar a região um objeto</label>
+             entre
+             <input name='minArea'  class="bloco-cfg"  data-default='300' style='width:80px'/>
+             e
+            <input name='maxArea'  class="bloco-cfg"  data-default='3000' style='width:80px'/><br>
           </div>
           <div class="uk-form-row">
-            <label class="uk-form-label">id</label>
+            <label class="uk-form-label">Identificar ùnico<span class="not-state-1"> para cada região do bloco</span></label>
             <textarea name='id' style='width:600px;height:140px'; class="bloco-cfg"  id='t-id' data-default="function($b,$l,$o) {
   $idQuestao = str_pad($b*20 + $l+1,3,'0',STR_PAD_LEFT);
   return 'e-'.$idQuestao.'-'.($o+1);
 }"></textarea>
           </div>
           <div class="uk-form-row state-config not-state-1">
-            <label class="uk-form-label">casoTrue</label>
+            <label class="uk-form-label">Valor caso elipse esteja preenchida</label>
             <textarea name='casoTrue' style='width:600px;height:200px'; class="bloco-cfg"   id='t-ct' data-default="function($b,$l,$o) { 
   switch ($o){
     case 0: return 'A';
@@ -345,7 +365,7 @@ setTimeout(function(){
 }"></textarea><br>
           </div>
           <div class="uk-form-row state-config not-state-1">
-            <label class="uk-form-label">casoFalse</label>
+            <label class="uk-form-label">Valor caso elipse <b>não</b> esteja preenchida</label>
             <textarea name='casoFalse'  class="bloco-cfg" data-default="W"   id='t-cf' style='width:600px;height:140px';></textarea>
           </div>
         </form>
@@ -423,5 +443,7 @@ table td { border:2px solid #03a9f4; }
   opacity: 0.9;
   margin-right: 20px;
 }
+#myCanvas {
+    max-width: none;}
 -->
 </style>

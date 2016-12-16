@@ -9,7 +9,7 @@ $this->menu = [
 		<li>
 			<?=$t;?>
 			<div class="uk-float-right">
-			<?=CHtml::ajaxLink('Ver regiões',$this->createUrl('/template/preview',[
+			<?=CHtml::ajaxLink('Ver',$this->createUrl('/template/preview',[
 				'template'=>$t,
 			]),[
 				'complete'=>'js:function(html){
@@ -27,12 +27,13 @@ $this->menu = [
 			//]),[
 			//	'class'=>'uk-button uk-button-link'
 			//]);?> -->
-			<?=CHtml::link('Editar gerador',$this->createUrl('/template/editarSaida',[
+			<?=CHtml::link('Editar',$this->createUrl('/template/editarSaida',[
 				'template'=>$t,
 			]),[
 				'class'=>'uk-button uk-button-link'
 			]);?>
-			<?=CHtml::link(' Reprocessar',$this->createUrl('/template/Reprocessar',[
+			&rarr;
+			<?=CHtml::link('Aplicar edição',$this->createUrl('/template/Reprocessar',[
 				'template'=>$t,
 				'tipo'=>1,
 			]),[
