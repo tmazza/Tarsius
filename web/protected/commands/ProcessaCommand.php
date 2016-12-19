@@ -125,10 +125,11 @@ class ProcessaCommand extends CConsoleCommand
             }
 
             # Atualiza status do processo. Usado para controlar a distribuição
+            $dirIn = basename($this->dirIn);
             $qtd = Processo::model()->updateAll([
                 'status'  => Processo::StatusFinalizado,
                 'dataFim' => time(),
-            ], "trabalho_id={$trabId} AND pid={$this->pid}");
+            ], "trabalho_id={$trabId} AND workDir='{$dirIn}'");
             if ($qtd != 1) {
                 throw new Exception("Erro ao atualizar processo. PID: '{$this->pid}'.");
             }
