@@ -184,7 +184,7 @@ class Mask
             }            
 
             if (isset($data[self::VALIDATE_MASK])) {
-                $this->validateMask = $data[self::VALIDATE_MASK];
+                $this->validateMask = json_decode($data[self::VALIDATE_MASK]);
                 if (!is_array($this->validateMask)) {
                     $this->validateMask = false;
                 }
