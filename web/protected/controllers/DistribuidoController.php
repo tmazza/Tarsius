@@ -115,6 +115,4 @@ class DistribuidoController extends BaseController
         }
         return  Yii::app()->baseUrl . '/../data/runtime/trab-'.$dist->trabalho->id.'/img/'.substr($file,0,-4) . '.png';
     }
-
-
 }
