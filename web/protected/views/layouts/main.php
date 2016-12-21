@@ -8,15 +8,15 @@
             </div>
 
             <div class="uk-width-medium-1-4">
-                <div class="uk-panel">
-                    <h3 class="uk-panel-title">Ações</h3>
-                    <ul class="uk-nav uk-nav-side">
-                        <?php 
-                        foreach ($this->menu as $i)
-                            echo '<li>' . CHtml::link($i[0],$i[1],isset($i[2])?$i[2]:[]) . '</li>';
-                        ?>
-                    </ul>
-                </div>
+                <?php if (count($this->menu)): ?>
+                    <div class="uk-panel">
+                        <h3 class="uk-panel-title">Ações</h3>
+                        <ul class="uk-nav uk-nav-side">
+                            <?php foreach ($this->menu as $i)
+                                echo '<li>' . CHtml::link($i[0],$i[1],isset($i[2])?$i[2]:[]) . '</li>';?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

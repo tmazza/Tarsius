@@ -1,7 +1,5 @@
 <?php
-include_once(Yii::getPathOfAlias('webroot') . '/../src/GeraTemplate.php');
-include_once(Yii::getPathOfAlias('webroot') . '/../src/GeraTemplateDuasReferencias.php');
-include_once(Yii::getPathOfAlias('webroot') . '/../src/GeraTemplateQuatroReferencias.php');
+
 class TemplateController extends BaseController {
 
 	public $strFuncoes=[];
@@ -21,29 +19,60 @@ class TemplateController extends BaseController {
 		$model = new Template();
 
 		if(isset($_FILES['file']) && isset($_POST['nome'])){
-			$model->nome = $_POST['nome'];
-			$model->file = $_FILES['file']['name'];
+			if($_FILES['file']['error'] == UPLOAD_ERR_OK) {
+				$model->nome = $_POST['nome'];
+				$model->file = $_FILES['file']['name'];
 
-			# Cria diretorio para template
-			$dirBasename = HView::dirname($model->nome);
-			$dir = Yii::app()->params['templatesDir'] . '/' . $dirBasename ;
-			if(!is_dir($dir))
-				CFileHelper::createDirectory($dir,0777);
+				# Cria diretorio para template
+				$dirBasename = HView::dirname($model->nome);
+				$dir = Yii::app()->params['templatesDir'] . '/' . $dirBasename ;
+				if(!is_dir(Yii::app()->params['templatesDir'])){
+					CFileHelper::createDirectory(Yii::app()->params['templatesDir'],0777);
+				}
+				if(!is_dir($dir)){
+					CFileHelper::createDirectory($dir,0777);
+				}
 
-			# Move imagem para diretorio criado
-			$filename = $dir.'/base.jpg';
-			rename($_FILES['file']['tmp_name'],$filename);
-			chmod($filename,0777);
+				# Move imagem para diretorio criado
+				$filename = $dir.'/base.jpg';
+				rename($_FILES['file']['tmp_name'],$filename);
+				chmod($filename,0777);
 
-			# Rediriona para tela edição/criação
-			$this->redirect($this->createUrl('/template/editar',[
-				'template'=>$dirBasename,
-			]));
+				# Rediriona para tela edição/criação
+				$this->redirect($this->createUrl('/template/editar',[
+					'template'=>$dirBasename,
+				]));
+			} else {
+				HView::fMsg('Erro ' . $this->getUploadError($_FILES['file']['error']));
+			}
 		}
 
 		$this->render('upload',[
 			'model'=>$model,
 		]);
+	}
+
+	private function getUploadError($errorID)
+	{
+		switch ($errorID) {
+
+			case UPLOAD_ERR_INI_SIZE: 
+				return "The uploaded file exceeds the upload_max_filesize directive in php.ini.";
+			case UPLOAD_ERR_FORM_SIZE: 
+				return "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.";
+			case UPLOAD_ERR_PARTIAL: 
+				return "The uploaded file was only partially uploaded.";
+			case UPLOAD_ERR_NO_FILE: 
+				return "No file was uploaded.";
+			case UPLOAD_ERR_NO_TMP_DIR: 
+				return "Missing a temporary folder. Introduced in PHP 5.0.3.";
+			case UPLOAD_ERR_CANT_WRITE: 
+				return "Failed to write file to disk. Introduced in PHP 5.1.0.";
+			case UPLOAD_ERR_EXTENSION: 
+				return "A PHP extension stopped the file upload. PHP does not provide a way to ascertain which extension caused the file upload to stop; examining the list of loaded extensions with phpinfo() may help. Introduced in PHP 5.2.0.";
+			default:
+				return "Erro desncohecido ao fazer upload.";
+		}
 	}
 
 	public function actionEditar($template){
@@ -84,7 +113,6 @@ class TemplateController extends BaseController {
 			fclose($h);
 		}
 
-
 		$this->render('edicaoSaida',[
 			'template' => $template,
 			'content' => $content,
@@ -92,18 +120,24 @@ class TemplateController extends BaseController {
 
 	}	
 
+	/**
+	 * Gera arquivo JSON do template.
+	 */
 	public function actionReprocessar($template,$tipo=1)
 	{
-		$gerador = new GeraTemplate();
-		if($tipo == 2){
-			$gerador = new GeraTemplateDuasReferencias();
-		} elseif ($tipo == 4){
-			$gerador = new GeraTemplateQuatroReferencias();
+		ini_set("memory_limit","2048M");
+
+		$templateDir = Yii::getPathOfAlias('webroot') . '/../data/template/' . $template;
+		$config = include $templateDir . '/gerador.php';
+
+		$gerador = new Tarsius\MaskGenerator($template, $templateDir . '/base.jpg', $config);
+		try {
+			$gerador->generate();
+			HView::fMsg(CHtml::tag('h3', [], 'Reprocessamento de ' . $template . ' finalizado.'));	
+		} catch (Exception $e) {
+			HView::fMsg(CHtml::tag('h3', [], $e->getMessage()) . CHtml::tag('pre', [], $e));				
 		}
-		$dir = Yii::getPathOfAlias('webroot') . '/../data/template/' . $template;
-		$img = $dir . '/base.jpg';
-		$config = include $dir . '/gerador.php';
-		$gerador->gerarTemplate($img,$config,$this->resolucaoBase);
+
 		$this->redirect($this->createUrl('/template/index'));
 	}
 
@@ -142,9 +176,9 @@ class TemplateController extends BaseController {
 		$dir = Yii::app()->params['templatesDir'] . '/' . $template;
 
 		# formata arquivo gerador de template
-		$regioes = $this->getRegioesFormatadas($blocos,$dir);
+		$regioes = $this->getRegioesFormatadas($blocos, $dir);
 		$formatoSaida = $this->getFormatoSaida();	
-		$templateGerador = $this->getBaseGerador($template,$regioes,$formatoSaida);
+		$templateGerador = $this->getBaseGerador($template, $regioes, $formatoSaida);
 
 		# grava arquivo gerador de template
 		$handle = fopen($dir.'/'.'gerador.php', 'w+');
@@ -156,18 +190,29 @@ class TemplateController extends BaseController {
 	}
 
 	public function actionPreview($template){
-		$urlImage = Yii::app()->baseUrl . '/../data/template/'.$template.'/preview.jpg';
-		echo CHtml::image($urlImage,'',['style'=>'width:100%']);	
+		$urlImage = Yii::app()->baseUrl . '/../data/template/'.$template.'/template.png';
+		echo CHtml::tag('div', [
+			'style'=>'width:80%;margin: 0 auto;',
+		], CHtml::image($urlImage));	
 	}
 
 	/**
 	 * Gerar arquivo .json com cada uma das regiões encontradas
+	 * 
+	 * @todo unificar com reprocessar(). Faz a mesma coisa. 
+	 *
 	 */
-	private function gerarTempalteEstatico($dir){
-		$img = $dir . '/base.jpg';
+	private function gerarTempalteEstatico($dir)
+	{
+		ini_set("memory_limit","2048M");
+
 		$config = include $dir . '/gerador.php';
-		$g = new GeraTemplate();
-		$g->gerarTemplate($img,$config,$this->resolucaoBase);
+		$gerador = new Tarsius\MaskGenerator($dir, $dir . '/base.jpg', $config);
+		try {
+			$gerador->generate();
+		} catch (Exception $e) {
+			HView::fMsg(CHtml::tag('h3', [], $e->getMessage()) . CHtml::tag('pre', [], $e));				
+		}
 	}
 
 	/**
@@ -210,26 +255,14 @@ class TemplateController extends BaseController {
 	 *				usort() (http://php.net/manual/pt_BR/function.usort.php)
 	 */
 	public function getFormatoSaida(){
-		return $this->array2Str([
-		    'respostas' => [
-		      'match' => '/^e-.*-\d$/',
-		      'order' => false,
-		    ],
-	    ]);
-	}
-	
-	private function array2Str($array){
-	    $str = '';
-	    foreach ($array as $k => $v) {
-	    	if(is_string($v)){
-	    		$str .= "'{$k}' => '$v',\n";
-	    	} else if(is_bool($v)) {
-	    		$str .= "'{$k}' => " . ($v ? 'true' : 'false') . ",\n";
-	    	} else {
-	    		$str .= "'{$k}' => " . $this->array2Str($v) . ",\n";
-	    	}
-	    }
-	    return "[{$str}]";
+		return <<<DEFAULTOUTPUTFORMAT
+[
+    'respostas' => [
+      'match' => '/^e-.*-\d$/',
+	  'order' => false,
+    ],
+  ]
+DEFAULTOUTPUTFORMAT;
 	}
 
 	/**
@@ -276,17 +309,17 @@ BASEGERADOR;
 	private function getTemplateRegiao($tipo,$p1x,$p1y,$p2x,$p2y,$colPorLin,$agrupa,$minArea,$maxArea,$id,$casoTrue,$casoFalse){
 		return <<<TEMPLATEREGIAO
 [
-  'tipo' => $tipo,
-  'p1' => [$p1x,$p1y],
-  'p2' => [$p2x,$p2y],
-  'colunasPorLinha' => $colPorLin,
-  'agrupaObjetos' => $agrupa,
-  'minArea' => $minArea,
-  'maxArea' => $maxArea,
-  'id' => $id,
-  'casoTrue' => $casoTrue,
-  'casoFalse' => $casoFalse,
-],
+    'tipo' => $tipo,
+    'p1' => [$p1x,$p1y],
+    'p2' => [$p2x,$p2y],
+    'colunasPorLinha' => $colPorLin,
+    'agrupaObjetos' => $agrupa,
+    'minArea' => $minArea,
+    'maxArea' => $maxArea,
+    'id' => $id,
+    'casoTrue' => $casoTrue,
+    'casoFalse' => $casoFalse,
+  ],
 TEMPLATEREGIAO;
 	}
 

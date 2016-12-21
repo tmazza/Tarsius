@@ -8,8 +8,8 @@ $this->menu = [
 	<?php foreach ($templates as $t): ?>
 		<li>
 			<?=$t;?>
-			<div class="uk-button-group uk-align-right">
-			<?=CHtml::ajaxLink('Ver regiões',$this->createUrl('/template/preview',[
+			<div class="uk-float-right">
+			<?=CHtml::ajaxLink('Ver',$this->createUrl('/template/preview',[
 				'template'=>$t,
 			]),[
 				'complete'=>'js:function(html){
@@ -20,42 +20,38 @@ $this->menu = [
 			],[
 				'class'=>'uk-button uk-button-link'
 			]);?>
-			<?//=CHtml::link('Editar',$this->createUrl('/template/editar',[
+			<!-- <?
+			# TODO
+			//=CHtml::link('Editar',$this->createUrl('/template/editar',[
 			//	'template'=>$t,
 			//]),[
 			//	'class'=>'uk-button uk-button-link'
-			//]);?>
-			<?=CHtml::link('Editar gerador',$this->createUrl('/template/editarSaida',[
+			//]);?> -->
+			<?=CHtml::link('Editar',$this->createUrl('/template/editarSaida',[
 				'template'=>$t,
 			]),[
 				'class'=>'uk-button uk-button-link'
 			]);?>
-			<div class="uk-button">Reprocessa: </div>
-			<?=CHtml::link(' 1',$this->createUrl('/template/Reprocessar',[
+			&rarr;
+			<?=CHtml::link('Aplicar edição',$this->createUrl('/template/Reprocessar',[
 				'template'=>$t,
 				'tipo'=>1,
 			]),[
-				'class'=>'uk-button uk-button-link'
+				'class'=>'uk-button uk-button-link',
+				'onclick'=>'$(this).html("<i class=\"uk-icon-spinner uk-icon-spin\"></i> Reprocessando");',
 			]);?>
-			<?=CHtml::link(' 2',$this->createUrl('/template/Reprocessar',[
-				'template'=>$t,
-				'tipo'=>2,
-			]),[
-				'class'=>'uk-button uk-button-link'
-			]);?>
-			<?=CHtml::link(' 4',$this->createUrl('/template/Reprocessar',[
-				'template'=>$t,
-				'tipo'=>4,
-			]),[
-				'class'=>'uk-button uk-button-link'
-			]);?>
-			<div class="uk-button"> | </div>
 			<?=CHtml::link('<i class="uk-icon uk-icon-trash"></i>',$this->createUrl('/template/excluir',[
 				'template'=>$t,
 			]),[
 				'class'=>'uk-button uk-button-link',
 				'confirm'=>'Certeza?'
 			]);?>
+
+			</div>
+			<div class="uk-dropdown">
+			    <ul class="uk-nav uk-nav-dropdown">
+			    	
+			    </ul>
 			</div>
 		</li>
 	<?php endforeach; ?>

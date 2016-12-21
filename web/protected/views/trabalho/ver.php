@@ -48,6 +48,7 @@ if($trabalho->status == 2){
 	 	'processado'=>$processado,
 	 	'processosAtivos'=>$processosAtivos,
 	 	'naoExportadas'=>$naoExportadas,
+	 	'erros'=>$erros,
 	]); ?>
 </div>
 

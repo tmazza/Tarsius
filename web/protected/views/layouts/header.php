@@ -12,8 +12,10 @@
             <li class="<?=$this->id=='template'?'uk-active':'';?>">
                <?=CHtml::link('Templates',$this->createUrl('/template/index'));?>
             </li>
-            <li class="<?=$this->id=='avaliacao'?'uk-active':'';?>">
-               <?=CHtml::link('Avaliações',$this->createUrl('/avaliacao/index'));?>
+        </ul>
+        <ul class="uk-navbar-nav uk-hidden-small uk-margin-top uk-float-right">
+            <li class="<?=$this->id=='configuracao'?'uk-active':'';?>">
+                   <?=CHtml::link('<i class="uk-icon uk-icon-cog"></i>',$this->createUrl('/configuracao/index'));?>
             </li>
         </ul>
         <a href="#offcanvas" class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas></a>

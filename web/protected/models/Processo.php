@@ -17,7 +17,9 @@
 class Processo extends CActiveRecord
 {
 
-	// const StatusExecutando = 1;
+	const StatusExecutando = 1;
+	const StatusFinalizado = 2;
+	const StatusParadaForcada = 3;
 
 	/**
 	 * @return string the associated database table name
@@ -50,51 +52,6 @@ class Processo extends CActiveRecord
 	}
 
 	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-			'id' => 'ID',
-			'pid' => 'Pid',
-			'status' => 'Status',
-			'trabalho_id' => 'Trabalho',
-			'workDir' => 'Work Dir',
-			'qtd' => 'Qtd',
-		);
-	}
-
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 *
-	 * Typical usecase:
-	 * - Initialize the model fields with values from filter form.
-	 * - Execute this method to get CActiveDataProvider instance which will filter
-	 * models according to data in model fields.
-	 * - Pass data provider to CGridView, CListView or any similar widget.
-	 *
-	 * @return CActiveDataProvider the data provider that can return the models
-	 * based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('id',$this->id);
-		$criteria->compare('pid',$this->pid);
-		$criteria->compare('status',$this->status);
-		$criteria->compare('trabalho_id',$this->trabalho_id);
-		$criteria->compare('workDir',$this->workDir,true);
-		$criteria->compare('qtd',$this->qtd);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
-
-	/**
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
@@ -103,5 +60,19 @@ class Processo extends CActiveRecord
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
+	}
+
+	public static function insertOne($pid, $dirHash, $qtdArquivos, $trabId)
+	{
+        $model = new Processo();
+        $model->status = 1;
+        $model->pid = $pid;
+        $model->trabalho_id = $trabId;
+        $model->workDir = $dirHash;
+        $model->qtd = $qtdArquivos;
+        $model->dataInicio = time();
+        if (!$model->save()) {
+        	throw new Exception("Falha ao inserir registro de processo {$pid}.");
+        }
 	}
 }

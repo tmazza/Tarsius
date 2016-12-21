@@ -18,5 +18,4 @@
 		<h3>Não encontrado.</h3>
 		<hr>
 	<?php endif; ?>
-	<h5><?=$msg?></h5>
 <?php endif; ?>

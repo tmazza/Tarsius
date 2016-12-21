@@ -9,12 +9,10 @@ $this->menu = [
 <!-- <div contenteditable=true id=asd><?=CHtml::encode($content);?></div> -->
 <textarea id=asd style="width:100%;height:640px;"><?=CHtml::encode($content);?></textarea>
 </pre>
-<button onclick="enviar()">Atualizar</button>
-<br><br>
-Dicas
+<button onclick="enviar()" class="uk-button uk-button-primary">Atualizar</button>
 <br><br>
 <div>
-Definição de campo para validar tempalte:
+Definição de campo para validar template:
 <pre>'validaReconhecimento' => ['ID-REGIAO','VALOR-ESPERADO'],</pre>
 Definição de saída agrupando mais de uma região.
 <pre>

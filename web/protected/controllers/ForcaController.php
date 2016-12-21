@@ -1,5 +1,5 @@
 <?php
-include_once(Yii::getPathOfAlias('webroot') . '/../src/Image.php');
+
 class ForcaController extends BaseController {
 
 	public function actionIndex($id,$msg=false){
@@ -57,7 +57,7 @@ class ForcaController extends BaseController {
 
 		$ids = implode(' ', $ids);
 		$validaTemplate = (int) $validaTemplate;
-	    $cmd = 'hhvm ' . Yii::getPathOfAlias('application') .'/tarsius processa reprocessa';
+	    $cmd = 'php ' . Yii::getPathOfAlias('application') .'/tarsius processa redo';
 	    $cmd .= " {$ids}";
 	    $cmd .= " --minMatch={$minMatch}";
 	    $cmd .= " --validaTemplate={$validaTemplate}";

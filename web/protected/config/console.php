@@ -10,7 +10,6 @@ return array(
     'language' => 'pt_br',
     'components' => array(
         'db'          => require __DIR__ . '/database.php',
-        'dbExport'    => require __DIR__ . '/dbExport.php',
         'errorHandler' => array(
             'errorAction' => '/site/error',
         ),
@@ -36,7 +35,8 @@ return array(
         ),
     ),
     'params' => [
-        'templatesDir'=>__DIR__.'/../../../data/template',
-        'urlBase'=>'https://imagens-concursos.ufrgs.br/',
+        'templatesDir' => __DIR__. '/../../../data/template',
+        'runtimeDir' => __DIR__. '/../../../data/runtime',
+        'urlBase' => 'https://imagens-concursos.ufrgs.br/',
     ],
 );
