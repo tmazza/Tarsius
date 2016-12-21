@@ -382,7 +382,7 @@ class TrabalhoController extends BaseController
         if (substr($processo->trabalho->sourceDir, -1) != '/') {
             $processo->trabalho->sourceDir .= '/';
         }   
-        $dirOut = $processo->trabalho->sourceDir . '/';
+        $dirOut = $processo->trabalho->sourceDir;
         $ok = true;
         foreach ($data as $d) {
             if (rename($dirIn.$d['nome'], $dirOut.$d['nome'])) {
