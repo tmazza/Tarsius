@@ -120,14 +120,33 @@ $this->menu[] = ['Voltar',$this->createUrl('/trabalho/ver',[
 		</li>
 	<?php endforeach; ?>
 </ul>
-
-Min match
-<input type="text" name="minMatch" value="0.75" /> 
-<br>
-<label for='checkbox-validartemplate'>
+<div class="uk-alert">
+	<b>Reprocessar com: </b>
+	<br>
+	Preenchimento mínimo elipses
+	<input type="text" name="minMatch" value="0.75" /> 
+	<br>
+	<label for='checkbox-validartemplate'>
 	<input type="checkbox" name="validaTemplate" id='checkbox-validartemplate' checked="" />
 	Validar template
-</label>
+	</label>
+</div>
+OU<br>
+<div class="uk-alert">
+	<br>
+	<label>
+		<input type="radio" name="descartar" value="1" />
+		Descartar
+		<small>Não será reprocessado</small>
+	</label>
+	<br>
+	<label>
+		<input type="radio" name="descartar" value="2" />
+		Reler
+		<small>Será reprocessado</small>
+	</label>
+</div>
+<br><br>
 <br>
 
 <?=CHtml::endForm();?>

@@ -72,7 +72,7 @@ if(count($erros) > 0){
 				  </tr>
 				  <tr>
 				    <td colspan="2" class="uk-text-right"> 
-				    	<?=CHtml::link('Refazer não processadas', $this->createUrl('/trabalho/cancelaProcesso',[
+				    	<?=CHtml::link('Redistribuir', $this->createUrl('/trabalho/cancelaProcesso',[
 				    		'id' => $p['id'],
 				    	]))?>
 				    </td>

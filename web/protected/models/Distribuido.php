@@ -20,6 +20,7 @@ class Distribuido extends CActiveRecord
 	const StatusParado = 3;
 	const StatusAguardando = 1;
 	const StatusReprocessamento = 4;
+	const StatusDescartado = 5;
 
 
 	/**
@@ -122,5 +123,15 @@ class Distribuido extends CActiveRecord
         	throw new Exception("Falha ao inserir registro {$file} em distribuído.");
         }
 	}
+
+
+
+    public function descartar()
+    {
+        $this->status = self::StatusDescartado;
+        $this->update(['status']);
+    }
+
+
 
 }
