@@ -15,5 +15,8 @@
     },
     "require-dev": {
         "phpdocumentor/phpdocumentor": "^2.9"
+    },
+    "scripts": {
+        "pre-install-cmd": "php init.php"        
     }
 }
