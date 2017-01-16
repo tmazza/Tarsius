@@ -29,19 +29,30 @@ class ForcaController extends BaseController {
 		set_time_limit(0);
 		$minMatch = (float) $_POST['minMatch'];
 		$validaTemplate = isset($_POST['validaTemplate']) ? (bool) $_POST['validaTemplate'] : false;
-		$folhas = $_POST['folha'];
+		$folhas = isset($_POST['folha']) ? $_POST['folha'] : [];
 
+		$descartar = isset($_POST['descartar']) ? $_POST['descartar'] : false;
+		if ($descartar) {
+			foreach ($folhas as $f) {
+				$model = Distribuido::model()->findByPk((int) $f);
+				$trabalho = $model->trabalho_id;
+				$nome = $model->nome;
 
-		$chuncks = array_chunk($folhas, ceil(count($folhas)/16));	
+				if($descartar == 1) { # descarta registro, não precisará ser relido
+					$model->descartar();
+				} else { # ficará como não distribuído, será reprocessado na distribuição
+					$model->delete();
+				}
 
-		foreach ($chuncks as $ids) {
-			$this->processar($ids,$minMatch,$validaTemplate);
+				Finalizado::model()->deleteAll("trabalho_id = {$trabalho} AND nome = '{$nome}'");
+			}
+		} elseif(count($folhas) > 0) {
+			$chuncks = array_chunk($folhas, ceil(count($folhas)/16));	
+			foreach ($chuncks as $ids) {
+				$this->processar($ids,$minMatch,$validaTemplate);
+			}
 		}
-
 		$this->redirect(Yii::app()->request->urlReferrer);
-		// $this->render('emMassa',[
-		// 	'resultados'=>$resultados,
-		// ]);
 	}
 
 	private function processar($ids,$minMatch,$validaTemplate=true)
