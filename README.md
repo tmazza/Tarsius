@@ -83,7 +83,7 @@ Sendo tarsius o diretório em [./tarsius](./tarsius).
 
 ## Uso
 
-Ao final dos passos descritoas acima a aplicação estará acessível em `http://localhost/tarsius`.
+Ao final dos passos descritos acima a aplicação estará acessível em `http://localhost/tarsius`.
 
 Próximas etapas (documentação em criação) 
 
@@ -92,7 +92,7 @@ Próximas etapas (documentação em criação)
 * Criação de uma trabalho
 * Definir exportação dos resultados
   
-
+Para mais informações, guias e tutoriais sobre o projeto acesse a [Wiki](https://github.com/ufrgs/tarsius/wiki/) do repositório.
 
 
 
